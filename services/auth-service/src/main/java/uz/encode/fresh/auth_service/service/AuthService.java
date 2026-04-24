@@ -1,5 +1,9 @@
 package uz.encode.fresh.auth_service.service;
 
-public class AuthService {
-    
+import uz.encode.fresh.auth_service.dto.AuthRequest;
+
+public interface AuthService {
+    String register(AuthRequest request);
+
+    String login(AuthRequest request);
 }
