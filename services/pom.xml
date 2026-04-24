@@ -1,0 +1,22 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>uz.encode.fresh</groupId>
+    <artifactId>booking-platform</artifactId>
+    <version>1.0.0</version>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>common</module>
+        <module>auth-service</module>
+        <module>user-service</module>
+        <module>core-service</module>
+        <module>notification-service</module>
+    </modules>
+
+    <properties>
+        <java.version>17</java.version>
+        <spring.boot.version>3.2.5</spring.boot.version>
+    </properties>
+</project>
