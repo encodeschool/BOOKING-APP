@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 @Table(name = "services")
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
 public class ServiceEntity {
 
     @Id

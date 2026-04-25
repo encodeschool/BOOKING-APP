@@ -1,0 +1,22 @@
+server:
+  port: 8081
+
+jwt:
+  secret: mysupersecuresecretkeythatisatleast32characterslong123
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/auth_db
+    username: postgres
+    password: postgres
+
+  application:
+    name: auth-service
+
+eureka:
+  instance:
+    prefer-ip-address: true
+    ip-address: 127.0.0.1
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/

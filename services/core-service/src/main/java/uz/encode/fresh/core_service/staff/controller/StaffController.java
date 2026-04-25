@@ -14,7 +14,7 @@ import uz.encode.fresh.core_service.staff.dto.UpdateStaffRequest;
 import uz.encode.fresh.core_service.staff.service.StaffService;
 
 @RestController
-@RequestMapping("/staff")
+@RequestMapping("/api/staff")
 public class StaffController {
 
     @Autowired

@@ -14,7 +14,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @RestController
-@RequestMapping("/working-hours")
+@RequestMapping("/api/working-hours")
 public class WorkingHoursController {
 
     @Autowired

@@ -13,11 +13,4 @@ public class BusinessResponse {
     public String name;
     public String address;
     public String phone;
-
-    public BusinessResponse(Long id, String name, String address, String phone) {
-        this.id = id;
-        this.name = name;
-        this.address = address;
-        this.phone = phone;
-    }
 }

@@ -12,7 +12,7 @@ import uz.encode.fresh.auth_service.dto.AuthResponse;
 import uz.encode.fresh.auth_service.service.AuthService;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 public class AuthController {
 
     @Autowired
@@ -20,7 +20,7 @@ public class AuthController {
 
     @PostMapping("/register")
     public AuthResponse register(@Valid @RequestBody AuthRequest request) {
-        return new AuthResponse(service.register(request));
+        return service.register(request);
     }
 
     @PostMapping("/login")

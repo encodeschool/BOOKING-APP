@@ -15,7 +15,7 @@ import uz.encode.fresh.core_service.business.entity.Business;
 import uz.encode.fresh.core_service.business.service.BusinessService;
 
 @RestController
-@RequestMapping("/businesses")
+@RequestMapping("/api/businesses")
 public class BusinessController {
 
     @Autowired

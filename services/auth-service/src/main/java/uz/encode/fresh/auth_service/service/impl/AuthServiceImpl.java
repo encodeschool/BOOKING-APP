@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 import lombok.AllArgsConstructor;
 import uz.encode.fresh.auth_service.dto.AuthRequest;
+import uz.encode.fresh.auth_service.dto.AuthResponse;
 import uz.encode.fresh.auth_service.entity.User;
 import uz.encode.fresh.auth_service.repository.UserRepository;
 import uz.encode.fresh.auth_service.security.JwtUtil;
@@ -19,7 +20,8 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public String register(AuthRequest request) {
+    public AuthResponse register(AuthRequest request) {
+
         if (repo.findByEmail(request.getEmail()).isPresent()) {
             throw new RuntimeException("User already exists");
         }
@@ -28,9 +30,11 @@ public class AuthServiceImpl implements AuthService {
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
 
-        repo.save(user);
+        User saved = repo.save(user);
 
-        return jwtUtil.generateToken(user.getEmail());
+        String token = jwtUtil.generateToken(saved.getId(), saved.getEmail());
+
+        return new AuthResponse(saved.getId(), saved.getEmail(), token);
     }
 
     @Override
@@ -42,6 +46,6 @@ public class AuthServiceImpl implements AuthService {
             throw new RuntimeException("Invalid password");
         }
 
-        return jwtUtil.generateToken(user.getEmail());
+        return jwtUtil.generateToken(user.getId(), user.getEmail());
     }
 }

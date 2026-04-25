@@ -1,6 +1,8 @@
 spring:
   profiles:
     active: dev
-    
-jwt:
-  secret: mysupersecuresecretkeythatisatleast32characterslong123
+  application:
+    name: core-service
+
+  config:
+    import: optional:configserver:http://localhost:8088

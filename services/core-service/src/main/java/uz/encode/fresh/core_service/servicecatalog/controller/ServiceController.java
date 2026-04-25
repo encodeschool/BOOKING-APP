@@ -15,7 +15,7 @@ import uz.encode.fresh.core_service.servicecatalog.dto.UpdateServiceRequest;
 import uz.encode.fresh.core_service.servicecatalog.service.ServiceCatalogService;
 
 @RestController
-@RequestMapping("/services")
+@RequestMapping("/api/services")
 public class ServiceController {
 
     @Autowired

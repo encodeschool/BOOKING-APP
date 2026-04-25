@@ -2,49 +2,105 @@
   "version": "0.2.0",
   "configurations": [
     
+    // ==================== AUTH SERVICE ====================
     {
       "type": "java",
       "name": "Auth Service (DEV)",
       "request": "launch",
       "mainClass": "uz.encode.fresh.auth_service.AuthServiceApplication",
-      "vmArgs": "-Dspring.profiles.active=dev"
+      "vmArgs": "-Dspring.profiles.active=dev",
+      "projectName": "auth-service"
     },
     {
       "type": "java",
       "name": "Auth Service (PROD)",
       "request": "launch",
       "mainClass": "uz.encode.fresh.auth_service.AuthServiceApplication",
-      "vmArgs": "-Dspring.profiles.active=prod"
+      "vmArgs": "-Dspring.profiles.active=prod",
+      "projectName": "auth-service"
     },
 
+    // ==================== USER SERVICE ====================
     {
       "type": "java",
       "name": "User Service (DEV)",
       "request": "launch",
       "mainClass": "uz.encode.fresh.user_service.UserServiceApplication",
-      "vmArgs": "-Dspring.profiles.active=dev"
+      "vmArgs": "-Dspring.profiles.active=dev",
+      "projectName": "user-service"
     },
     {
       "type": "java",
       "name": "User Service (PROD)",
       "request": "launch",
       "mainClass": "uz.encode.fresh.user_service.UserServiceApplication",
-      "vmArgs": "-Dspring.profiles.active=prod"
+      "vmArgs": "-Dspring.profiles.active=prod",
+      "projectName": "user-service"
     },
 
+    // ==================== CORE SERVICE ====================
     {
       "type": "java",
       "name": "Core Service (DEV)",
       "request": "launch",
       "mainClass": "uz.encode.fresh.core_service.CoreServiceApplication",
-      "vmArgs": "-Dspring.profiles.active=dev"
+      "vmArgs": "-Dspring.profiles.active=dev",
+      "projectName": "core-service"
     },
     {
       "type": "java",
       "name": "Core Service (PROD)",
       "request": "launch",
       "mainClass": "uz.encode.fresh.core_service.CoreServiceApplication",
-      "vmArgs": "-Dspring.profiles.active=prod"
+      "vmArgs": "-Dspring.profiles.active=prod",
+      "projectName": "core-service"
+    },
+
+    // ==================== API GATEWAY ====================
+    {
+      "type": "java",
+      "name": "API Gateway (DEV)",
+      "request": "launch",
+      "mainClass": "uz.encode.fresh.api_gateway.ApiGatewayApplication",
+      "vmArgs": "-Dspring.profiles.active=dev",
+      "projectName": "api-gateway"
+    },
+    {
+      "type": "java",
+      "name": "API Gateway (PROD)",
+      "request": "launch",
+      "mainClass": "uz.encode.fresh.api_gateway.ApiGatewayApplication",
+      "vmArgs": "-Dspring.profiles.active=prod",
+      "projectName": "api-gateway"
+    },
+
+    // ==================== CONFIG SERVER ====================
+    {
+      "type": "java",
+      "name": "Config Server",
+      "request": "launch",
+      "mainClass": "uz.encode.fresh.config_server.ConfigServerApplication",
+      "projectName": "config-server"
+    },
+
+    // ==================== COMMON SECURITY ====================
+    {
+      "type": "java",
+      "name": "Common Security (DEV)",
+      "request": "launch",
+      "mainClass": "uz.encode.fresh.common_security.CommonSecurityApplication",
+      "vmArgs": "-Dspring.profiles.active=dev",
+      "projectName": "common-security"
+    },
+
+    // ==================== SERVICE REGISTRY ====================
+
+    {
+      "type": "java",
+      "name": "Service Registry",
+      "request": "launch",
+      "mainClass": "uz.encode.fresh.service_registry.ServiceRegistryApplication",
+      "projectName": "service-registry"
     }
 
   ]
