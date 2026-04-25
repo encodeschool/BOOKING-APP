@@ -1,0 +1,17 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Run Auth DEV",
+      "type": "shell",
+      "command": "mvn spring-boot:run -Dspring-boot.run.profiles=dev",
+      "group": "build"
+    },
+    {
+      "label": "Run Auth PROD",
+      "type": "shell",
+      "command": "mvn spring-boot:run -Dspring-boot.run.profiles=prod",
+      "group": "build"
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    
+    {
+      "type": "java",
+      "name": "Auth Service (DEV)",
+      "request": "launch",
+      "mainClass": "uz.encode.fresh.auth_service.AuthServiceApplication",
+      "vmArgs": "-Dspring.profiles.active=dev"
+    },
+    {
+      "type": "java",
+      "name": "Auth Service (PROD)",
+      "request": "launch",
+      "mainClass": "uz.encode.fresh.auth_service.AuthServiceApplication",
+      "vmArgs": "-Dspring.profiles.active=prod"
+    },
+
+    {
+      "type": "java",
+      "name": "User Service (DEV)",
+      "request": "launch",
+      "mainClass": "uz.encode.fresh.user_service.UserServiceApplication",
+      "vmArgs": "-Dspring.profiles.active=dev"
+    },
+    {
+      "type": "java",
+      "name": "User Service (PROD)",
+      "request": "launch",
+      "mainClass": "uz.encode.fresh.user_service.UserServiceApplication",
+      "vmArgs": "-Dspring.profiles.active=prod"
+    },
+
+    {
+      "type": "java",
+      "name": "Core Service (DEV)",
+      "request": "launch",
+      "mainClass": "uz.encode.fresh.core_service.CoreServiceApplication",
+      "vmArgs": "-Dspring.profiles.active=dev"
+    },
+    {
+      "type": "java",
+      "name": "Core Service (PROD)",
+      "request": "launch",
+      "mainClass": "uz.encode.fresh.core_service.CoreServiceApplication",
+      "vmArgs": "-Dspring.profiles.active=prod"
+    }
+
+  ]
+}
