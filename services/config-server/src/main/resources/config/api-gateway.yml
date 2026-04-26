@@ -20,6 +20,11 @@ spring:
           predicates:
             - Path=/api/auth/**
 
+        - id: booking-service
+          uri: lb://BOOKING-SERVICE
+          predicates:
+            - Path=/api/bookings/**
+
 eureka:
   client:
     service-url:

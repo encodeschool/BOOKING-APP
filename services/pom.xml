@@ -11,6 +11,7 @@
         <module>auth-service</module>
         <module>user-service</module>
         <module>core-service</module>
+        <module>booking-service</module>
         <module>api-gateway</module>
         <module>config-server</module>
         <module>service-registry</module>

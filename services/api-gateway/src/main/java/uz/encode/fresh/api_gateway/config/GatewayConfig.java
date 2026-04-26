@@ -13,6 +13,7 @@ public class GatewayConfig {
 
         return http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
+                .cors(cors -> {})
                 .authorizeExchange(ex -> ex
                         .pathMatchers("/api/auth/**").permitAll()
                         .anyExchange().permitAll() // gateway should NOT block traffic

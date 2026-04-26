@@ -1,0 +1,22 @@
+package uz.encode.fresh.booking_service.service;
+
+import java.util.List;
+
+import uz.encode.fresh.booking_service.dto.BookingResponse;
+import uz.encode.fresh.booking_service.dto.CreateBookingRequest;
+import uz.encode.fresh.booking_service.dto.UpdateBookingStatusRequest;
+
+public interface BookingService {
+
+    BookingResponse create(Long clientId, CreateBookingRequest request);
+
+    List<BookingResponse> getClientBookings(Long clientId);
+
+    List<BookingResponse> getBusinessBookings(Long ownerId, Long businessId);
+
+    BookingResponse getBooking(Long requesterId, Long bookingId);
+
+    BookingResponse updateBusinessStatus(Long ownerId, Long bookingId, UpdateBookingStatusRequest request);
+
+    BookingResponse cancelByClient(Long clientId, Long bookingId, String reason);
+}

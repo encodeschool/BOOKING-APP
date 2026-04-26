@@ -1,0 +1,13 @@
+server:
+  port: 8084
+
+spring:
+  datasource:
+    url: jdbc:postgresql://prod-db:5432/booking_db
+    username: postgres
+    password: postgres
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
