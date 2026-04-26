@@ -15,7 +15,7 @@
         <module>api-gateway</module>
         <module>config-server</module>
         <module>service-registry</module>
-        <!-- <module>notification-service</module> -->
+        <module>notification-service</module>
     </modules>
 
     <properties>

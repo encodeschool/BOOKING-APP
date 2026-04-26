@@ -27,6 +27,7 @@ public class StaffServiceImpl implements StaffService {
         Staff s = new Staff();
         s.setBusinessId(req.businessId);
         s.setName(req.name);
+        s.setSpecialization(req.specialization);
         s.setRole(req.role);
         s.setPhone(req.phone);
 
@@ -66,10 +67,22 @@ public class StaffServiceImpl implements StaffService {
         repo.delete(s);
     }
 
+    @Override
+    public List<Staff> getByBusinessPublic(Long businessId) {
+        return repo.findByBusinessIdAndActiveTrue(businessId);
+    }
+
+    @Override
+    public Staff getById(Long id) {
+        return repo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Staff not found"));
+    }
+
     private StaffResponse map(Staff s) {
         StaffResponse r = new StaffResponse();
         r.id = s.getId();
         r.name = s.getName();
+        r.specialization = s.getSpecialization();
         r.role = s.getRole();
         r.phone = s.getPhone();
         r.active = s.getActive();

@@ -1,9 +1,9 @@
 package uz.encode.fresh.core_service.servicecatalog.service.impl;
 
 
-import org.springframework.stereotype.Service;
-
 import java.util.List;
+
+import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 import uz.encode.fresh.core_service.business.service.BusinessAuthorizationService;
@@ -80,5 +80,16 @@ public class ServiceCatalogServiceImpl implements ServiceCatalogService {
         r.durationMinutes = s.getDurationMinutes();
         r.active = s.getActive();
         return r;
+    }
+
+    @Override
+    public List<ServiceEntity> getByBusinessPublic(Long businessId) {
+        return repo.findByBusinessIdAndActive(businessId, true);
+    }
+
+    @Override
+    public ServiceEntity getById(Long id) {
+        return repo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Service not found"));
     }
 }

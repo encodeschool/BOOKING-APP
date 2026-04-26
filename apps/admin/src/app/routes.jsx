@@ -7,6 +7,8 @@ import ServicesPage from "../pages/Services/ServicesPage";
 import StaffPage from "../pages/Staff/StaffPage";
 import BookingsPage from "../pages/Bookings/BookingsPage";
 import SettingsPage from "../pages/Settings/WorkingHoursPage";
+import UsersPage from "../pages/Users/UsersPage";
+import CalendarPage from "../pages/Calendar/CalendarPage";
 
 function ProtectedRoute({ children }) {
   const token = localStorage.getItem("admin-token");
@@ -66,6 +68,26 @@ function AppRoutes() {
           <ProtectedRoute>
             <AdminLayout>
               <BookingsPage />
+            </AdminLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/users"
+        element={
+          <ProtectedRoute>
+            <AdminLayout>
+              <UsersPage />
+            </AdminLayout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/calendar"
+        element={
+          <ProtectedRoute>
+            <AdminLayout>
+              <CalendarPage />
             </AdminLayout>
           </ProtectedRoute>
         }

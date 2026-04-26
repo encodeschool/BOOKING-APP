@@ -4,7 +4,9 @@ public class ServiceResponse {
 
     public Long id;
     public String name;
+    public String description;
     public Double price;
-    public Integer durationMinutes;
+    public Integer duration;
     public Boolean active;
+    public Integer durationMinutes;
 }

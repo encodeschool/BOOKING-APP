@@ -23,8 +23,11 @@ public class BusinessServiceImpl implements BusinessService {
         Business b = new Business();
         b.setOwnerId(ownerId);
         b.setName(req.name);
+        b.setDescription(req.description);
         b.setAddress(req.address);
         b.setPhone(req.phone);
+        b.setCategory(req.category);
+        b.setWorkingHours(req.workingHours);
 
         return repo.save(b);
     }
@@ -49,5 +52,16 @@ public class BusinessServiceImpl implements BusinessService {
         }
 
         repo.delete(b);
+    }
+
+    @Override
+    public List<Business> getAllBusinesses() {
+        return repo.findAll();
+    }
+
+    @Override
+    public Business getBusinessById(Long id) {
+        return repo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Business not found"));
     }
 }

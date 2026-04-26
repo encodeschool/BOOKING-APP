@@ -4,6 +4,7 @@ import java.util.List;
 
 import uz.encode.fresh.booking_service.dto.BookingResponse;
 import uz.encode.fresh.booking_service.dto.CreateBookingRequest;
+import uz.encode.fresh.booking_service.dto.CreatePublicBookingRequest;
 import uz.encode.fresh.booking_service.dto.UpdateBookingStatusRequest;
 
 public interface BookingService {
@@ -19,4 +20,8 @@ public interface BookingService {
     BookingResponse updateBusinessStatus(Long ownerId, Long bookingId, UpdateBookingStatusRequest request);
 
     BookingResponse cancelByClient(Long clientId, Long bookingId, String reason);
+
+    BookingResponse createPublicBooking(CreatePublicBookingRequest request);
+
+    List<String> getAvailableSlots(Long businessId, Long serviceId, String date);
 }

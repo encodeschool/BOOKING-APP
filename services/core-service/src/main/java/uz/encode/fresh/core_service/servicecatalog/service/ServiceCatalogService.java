@@ -17,4 +17,7 @@ public interface ServiceCatalogService {
 
     void delete(Long id, Long ownerId);
     
+    List<ServiceEntity> getByBusinessPublic(Long businessId);
+
+    ServiceEntity getById(Long id);
 }

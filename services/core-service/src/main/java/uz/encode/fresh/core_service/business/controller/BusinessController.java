@@ -32,8 +32,11 @@ public class BusinessController {
         return new BusinessResponse(
                 b.getId(),
                 b.getName(),
+                b.getDescription(),
                 b.getAddress(),
-                b.getPhone()
+                b.getPhone(),
+                b.getCategory(),
+                b.getWorkingHours()
         );
     }
 
@@ -47,8 +50,11 @@ public class BusinessController {
                 .map(b -> new BusinessResponse(
                         b.getId(),
                         b.getName(),
+                        b.getDescription(),
                         b.getAddress(),
-                        b.getPhone()
+                        b.getPhone(),
+                        b.getCategory(),
+                        b.getWorkingHours()
                 ))
                 .toList();
     }

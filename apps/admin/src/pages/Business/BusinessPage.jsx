@@ -13,6 +13,7 @@ export default function BusinessesPage() {
     address: "",
     phone: "",
   });
+  const [search, setSearch] = useState("");
 
   async function handleCreate() {
     try {
@@ -25,13 +26,18 @@ export default function BusinessesPage() {
     }
   }
 
+  const filteredBusinesses = businesses.filter(business =>
+    business.name.toLowerCase().includes(search.toLowerCase()) ||
+    business.address.toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold text-gray-800">Businesses</h1>
         <button
           onClick={() => setShowForm(true)}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2"
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow-sm"
         >
           <span>+</span> Add Business
         </button>
@@ -43,19 +49,19 @@ export default function BusinessesPage() {
           <div className="space-y-4">
             <input
               placeholder="Name"
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
             />
             <input
               placeholder="Address"
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               value={form.address}
               onChange={(e) => setForm({ ...form, address: e.target.value })}
             />
             <input
               placeholder="Phone"
-              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               value={form.phone}
               onChange={(e) => setForm({ ...form, phone: e.target.value })}
             />
@@ -77,7 +83,18 @@ export default function BusinessesPage() {
         </div>
       )}
 
-      <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+      {/* Search Panel */}
+      <div className="bg-white p-4 rounded-2xl shadow-sm mb-6">
+        <input
+          type="text"
+          placeholder="Search businesses..."
+          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+      </div>
+
+      <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
         <table className="w-full">
           <thead className="bg-gray-50">
             <tr>
@@ -96,7 +113,7 @@ export default function BusinessesPage() {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {businesses.map((business) => (
+            {filteredBusinesses.map((business) => (
               <tr key={business.id} className="hover:bg-gray-50">
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                   {business.name}
@@ -108,13 +125,18 @@ export default function BusinessesPage() {
                   {business.phone}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  <button className="text-blue-600 hover:text-blue-900 mr-2">Edit</button>
+                  <button className="text-blue-600 hover:text-blue-900 mr-3">Edit</button>
                   <button className="text-red-600 hover:text-red-900">Delete</button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
+        {filteredBusinesses.length === 0 && businesses.length > 0 && (
+          <div className="text-center py-8 text-gray-500">
+            No businesses match your search.
+          </div>
+        )}
         {businesses.length === 0 && (
           <div className="text-center py-8 text-gray-500">
             No businesses found. Click "Add Business" to create one.

@@ -11,6 +11,7 @@ import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import uz.encode.fresh.booking_service.dto.BookingResponse;
 import uz.encode.fresh.booking_service.dto.CreateBookingRequest;
+import uz.encode.fresh.booking_service.dto.CreatePublicBookingRequest;
 import uz.encode.fresh.booking_service.dto.UpdateBookingStatusRequest;
 import uz.encode.fresh.booking_service.entity.Booking;
 import uz.encode.fresh.booking_service.integration.CoreServiceClient;
@@ -48,7 +49,8 @@ public class BookingServiceImpl implements BookingService {
         validateBusinessRelations(request, service, staff);
         validateAvailability(request, service, staff);
 
-        LocalTime endTime = request.startTime.plusMinutes(service.durationMinutes());
+        LocalTime startTime = LocalTime.parse(request.bookingTime);
+        LocalTime endTime = startTime.plusMinutes(service.durationMinutes());
 
         Booking booking = new Booking();
         booking.setClientId(clientId);
@@ -56,7 +58,7 @@ public class BookingServiceImpl implements BookingService {
         booking.setServiceId(service.id());
         booking.setStaffId(staff.id());
         booking.setBookingDate(request.bookingDate);
-        booking.setStartTime(request.startTime);
+        booking.setStartTime(startTime);
         booking.setEndTime(endTime);
         booking.setStatus(BookingStatus.PENDING);
         booking.setNotes(request.notes);
@@ -130,6 +132,118 @@ public class BookingServiceImpl implements BookingService {
         return toResponse(bookingRepository.save(booking));
     }
 
+    @Override
+    @Transactional
+    public BookingResponse createPublicBooking(CreatePublicBookingRequest request) {
+        BusinessDetailsResponse business = getBusiness(request.businessId);
+        ServiceDetailsResponse service = getService(request.serviceId);
+
+        StaffDetailsResponse staff = null;
+        if (request.staffId != null) {
+            staff = getStaff(request.staffId);
+            // Skip validation for public bookings - we'll validate during actual booking creation
+        }
+
+        // For public bookings, we'll create a temporary client ID or handle differently
+        // For now, let's use a default client ID or create a new client record
+        Long clientId = createOrGetPublicClient(request);
+
+        // Create a modified request for internal processing
+        CreateBookingRequest internalRequest = new CreateBookingRequest();
+        internalRequest.businessId = request.businessId;
+        internalRequest.serviceId = request.serviceId;
+        internalRequest.staffId = request.staffId != null ? request.staffId : getAvailableStaff(request.businessId);
+        internalRequest.bookingDate = request.bookingDate;
+        internalRequest.bookingTime = request.bookingTime;
+        internalRequest.customerName = request.customerName;
+        internalRequest.customerEmail = request.customerEmail;
+        internalRequest.customerPhone = request.customerPhone;
+        internalRequest.notes = request.notes;
+
+        return create(clientId, internalRequest);
+    }
+
+    private Long createOrGetPublicClient(CreatePublicBookingRequest request) {
+        // For public bookings, we need to create a temporary client
+        // In a real implementation, this would create a client record in the user service
+        // For now, we'll use a default public client ID
+        // TODO: Integrate with user service to create proper client records
+        // TODO: Store customer information (name, email, phone) in booking or separate table
+        return -1L; // Default public client ID
+    }
+
+    private Long getAvailableStaff(Long businessId) {
+        // Get all staff for the business and return the first available one
+        List<StaffDetailsResponse> staffList = coreServiceClient.getStaffByBusiness(businessId);
+        return staffList.stream()
+                .filter(staff -> Boolean.TRUE.equals(staff.active()))
+                .findFirst()
+                .map(StaffDetailsResponse::id)
+                .orElseThrow(() -> new IllegalArgumentException("No available staff found"));
+    }
+
+    @Override
+    public List<String> getAvailableSlots(Long businessId, Long serviceId, String date) {
+        LocalDate bookingDate = LocalDate.parse(date);
+        ServiceDetailsResponse service = getService(serviceId);
+        WorkingHoursResponse workingHours = getWorkingHours(businessId, bookingDate.getDayOfWeek());
+
+        if (workingHours.closed() || workingHours.startTime() == null || workingHours.endTime() == null) {
+            return List.of();
+        }
+
+        List<String> availableSlots = new java.util.ArrayList<>();
+        LocalTime currentTime = workingHours.startTime();
+
+        // Get all active staff for this business
+        List<StaffDetailsResponse> staffList = coreServiceClient.getStaffByBusiness(businessId);
+
+        while (currentTime.isBefore(workingHours.endTime())) {
+            LocalTime endTime = currentTime.plusMinutes(service.durationMinutes());
+
+            if (endTime.isAfter(workingHours.endTime())) {
+                break;
+            }
+
+            // Check if slot is available for at least one staff member
+            boolean isAvailable = false;
+            for (StaffDetailsResponse staff : staffList) {
+                if (Boolean.TRUE.equals(staff.active())) {
+                    boolean hasOverlappingBooking = bookingRepository.existsOverlappingBooking(
+                            staff.id(),
+                            bookingDate,
+                            currentTime,
+                            endTime,
+                            ACTIVE_BOOKING_STATUSES
+                    );
+
+                    if (!hasOverlappingBooking) {
+                        // Check if staff hasn't exceeded daily limit
+                        long bookingCount = bookingRepository.countByStaffIdAndBookingDateAndStatusIn(
+                                staff.id(),
+                                bookingDate,
+                                ACTIVE_BOOKING_STATUSES
+                        );
+
+                        Integer maxBookings = staff.maxBookingsPerDay() != null ? staff.maxBookingsPerDay() : 20;
+                        if (bookingCount < maxBookings) {
+                            isAvailable = true;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (isAvailable) {
+                availableSlots.add(currentTime.toString());
+            }
+
+            currentTime = currentTime.plusMinutes(30); // 30-minute intervals
+        }
+
+        return availableSlots;
+    }
+
     private void validateBusinessRelations(CreateBookingRequest request,
                                            ServiceDetailsResponse service,
                                            StaffDetailsResponse staff) {
@@ -157,7 +271,8 @@ public class BookingServiceImpl implements BookingService {
             throw new IllegalArgumentException("Booking date cannot be in the past");
         }
 
-        if (request.bookingDate.isEqual(LocalDate.now()) && request.startTime.isBefore(LocalTime.now())) {
+        LocalTime startTime = LocalTime.parse(request.bookingTime);
+        if (request.bookingDate.isEqual(LocalDate.now()) && startTime.isBefore(LocalTime.now())) {
             throw new IllegalArgumentException("Booking time cannot be in the past");
         }
 
@@ -165,8 +280,8 @@ public class BookingServiceImpl implements BookingService {
             throw new IllegalArgumentException("Service duration is invalid");
         }
 
-        LocalTime endTime = request.startTime.plusMinutes(service.durationMinutes());
-        if (!endTime.isAfter(request.startTime)) {
+        LocalTime endTime = startTime.plusMinutes(service.durationMinutes());
+        if (!endTime.isAfter(startTime)) {
             throw new IllegalArgumentException("Booking end time is invalid");
         }
 
@@ -180,7 +295,7 @@ public class BookingServiceImpl implements BookingService {
             throw new IllegalArgumentException("Working hours are not configured for the selected day");
         }
 
-        if (request.startTime.isBefore(workingHours.startTime()) || endTime.isAfter(workingHours.endTime())) {
+        if (startTime.isBefore(workingHours.startTime()) || endTime.isAfter(workingHours.endTime())) {
             throw new IllegalArgumentException("Booking time is outside working hours");
         }
 
@@ -197,7 +312,7 @@ public class BookingServiceImpl implements BookingService {
         boolean overlaps = bookingRepository.existsOverlappingBooking(
                 staff.id(),
                 request.bookingDate,
-                request.startTime,
+                startTime,
                 endTime,
                 ACTIVE_BOOKING_STATUSES
         );

@@ -11,4 +11,6 @@ import uz.encode.fresh.core_service.servicecatalog.entity.ServiceEntity;
 public interface ServiceRepository extends JpaRepository<ServiceEntity, Long> {
 
     List<ServiceEntity> findByBusinessId(Long businessId);
+
+    List<ServiceEntity> findByBusinessIdAndActive(Long businessId, Boolean active);
 }

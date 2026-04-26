@@ -14,5 +14,7 @@ public interface BusinessService {
 
     void delete(Long id, Long ownerId);
 
-    
+    List<Business> getAllBusinesses();
+
+    Business getBusinessById(Long id);
 }

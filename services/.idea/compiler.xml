@@ -11,6 +11,7 @@
         <module name="common-security" />
         <module name="config-server" />
         <module name="service-registry" />
+        <module name="notification-service" />
       </profile>
       <profile name="Annotation profile for booking-platform" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />

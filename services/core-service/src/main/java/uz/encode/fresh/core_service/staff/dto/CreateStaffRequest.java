@@ -11,6 +11,8 @@ public class CreateStaffRequest {
     @NotBlank
     public String name;
 
+    public String specialization;
+
     public String role;
     public String phone;
 }

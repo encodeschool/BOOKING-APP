@@ -17,4 +17,7 @@ public interface StaffService {
 
     void delete(Long id, Long ownerId);
 
+    List<Staff> getByBusinessPublic(Long businessId);
+
+    Staff getById(Long id);
 }

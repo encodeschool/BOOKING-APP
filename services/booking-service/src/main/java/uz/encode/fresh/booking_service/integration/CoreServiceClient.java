@@ -1,6 +1,7 @@
 package uz.encode.fresh.booking_service.integration;
 
 import java.time.DayOfWeek;
+import java.util.List;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +23,9 @@ public interface CoreServiceClient {
 
     @GetMapping("/api/internal/staff/{id}")
     StaffDetailsResponse getStaff(@PathVariable("id") Long id);
+
+    @GetMapping("/api/internal/staff/business/{businessId}")
+    List<StaffDetailsResponse> getStaffByBusiness(@PathVariable("businessId") Long businessId);
 
     @GetMapping("/api/internal/working-hours/{businessId}/{dayOfWeek}")
     WorkingHoursResponse getWorkingHours(@PathVariable("businessId") Long businessId,
