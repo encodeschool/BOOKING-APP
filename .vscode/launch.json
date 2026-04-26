@@ -59,18 +59,9 @@
     // ==================== API GATEWAY ====================
     {
       "type": "java",
-      "name": "API Gateway (DEV)",
+      "name": "API Gateway",
       "request": "launch",
       "mainClass": "uz.encode.fresh.api_gateway.ApiGatewayApplication",
-      "vmArgs": "-Dspring.profiles.active=dev",
-      "projectName": "api-gateway"
-    },
-    {
-      "type": "java",
-      "name": "API Gateway (PROD)",
-      "request": "launch",
-      "mainClass": "uz.encode.fresh.api_gateway.ApiGatewayApplication",
-      "vmArgs": "-Dspring.profiles.active=prod",
       "projectName": "api-gateway"
     },
 
@@ -81,16 +72,6 @@
       "request": "launch",
       "mainClass": "uz.encode.fresh.config_server.ConfigServerApplication",
       "projectName": "config-server"
-    },
-
-    // ==================== COMMON SECURITY ====================
-    {
-      "type": "java",
-      "name": "Common Security (DEV)",
-      "request": "launch",
-      "mainClass": "uz.encode.fresh.common_security.CommonSecurityApplication",
-      "vmArgs": "-Dspring.profiles.active=dev",
-      "projectName": "common-security"
     },
 
     // ==================== SERVICE REGISTRY ====================

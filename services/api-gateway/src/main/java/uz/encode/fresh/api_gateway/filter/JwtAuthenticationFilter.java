@@ -1,25 +1,44 @@
 package uz.encode.fresh.api_gateway.filter;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import reactor.core.publisher.Mono;
+import java.nio.charset.StandardCharsets;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
+import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
-import org.springframework.web.server.*;
+import org.springframework.web.server.ServerWebExchange;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
+import reactor.core.publisher.Mono;
+
+import javax.crypto.SecretKey;
 
 
 @Component
+@Order(-1)
 public class JwtAuthenticationFilter implements GlobalFilter {
 
     @Value("${jwt.secret}")
     private String secret;
 
+    private SecretKey signingKey() {
+        return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+    }
+
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+
+        String path = exchange.getRequest().getURI().getPath();
+
+        // ❌ skip auth endpoints
+        if (path.startsWith("/api/auth")) {
+            return chain.filter(exchange);
+        }
 
         ServerHttpRequest request = exchange.getRequest();
 
@@ -37,13 +56,13 @@ public class JwtAuthenticationFilter implements GlobalFilter {
 
         try {
             Claims claims = Jwts.parser()
-                    .setSigningKey(secret)
+                    .setSigningKey(signingKey())
                     .parseClaimsJws(token)
                     .getBody();
 
-            // inject user info into request headers
             ServerHttpRequest mutatedRequest = request.mutate()
                     .header("X-User-Id", claims.getSubject())
+                    .header("X-User-Email", claims.get("email", String.class))
                     .build();
 
             return chain.filter(exchange.mutate()
@@ -51,7 +70,7 @@ public class JwtAuthenticationFilter implements GlobalFilter {
                     .build());
 
         } catch (Exception e) {
-            exchange.getResponse().setStatusCode(org.springframework.http.HttpStatus.UNAUTHORIZED);
+            exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
             return exchange.getResponse().setComplete();
         }
     }

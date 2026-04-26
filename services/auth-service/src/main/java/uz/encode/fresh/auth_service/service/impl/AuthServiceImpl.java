@@ -2,11 +2,14 @@ package uz.encode.fresh.auth_service.service.impl;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import lombok.AllArgsConstructor;
 import uz.encode.fresh.auth_service.dto.AuthRequest;
 import uz.encode.fresh.auth_service.dto.AuthResponse;
 import uz.encode.fresh.auth_service.entity.User;
+import uz.encode.fresh.auth_service.integration.UserServiceClient;
+import uz.encode.fresh.auth_service.integration.dto.CreateUserProfileRequest;
 import uz.encode.fresh.auth_service.repository.UserRepository;
 import uz.encode.fresh.auth_service.security.JwtUtil;
 import uz.encode.fresh.auth_service.service.AuthService;
@@ -18,8 +21,10 @@ public class AuthServiceImpl implements AuthService {
     private final UserRepository repo;
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
+    private final UserServiceClient userServiceClient;
 
     @Override
+    @Transactional
     public AuthResponse register(AuthRequest request) {
 
         if (repo.findByEmail(request.getEmail()).isPresent()) {
@@ -31,6 +36,7 @@ public class AuthServiceImpl implements AuthService {
         user.setPassword(passwordEncoder.encode(request.getPassword()));
 
         User saved = repo.save(user);
+        userServiceClient.createUser(new CreateUserProfileRequest(saved.getId(), saved.getEmail()));
 
         String token = jwtUtil.generateToken(saved.getId(), saved.getEmail());
 
@@ -38,7 +44,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public String login(AuthRequest request) {
+    public AuthResponse login(AuthRequest request) {
         User user = repo.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -46,6 +52,9 @@ public class AuthServiceImpl implements AuthService {
             throw new RuntimeException("Invalid password");
         }
 
-        return jwtUtil.generateToken(user.getId(), user.getEmail());
+        userServiceClient.createUser(new CreateUserProfileRequest(user.getId(), user.getEmail()));
+
+        String token = jwtUtil.generateToken(user.getId(), user.getEmail());
+        return new AuthResponse(user.getId(), user.getEmail(), token);
     }
 }

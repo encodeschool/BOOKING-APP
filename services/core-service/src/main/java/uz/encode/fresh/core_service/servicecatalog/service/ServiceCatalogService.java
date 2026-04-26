@@ -9,12 +9,12 @@ import uz.encode.fresh.core_service.servicecatalog.entity.ServiceEntity;
 
 public interface ServiceCatalogService {
     
-    ServiceResponse create(CreateServiceRequest req);
+    ServiceResponse create(Long ownerId, CreateServiceRequest req);
 
-    List<ServiceResponse> getByBusiness(Long businessId);
+    List<ServiceResponse> getByBusiness(Long businessId, Long ownerId);
 
-    ServiceResponse update(Long id, UpdateServiceRequest req);
+    ServiceResponse update(Long id, Long ownerId, UpdateServiceRequest req);
 
-    void delete(Long id);
+    void delete(Long id, Long ownerId);
     
 }

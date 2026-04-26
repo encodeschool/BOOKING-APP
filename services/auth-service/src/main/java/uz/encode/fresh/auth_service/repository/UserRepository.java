@@ -8,6 +8,6 @@ import org.springframework.stereotype.Repository;
 import uz.encode.fresh.auth_service.entity.User;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, Object> {
+public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
 }

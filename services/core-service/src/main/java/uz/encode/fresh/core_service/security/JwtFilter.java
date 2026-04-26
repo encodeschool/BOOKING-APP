@@ -1,18 +1,34 @@
 package uz.encode.fresh.core_service.security;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import jakarta.servlet.*;
-import jakarta.servlet.http.*;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Collections;
+
+import javax.crypto.SecretKey;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import java.io.IOException;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
 
-    private final String secret = "mysecretkey123456";
+    @Value("${jwt.secret}")
+    private String secret;
+
+    private SecretKey signingKey() {
+        return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -27,11 +43,18 @@ public class JwtFilter extends OncePerRequestFilter {
 
             try {
                 Claims claims = Jwts.parser()
-                        .setSigningKey(secret)
+                        .setSigningKey(signingKey())
                         .parseClaimsJws(token)
                         .getBody();
 
-                request.setAttribute("userId", Long.parseLong(claims.getSubject()));
+                Long userId = Long.parseLong(claims.getSubject());
+                String email = claims.get("email", String.class);
+
+                request.setAttribute("userId", userId);
+                request.setAttribute("email", email);
+                SecurityContextHolder.getContext().setAuthentication(
+                        new UsernamePasswordAuthenticationToken(email, null, Collections.emptyList())
+                );
 
             } catch (Exception e) {
                 response.setStatus(401);

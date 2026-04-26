@@ -9,12 +9,12 @@ import uz.encode.fresh.core_service.staff.entity.Staff;
 
 public interface StaffService {
     
-    StaffResponse create(CreateStaffRequest req);
+    StaffResponse create(Long ownerId, CreateStaffRequest req);
     
-    List<StaffResponse> getByBusiness(Long businessId);
+    List<StaffResponse> getByBusiness(Long businessId, Long ownerId);
 
-    StaffResponse update(Long id, UpdateStaffRequest req);
+    StaffResponse update(Long id, Long ownerId, UpdateStaffRequest req);
 
-    void delete(Long id);
+    void delete(Long id, Long ownerId);
 
 }

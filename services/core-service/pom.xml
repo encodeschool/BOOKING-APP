@@ -85,13 +85,6 @@
             <artifactId>jjwt-jackson</artifactId>
         </dependency>
 
-        <!-- SHARED SECURITY -->
-        <dependency>
-            <groupId>uz.encode.fresh</groupId>
-            <artifactId>common-security</artifactId>
-            <version>1.0.0</version>
-        </dependency>
-
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>

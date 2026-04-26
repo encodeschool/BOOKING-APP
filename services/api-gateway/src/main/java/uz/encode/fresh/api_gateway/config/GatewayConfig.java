@@ -15,7 +15,7 @@ public class GatewayConfig {
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(ex -> ex
                         .pathMatchers("/api/auth/**").permitAll()
-                        .anyExchange().authenticated()
+                        .anyExchange().permitAll() // gateway should NOT block traffic
                 )
                 .build();
     }

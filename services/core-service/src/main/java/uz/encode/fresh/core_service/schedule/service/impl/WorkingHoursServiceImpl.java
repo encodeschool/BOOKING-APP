@@ -2,25 +2,26 @@ package uz.encode.fresh.core_service.schedule.service.impl;
 
 import org.springframework.stereotype.Service;
 
-import java.time.DayOfWeek;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
+import lombok.RequiredArgsConstructor;
+import uz.encode.fresh.core_service.business.service.BusinessAuthorizationService;
 import uz.encode.fresh.core_service.schedule.dto.WorkingHoursRequest;
 import uz.encode.fresh.core_service.schedule.entity.WorkingHours;
 import uz.encode.fresh.core_service.schedule.repository.WorkingHoursRepository;
 import uz.encode.fresh.core_service.schedule.service.WorkingHoursService;
 
 @Service
+@RequiredArgsConstructor
 public class WorkingHoursServiceImpl implements WorkingHoursService {
 
-    @Autowired
-    private WorkingHoursRepository repo;
+    private final WorkingHoursRepository repo;
+    private final BusinessAuthorizationService businessAuthorizationService;
 
     // CREATE OR UPDATE (UPSERT)
     @Override
-    public WorkingHours save(WorkingHoursRequest req) {
+    public WorkingHours save(Long ownerId, WorkingHoursRequest req) {
+        businessAuthorizationService.assertOwner(req.businessId, ownerId);
 
         validate(req);
 
@@ -41,11 +42,9 @@ public class WorkingHoursServiceImpl implements WorkingHoursService {
     }
 
     @Override
-    public List<WorkingHours> getByBusiness(Long businessId) {
-        return repo.findAll()
-                .stream()
-                .filter(w -> w.getBusinessId().equals(businessId))
-                .toList();
+    public List<WorkingHours> getByBusiness(Long businessId, Long ownerId) {
+        businessAuthorizationService.assertOwner(businessId, ownerId);
+        return repo.findAllByBusinessId(businessId);
     }
 
     // VALIDATION LOGIC (VERY IMPORTANT)

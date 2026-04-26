@@ -5,8 +5,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
+import lombok.RequiredArgsConstructor;
+import uz.encode.fresh.core_service.business.service.BusinessAuthorizationService;
 import uz.encode.fresh.core_service.servicecatalog.dto.CreateServiceRequest;
 import uz.encode.fresh.core_service.servicecatalog.dto.ServiceResponse;
 import uz.encode.fresh.core_service.servicecatalog.dto.UpdateServiceRequest;
@@ -15,13 +15,15 @@ import uz.encode.fresh.core_service.servicecatalog.repository.ServiceRepository;
 import uz.encode.fresh.core_service.servicecatalog.service.ServiceCatalogService;
 
 @Service
+@RequiredArgsConstructor
 public class ServiceCatalogServiceImpl implements ServiceCatalogService {
 
-    @Autowired
-    private ServiceRepository repo;
+    private final ServiceRepository repo;
+    private final BusinessAuthorizationService businessAuthorizationService;
 
     @Override
-    public ServiceResponse create(CreateServiceRequest req) {
+    public ServiceResponse create(Long ownerId, CreateServiceRequest req) {
+        businessAuthorizationService.assertOwner(req.businessId, ownerId);
 
         ServiceEntity s = new ServiceEntity();
         s.setBusinessId(req.businessId);
@@ -36,7 +38,8 @@ public class ServiceCatalogServiceImpl implements ServiceCatalogService {
     }
 
     @Override
-    public List<ServiceResponse> getByBusiness(Long businessId) {
+    public List<ServiceResponse> getByBusiness(Long businessId, Long ownerId) {
+        businessAuthorizationService.assertOwner(businessId, ownerId);
         return repo.findByBusinessId(businessId)
                 .stream()
                 .map(this::mapToResponse)
@@ -44,10 +47,11 @@ public class ServiceCatalogServiceImpl implements ServiceCatalogService {
     }
 
     @Override
-    public ServiceResponse update(Long id, UpdateServiceRequest req) {
+    public ServiceResponse update(Long id, Long ownerId, UpdateServiceRequest req) {
 
         ServiceEntity s = repo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Service not found"));
+        businessAuthorizationService.assertOwner(s.getBusinessId(), ownerId);
 
         if (req.name != null) s.setName(req.name);
         if (req.price != null) s.setPrice(req.price);
@@ -61,8 +65,11 @@ public class ServiceCatalogServiceImpl implements ServiceCatalogService {
     }
 
     @Override
-    public void delete(Long id) {
-        repo.deleteById(id);
+    public void delete(Long id, Long ownerId) {
+        ServiceEntity s = repo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Service not found"));
+        businessAuthorizationService.assertOwner(s.getBusinessId(), ownerId);
+        repo.delete(s);
     }
 
     private ServiceResponse mapToResponse(ServiceEntity s) {

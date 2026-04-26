@@ -2,9 +2,10 @@ package uz.encode.fresh.core_service.staff.service.impl;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import lombok.RequiredArgsConstructor;
+import uz.encode.fresh.core_service.business.service.BusinessAuthorizationService;
 import uz.encode.fresh.core_service.staff.dto.CreateStaffRequest;
 import uz.encode.fresh.core_service.staff.dto.StaffResponse;
 import uz.encode.fresh.core_service.staff.dto.UpdateStaffRequest;
@@ -13,13 +14,15 @@ import uz.encode.fresh.core_service.staff.repository.StaffRepository;
 import uz.encode.fresh.core_service.staff.service.StaffService;
 
 @Service
+@RequiredArgsConstructor
 public class StaffServiceImpl implements StaffService {
 
-    @Autowired
-    private StaffRepository repo;
+    private final StaffRepository repo;
+    private final BusinessAuthorizationService businessAuthorizationService;
 
     @Override
-    public StaffResponse create(CreateStaffRequest req) {
+    public StaffResponse create(Long ownerId, CreateStaffRequest req) {
+        businessAuthorizationService.assertOwner(req.businessId, ownerId);
 
         Staff s = new Staff();
         s.setBusinessId(req.businessId);
@@ -32,7 +35,8 @@ public class StaffServiceImpl implements StaffService {
     }
 
     @Override
-    public List<StaffResponse> getByBusiness(Long businessId) {
+    public List<StaffResponse> getByBusiness(Long businessId, Long ownerId) {
+        businessAuthorizationService.assertOwner(businessId, ownerId);
         return repo.findByBusinessId(businessId)
                 .stream()
                 .map(this::map)
@@ -40,10 +44,11 @@ public class StaffServiceImpl implements StaffService {
     }
 
     @Override
-    public StaffResponse update(Long id, UpdateStaffRequest req) {
+    public StaffResponse update(Long id, Long ownerId, UpdateStaffRequest req) {
 
         Staff s = repo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Staff not found"));
+        businessAuthorizationService.assertOwner(s.getBusinessId(), ownerId);
 
         if (req.name != null) s.setName(req.name);
         if (req.role != null) s.setRole(req.role);
@@ -54,8 +59,11 @@ public class StaffServiceImpl implements StaffService {
     }
 
     @Override
-    public void delete(Long id) {
-        repo.deleteById(id);
+    public void delete(Long id, Long ownerId) {
+        Staff s = repo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Staff not found"));
+        businessAuthorizationService.assertOwner(s.getBusinessId(), ownerId);
+        repo.delete(s);
     }
 
     private StaffResponse map(Staff s) {

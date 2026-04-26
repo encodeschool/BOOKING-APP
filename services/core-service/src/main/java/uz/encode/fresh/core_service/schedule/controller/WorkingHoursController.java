@@ -21,12 +21,14 @@ public class WorkingHoursController {
     private WorkingHoursService service;
 
     @PostMapping
-    public WorkingHours save(@Valid @RequestBody WorkingHoursRequest req) {
-        return service.save(req);
+    public WorkingHours save(HttpServletRequest request,
+                             @Valid @RequestBody WorkingHoursRequest req) {
+        return service.save((Long) request.getAttribute("userId"), req);
     }
 
     @GetMapping("/{businessId}")
-    public List<WorkingHours> get(@PathVariable Long businessId) {
-        return service.getByBusiness(businessId);
+    public List<WorkingHours> get(@PathVariable Long businessId,
+                                  HttpServletRequest request) {
+        return service.getByBusiness(businessId, (Long) request.getAttribute("userId"));
     }
 }
