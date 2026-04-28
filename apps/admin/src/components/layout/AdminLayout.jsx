@@ -7,7 +7,7 @@ export default function AdminLayout({ children }) {
       <Sidebar />
       <div className="flex-1 flex flex-col ml-0">
         <Topbar />
-        <main className="flex-1 p-8 bg-gray-50 overflow-auto">
+        <main className="flex-1 ml-72 p-8 bg-gray-50 overflow-auto">
           <div className="max-w-7xl mx-auto">
             {children}
           </div>
