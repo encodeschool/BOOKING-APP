@@ -6,6 +6,7 @@ import ServicesPage from "./pages/ServicesPage";
 import BookingPage from "./pages/BookingPage";
 import ContactPage from "./pages/ContactPage";
 import AboutPage from "./pages/AboutPage";
+import MapWithListView from './pages/MapPage';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           <Route path="/booking" element={<BookingPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/about" element={<AboutPage />} />
+          <Route path="/map" element={<MapWithListView />} />
         </Routes>
       </main>
       <Footer />
