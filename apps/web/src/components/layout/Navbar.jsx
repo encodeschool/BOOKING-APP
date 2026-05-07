@@ -464,10 +464,113 @@ const Navbar = () => {
               </button>
 
               {menuOpen && (
-                <div className="absolute right-0 mt-2 w-64 bg-white border rounded-xl shadow-lg">
-                  <Link className="block px-4 py-2 text-sm">
-                    Login
-                  </Link>
+                <div className="absolute right-0 mt-3 w-72 bg-white rounded-2xl shadow-xl border z-50 overflow-hidden">
+
+                  {/* HEADER */}
+                  {/* <div className="flex items-center justify-between px-4 py-3 border-b">
+                    <span className="text-sm font-semibold">Menu</span>
+                    <button
+                      onClick={() => setMenuOpen(false)}
+                      className="text-gray-500 hover:text-black"
+                    >
+                      ✕
+                    </button>
+                  </div> */}
+
+                  {/* CONTENT */}
+                  <div className="py-2">
+
+                    {/* SECTION: CUSTOMERS */}
+                    <div className="px-4 py-2 text-xs text-gray-400 uppercase">
+                      For customers
+                    </div>
+
+                    <Link
+                      to="/login"
+                      className="block px-4 py-3 hover:bg-gray-100 text-sm font-medium text-blue-600"
+                    >
+                      Log in or sign up
+                    </Link>
+
+                    <Link
+                      to="/map"
+                      className="block px-4 py-3 hover:bg-gray-100 text-sm font-medium text-blue-600"
+                    >
+                      Map of service
+                    </Link>
+
+                    <Link
+                      to="/services"
+                      className="block px-4 py-3 hover:bg-gray-100 text-sm font-medium text-blue-600"
+                    >
+                      All Services
+                    </Link>
+
+                    <Link
+                      to="/booking"
+                      className="block px-4 py-3 hover:bg-gray-100 text-sm font-medium text-blue-600"
+                    >
+                      Book right now
+                    </Link>
+
+                    <Link
+                      to="/download"
+                      className="block px-4 py-3 hover:bg-gray-100 text-sm"
+                    >
+                      Download the app
+                    </Link>
+
+                    <a
+                      href="https://www.fresha.com/help-center/get-support"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="block px-4 py-3 hover:bg-gray-100 text-sm"
+                    >
+                      Help and support
+                    </a>
+
+                    <button
+                      className="w-full text-left px-4 py-3 hover:bg-gray-100 text-sm"
+                    >
+                      🌍 English (US)
+                    </button>
+
+                    {/* DIVIDER */}
+                    <div className="border-t my-2"></div>
+
+                    {/* SECTION: BUSINESS */}
+                    <div className="px-4 py-2 text-xs text-gray-400 uppercase">
+                      For business
+                    </div>
+
+                    <a
+                      href="https://www.fresha.com/for-business"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="block px-4 py-3 hover:bg-gray-100 text-sm font-medium"
+                    >
+                      For businesses →
+                    </a>
+
+                    <div className="px-4 py-2 text-xs text-gray-400 uppercase">
+                      For customers
+                    </div>
+
+                    <Link
+                      to="/contact"
+                      className="block px-4 py-3 hover:bg-gray-100 text-sm font-medium text-blue-600"
+                    >
+                      Our contacts
+                    </Link>
+
+                    <Link
+                      to="/about"
+                      className="block px-4 py-3 hover:bg-gray-100 text-sm font-medium text-blue-600"
+                    >
+                      About us
+                    </Link>
+
+                  </div>
                 </div>
               )}
             </div>

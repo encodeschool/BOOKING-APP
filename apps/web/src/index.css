@@ -25,3 +25,20 @@
     @apply bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-200;
   }
 }
+
+.menu-item {
+  @apply block px-4 py-3 text-sm hover:bg-gray-100 cursor-pointer;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.animate-slideIn {
+  animation: slideIn 0.25s ease;
+}

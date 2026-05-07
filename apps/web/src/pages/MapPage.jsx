@@ -5,6 +5,8 @@ import "leaflet/dist/leaflet.css";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
 
+const NAVBAR_HEIGHT = 60;
+
 const mockVenues = [
   {
     id: 1,
@@ -18,8 +20,8 @@ const mockVenues = [
     lat: 56.9659,
     lng: 24.1433,
     services: [
-      { name: "Haircut", duration: "35-45 min", price: "€30" },
-      { name: "Beard", duration: "30 min", price: "€20" },
+      { name: "Haircut", price: "€30" },
+      { name: "Beard", price: "€20" },
     ],
   },
   {
@@ -32,25 +34,25 @@ const mockVenues = [
     image: "https://images.unsplash.com/photo-1600585154340-be6161a56a9c",
     lat: 56.9721,
     lng: 24.1587,
-    services: [{ name: "Facial", duration: "60 min", price: "€35" }],
+    services: [{ name: "Facial", price: "€35" }],
   },
 ];
 
-const MapPage = () => {
+export default function MapPage() {
   const mapRef = useRef(null);
   const mapInstance = useRef(null);
   const markersRef = useRef([]);
+  const listRef = useRef(null);
 
-  const [search, setSearch] = useState("");
   const [selectedVenue, setSelectedVenue] = useState(null);
+  const [activeTab, setActiveTab] = useState("venues");
+  const [showMap, setShowMap] = useState(true);
+  const [scrolled, setScrolled] = useState(false);
 
-  const filtered = mockVenues.filter((v) =>
-    v.name.toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = mockVenues;
 
-  // INIT MAP
   useEffect(() => {
-    if (!mapInstance.current) {
+    if (!mapInstance.current && mapRef.current) {
       mapInstance.current = L.map(mapRef.current).setView(
         [56.96, 24.14],
         13
@@ -58,18 +60,19 @@ const MapPage = () => {
 
       L.tileLayer(
         "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-        {
-          attribution: "&copy; OpenStreetMap",
-        }
+        { attribution: "&copy; OpenStreetMap" }
       ).addTo(mapInstance.current);
     }
-
-    setTimeout(() => {
-      mapInstance.current.invalidateSize();
-    }, 200);
   }, []);
 
-  // UPDATE MARKERS
+  useEffect(() => {
+    if (showMap && mapInstance.current) {
+      setTimeout(() => {
+        mapInstance.current.invalidateSize();
+      }, 200);
+    }
+  }, [showMap]);
+
   useEffect(() => {
     if (!mapInstance.current) return;
 
@@ -89,31 +92,91 @@ const MapPage = () => {
         .bindPopup(`<b>${v.name}</b>`);
 
       marker.on("click", () => setSelectedVenue(v));
-
       markersRef.current.push(marker);
     });
   }, [filtered]);
 
+  useEffect(() => {
+    const el = listRef.current;
+    const handleScroll = () => {
+      setScrolled(el.scrollTop > 10);
+    };
+    el.addEventListener("scroll", handleScroll);
+    return () => el.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
-    <div className="flex h-screen">
+    <div className="flex">
 
-      {/* LEFT SIDE (SCROLLABLE) */}
-      <div className="w-[60%] flex flex-col bg-white border-r">
+      {/* LEFT */}
+      <div className={`${showMap ? "w-[60%]" : "w-full"} border-r bg-white`}>
 
-        {/* FILTER */}
-        <div className="sticky top-[60px] z-20 bg-white/70 backdrop-blur-md p-4 border-b shadow-sm">
-          <input
-            placeholder="Search venues..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full px-4 py-3 border rounded-xl"
-          />
-        </div>
+        <div
+          ref={listRef}
+          className="h-[calc(100vh-60px)] overflow-y-auto"
+        >
 
-        {/* LIST */}
-        <div className="flex-1 overflow-y-auto p-5">
-          <div className="grid grid-cols-2 gap-5">
+          {/* HEADER */}
+          <div
+            className={`sticky top-0 z-20 border-b transition-all ${
+              scrolled
+                ? "bg-white/70 backdrop-blur-md shadow-sm"
+                : "bg-white"
+            }`}
+          >
+            <div className="p-4 space-y-4">
 
+              {/* TOP ROW */}
+              <div className="flex items-center justify-between">
+
+                {/* Tabs */}
+                <div className="flex bg-gray-100 rounded-xl p-1">
+                  <button
+                    onClick={() => setActiveTab("venues")}
+                    className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium ${
+                      activeTab === "venues"
+                        ? "bg-white shadow"
+                        : "text-gray-500"
+                    }`}
+                  >
+                    Venues
+                  </button>
+
+                  <button
+                    onClick={() => setActiveTab("professionals")}
+                    className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium ${
+                      activeTab === "professionals"
+                        ? "bg-white shadow"
+                        : "text-gray-500"
+                    }`}
+                  >
+                    Professionals
+                  </button>
+                </div>
+
+                <p className="text-sm text-gray-500">
+                  {filtered.length} venues in map area
+                </p>
+
+                <div className="flex gap-2">
+                  <button className="px-4 py-2 border rounded-xl text-sm hover:bg-gray-50">
+                    ⚙ Filters
+                  </button>
+
+                  <button
+                    onClick={() => setShowMap(!showMap)}
+                    className="px-4 py-2 border rounded-xl text-sm hover:bg-gray-50"
+                  >
+                    {showMap ? "Hide map" : "Show map"}
+                  </button>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+          {/* LIST */}
+          <div className="p-5 grid grid-cols-2 gap-5">
             {filtered.map((venue) => (
               <div
                 key={venue.id}
@@ -124,8 +187,6 @@ const MapPage = () => {
                     : "border-gray-200"
                 }`}
               >
-
-                {/* IMAGE */}
                 <div className="relative h-56">
                   <img
                     src={venue.image}
@@ -137,28 +198,19 @@ const MapPage = () => {
                   </div>
                 </div>
 
-                {/* CONTENT */}
                 <div className="p-4">
                   <div className="flex justify-between">
-                    <h3 className="font-semibold">
-                      {venue.name}
-                    </h3>
-                    <span className="text-sm">
-                      ⭐ {venue.rating}
-                    </span>
+                    <h3 className="font-semibold">{venue.name}</h3>
+                    <span>⭐ {venue.rating}</span>
                   </div>
 
                   <p className="text-sm text-gray-500">
                     {venue.address}
                   </p>
 
-                  {/* SERVICES */}
                   <div className="mt-3 space-y-2">
-                    {venue.services?.map((s, i) => (
-                      <div
-                        key={i}
-                        className="flex justify-between text-sm"
-                      >
+                    {venue.services.map((s, i) => (
+                      <div key={i} className="flex justify-between text-sm">
                         <span>{s.name}</span>
                         <span>{s.price}</span>
                       </div>
@@ -169,21 +221,24 @@ const MapPage = () => {
                     Book
                   </button>
                 </div>
-
               </div>
             ))}
-
           </div>
+
         </div>
       </div>
 
-      {/* RIGHT MAP (ALWAYS FIXED) */}
-      <div className="w-[40%] h-screen sticky top-0">
+      {/* ✅ MAP (NOT unmounted, just hidden) */}
+      <div
+        className={`${showMap ? "block" : "hidden"} w-[40%]  h-screen sticky top-0`}
+        style={{
+          top: NAVBAR_HEIGHT,
+          height: `calc(100vh - ${NAVBAR_HEIGHT}px)`,
+        }}
+      >
         <div ref={mapRef} className="w-full h-full" />
       </div>
 
     </div>
   );
-};
-
-export default MapPage;
+}

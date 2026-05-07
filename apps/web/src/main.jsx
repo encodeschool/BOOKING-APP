@@ -5,11 +5,12 @@ import { Toaster } from "react-hot-toast";
 import App from "./App.jsx";
 import "./index.css";
 
+import { BookingProvider } from "./context/BookingContext";
+
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
-    <BrowserRouter>
+  <BrowserRouter>
+    <BookingProvider>
       <App />
-      <Toaster position="top-right" />
-    </BrowserRouter>
-  </React.StrictMode>
+    </BookingProvider>
+  </BrowserRouter>
 );

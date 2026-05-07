@@ -1,10 +1,17 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import RollingNumber from "../components/RollingNumber";
+import { Search, MapPin } from "lucide-react";
 import { Calendar, Clock, Star, Users } from "lucide-react";
 import { useBusinesses } from "../hooks/useApi";
+import { useBooking } from "../context/BookingContext";
 
 const HomePage = () => {
-  const { businesses, loading } = useBusinesses();
-
+  const [count, setCount] = useState(6972);
+  const [hoverQR, setHoverQR] = useState(false);
+  const { businesses = [], loading } = useBusinesses();
+  const { openBooking } = useBooking();
+  
   const features = [
     {
       icon: Calendar,
@@ -28,33 +35,111 @@ const HomePage = () => {
     },
   ];
 
+  // simulate realtime bookings
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCount((prev) => prev + Math.floor(Math.random() * 3));
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div>
-      {/* Hero Section */}
-      <section className="bg-gradient-to-r from-primary-600 to-primary-800 text-white py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6">
-              Book Your Next Appointment
-              <span className="block text-primary-200">With Ease</span>
-            </h1>
-            <p className="text-xl md:text-2xl mb-8 text-primary-100">
-              Discover and book services from the best businesses in your area.
-              Simple, fast, and reliable.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/booking" className="btn-primary text-center">
-                Book Now
-              </Link>
-              <Link to="/services" className="btn-secondary text-center">
-                View Services
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
+      <section className="bg-gradient-to-r from-primary-600 to-primary-800 text-white py-20 relative overflow-hidden">
 
-      {/* Features Section */}
+      <div className="max-w-6xl mx-auto px-4 text-center">
+
+        {/* TITLE */}
+        <h1 className="text-4xl md:text-6xl font-bold mb-4">
+          Book local self-care services
+        </h1>
+
+        <p className="text-lg md:text-xl text-primary-100 mb-10">
+          Discover top-rated salons, barbers, medspas, wellness studios and beauty experts trusted by millions worldwide
+        </p>
+
+        {/* SEARCH BAR */}
+        {/* <div className="bg-white rounded-full p-2 flex items-center max-w-4xl mx-auto shadow-lg">
+
+          <input
+            readOnly
+            value="All treatments"
+            className="flex-1 px-4 py-2 text-black outline-none"
+          />
+
+          <div className="w-px h-6 bg-gray-300"></div>
+
+          <div className="flex items-center gap-2 px-4 text-black">
+            <MapPin size={16} />
+            <span>Current location</span>
+          </div>
+
+          <div className="w-px h-6 bg-gray-300"></div>
+
+          <input
+            readOnly
+            value="Any time"
+            className="flex-1 px-4 py-2 text-black outline-none"
+          />
+
+          <button className="bg-black text-white p-3 rounded-full ml-2">
+            <Search size={18} />
+          </button>
+        </div> */}
+
+        {/* STATS */}
+        <div className="mt-10 flex flex-row justify-center items-center gap-4">
+
+          <RollingNumber value={count} />
+
+          <p className="text-primary-200">
+            appointments booked today
+          </p>
+
+        </div>
+
+        {/* APP DOWNLOAD */}
+        <div
+          className="mt-8 relative inline-block"
+          onMouseEnter={() => setHoverQR(true)}
+          onMouseLeave={() => setHoverQR(false)}
+        >
+          <button className="bg-white text-black px-6 py-3 rounded-full font-semibold">
+            Get the app
+          </button>
+
+          {/* QR POPUP */}
+          {hoverQR && (
+            <div className="absolute top-14 left-1/2 -translate-x-1/2 bg-white text-black p-4 rounded-xl shadow-xl w-40 animate-fadeIn">
+              <img
+                src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://yourapp.com"
+                alt="QR Code"
+                className="w-full"
+              />
+              <p className="text-xs mt-2 text-center">
+                Scan to download
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* CTA */}
+        <div className="mt-8 flex gap-4 justify-center">
+          <button
+            onClick={openBooking}
+            className="bg-white text-black px-6 py-3 rounded-full"
+          >
+            Book Now
+          </button>
+          <Link to="/services" className="btn-secondary">
+            View Services
+          </Link>
+        </div>
+
+      </div>
+    </section>
+    {/* Features Section */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
