@@ -68,7 +68,7 @@ const Step4TimePicker = () => {
   };
 
   return (
-    <div className="w-full bg-white p-6">
+    <div className="w-full max-h-full bg-white flex flex-col rounded-2xl overflow-hidden">
 
       {/* HEADER */}
       <div className="flex items-center gap-3 p-5 border-b">
@@ -84,6 +84,10 @@ const Step4TimePicker = () => {
           <h2 className="text-xl font-semibold">
             Choose time
           </h2>
+
+          <p className="text-sm text-gray-500">
+            Select your time preference
+          </p>
         </div>
 
       </div>

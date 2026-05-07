@@ -83,10 +83,10 @@ const Step5CustomerDetails = () => {
   };
 
   return (
-    <div className="w-full h-full flex flex-col bg-white overflow-hidden">
+    <div className="w-full max-h-full bg-white flex flex-col rounded-2xl overflow-hidden">
 
       {/* HEADER */}
-      <div className="flex items-center gap-3 p-6 border-b shrink-0">
+      <div className="flex items-center gap-3 p-5 border-b">
 
         <button
           onClick={goBack}
@@ -96,11 +96,11 @@ const Step5CustomerDetails = () => {
         </button>
 
         <div>
-          <h2 className="text-2xl font-semibold">
+          <h2 className="text-xl font-semibold">
             Your details
           </h2>
 
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-sm text-gray-500">
             Enter your contact information
           </p>
         </div>
@@ -110,9 +110,9 @@ const Step5CustomerDetails = () => {
       {/* SCROLLABLE CONTENT */}
       <div className="flex-1 overflow-y-auto">
 
-        <div className="max-w-3xl mx-auto w-full p-6">
+        <div className="mx-auto w-full p-6">
 
-          <div className="space-y-6">
+          <div className="grid grid-cols-2 gap-4 justify-center">
 
             {/* NAME */}
             <div>
@@ -232,7 +232,7 @@ const Step5CustomerDetails = () => {
       {/* FOOTER ACTIONS */}
       <div className="border-t p-6 shrink-0 bg-white">
 
-        <div className="max-w-3xl mx-auto flex items-center justify-between">
+        <div className="mx-auto flex items-center justify-between">
 
           <button
             onClick={goBack}

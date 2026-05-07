@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useBooking } from "../../../context/BookingContext";
+import { ArrowLeft, Star, User } from "lucide-react";
 
 const Step6PaymentConfirmation = () => {
   const {
@@ -68,22 +69,31 @@ const Step6PaymentConfirmation = () => {
   }
 
   return (
-    <div className="w-full h-full flex items-center justify-center overflow-y-hidden">
+    <div className="w-full max-h-full bg-white flex flex-col rounded-2xl overflow-hidden">
 
-      <div className="w-full max-w-5xl bg-white p-8">
+      {/* HEADER */}
+        <div className="flex items-center gap-3 p-5 border-b">
 
-        {/* HEADER */}
-        <div className="mb-8">
+          <button
+            onClick={goBack}
+            className="p-2 hover:bg-gray-100 rounded-lg transition"
+          >
+            <ArrowLeft size={20} />
+          </button>
 
-          <h2 className="text-3xl font-semibold">
-            Confirm & Pay
-          </h2>
+          <div>
+            <h2 className="text-xl font-semibold">
+              Confirm & Pay
+            </h2>
 
-          <p className="text-gray-500 mt-2">
-            Review your booking details before confirming
-          </p>
+            <p className="text-sm text-gray-500">
+              Review your booking details before confirming
+            </p>
+          </div>
 
         </div>
+
+      <div className="w-full bg-white p-8">
 
         {/* CONTENT */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
