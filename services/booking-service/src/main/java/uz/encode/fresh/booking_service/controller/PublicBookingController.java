@@ -34,4 +34,12 @@ public class PublicBookingController {
             @RequestParam String date) {
         return bookingService.getAvailableSlots(businessId, serviceId, date);
     }
+
+    @GetMapping("/available-dates")
+    public List<String> getAvailableDates(
+            @RequestParam Long businessId,
+            @RequestParam Long serviceId,
+            @RequestParam(required = false) Long staffId) {
+        return bookingService.getAvailableDates(businessId, serviceId, staffId);
+    }
 }

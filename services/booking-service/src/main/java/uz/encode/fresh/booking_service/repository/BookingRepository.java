@@ -18,6 +18,8 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     List<Booking> findByBusinessIdOrderByBookingDateDescStartTimeDesc(Long businessId);
 
+    List<Booking> findByStaffIdOrderByBookingDateDescStartTimeDesc(Long staffId);
+
     long countByStaffIdAndBookingDateAndStatusIn(Long staffId, LocalDate bookingDate, Collection<BookingStatus> statuses);
 
     @Query("""

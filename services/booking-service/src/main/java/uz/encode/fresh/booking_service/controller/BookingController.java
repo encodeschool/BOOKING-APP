@@ -62,4 +62,14 @@ public class BookingController {
                                   @RequestParam(required = false) String reason) {
         return bookingService.cancelByClient((Long) request.getAttribute("userId"), bookingId, reason);
     }
+
+    @GetMapping("/staff/me")
+    public List<BookingResponse> staffBookings(HttpServletRequest request) {
+        return bookingService.getStaffBookings((Long) request.getAttribute("userId"));
+    }
+
+    @GetMapping("/staff/{bookingId}")
+    public BookingResponse getStaffBooking(HttpServletRequest request, @PathVariable Long bookingId) {
+        return bookingService.getStaffBooking((Long) request.getAttribute("userId"), bookingId);
+    }
 }

@@ -24,4 +24,10 @@ public interface BookingService {
     BookingResponse createPublicBooking(CreatePublicBookingRequest request);
 
     List<String> getAvailableSlots(Long businessId, Long serviceId, String date);
+
+    List<String> getAvailableDates(Long businessId, Long serviceId, Long staffId);
+
+    BookingResponse getStaffBooking(Long staffId, Long bookingId);
+
+    List<BookingResponse> getStaffBookings(Long staffId);
 }

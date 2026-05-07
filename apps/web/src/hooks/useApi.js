@@ -101,3 +101,29 @@ export function useAvailableSlots(businessId, serviceId, date) {
 
   return { slots, loading, error };
 }
+
+export function useAvailableDates(businessId, serviceId, staffId) {
+  const [dates, setDates] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (!businessId || !serviceId) return;
+
+    const fetchDates = async () => {
+      setLoading(true);
+      try {
+        const data = await apiClient.getAvailableDates(businessId, serviceId, staffId);
+        setDates(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDates();
+  }, [businessId, serviceId, staffId]);
+
+  return { dates, loading, error };
+}

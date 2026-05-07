@@ -17,7 +17,7 @@ public class CorsConfig {
         CorsConfiguration config = new CorsConfiguration();
 
         // Frontend origin
-        config.setAllowedOrigins(List.of("*"));
+        config.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:5173"));
 
         // Allow all headers
         config.setAllowedHeaders(List.of("*"));

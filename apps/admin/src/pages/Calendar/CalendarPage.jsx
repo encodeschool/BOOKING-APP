@@ -1,4 +1,13 @@
 import { useEffect, useState } from "react";
+import {
+  FaChevronLeft,
+  FaChevronRight,
+  FaPlus,
+  FaCalendarAlt,
+  FaClock,
+  FaUser,
+} from "react-icons/fa";
+
 import { useAuth } from "../../app/providers/AuthProvider";
 import { useBusiness } from "../../app/providers/BusinessProvider";
 
@@ -18,11 +27,11 @@ export default function CalendarPage() {
   const getDaysInMonth = (date) => {
     const year = date.getFullYear();
     const month = date.getMonth();
+
     const firstDay = new Date(year, month, 1);
-    const lastDay = new Date(year, month + 1, 0);
+
     const days = [];
 
-    // Add previous month's days to fill the first week
     const startDate = new Date(firstDay);
     startDate.setDate(startDate.getDate() - firstDay.getDay());
 
@@ -36,107 +45,262 @@ export default function CalendarPage() {
   };
 
   const getBookingsForDate = (date) => {
-    return calendarBookings.filter(booking => {
+    return calendarBookings.filter((booking) => {
       const bookingDate = new Date(booking.date);
       return bookingDate.toDateString() === date.toDateString();
     });
   };
 
   const days = getDaysInMonth(currentDate);
-  const monthNames = ["January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"];
+
+  const monthNames = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
 
   const navigateMonth = (direction) => {
-    setCurrentDate(prev => {
+    setCurrentDate((prev) => {
       const newDate = new Date(prev);
       newDate.setMonth(newDate.getMonth() + direction);
       return newDate;
     });
   };
 
-  const getRandomColor = () => {
-    const colors = [
-      'bg-blue-100 text-blue-800',
-      'bg-green-100 text-green-800',
-      'bg-yellow-100 text-yellow-800',
-      'bg-red-100 text-red-800',
-      'bg-purple-100 text-purple-800',
-      'bg-pink-100 text-pink-800',
-      'bg-indigo-100 text-indigo-800',
-      'bg-gray-100 text-gray-800'
-    ];
-    return colors[Math.floor(Math.random() * colors.length)];
+  const bookingColors = [
+    "bg-blue-100 text-blue-700 border-blue-200",
+    "bg-green-100 text-green-700 border-green-200",
+    "bg-purple-100 text-purple-700 border-purple-200",
+    "bg-pink-100 text-pink-700 border-pink-200",
+    "bg-orange-100 text-orange-700 border-orange-200",
+    "bg-indigo-100 text-indigo-700 border-indigo-200",
+  ];
+
+  const getBookingColor = (index) => {
+    return bookingColors[index % bookingColors.length];
   };
 
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-800">Calendar</h1>
-        <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow-sm">
-          <span>+</span> Add Booking
+    <div className="min-h-screen">
+      {/* HEADER */}
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5 mb-8">
+        <div>
+          <p className="text-sm font-medium text-emerald-600 mb-2">
+            Booking Management
+          </p>
+
+          <h1 className="text-4xl font-bold text-gray-900">
+            Calendar Overview
+          </h1>
+
+          <p className="text-gray-500 mt-2">
+            Manage appointments, bookings and schedules.
+          </p>
+        </div>
+
+        <button className="flex items-center gap-3 bg-gradient-to-r from-emerald-500 to-green-500 hover:scale-[1.02] transition-all text-white px-6 py-3 rounded-2xl shadow-lg shadow-emerald-200 font-medium">
+          <FaPlus />
+          Add Booking
         </button>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm p-6">
-        {/* Calendar Header */}
-        <div className="flex justify-between items-center mb-6">
-          <button
-            onClick={() => navigateMonth(-1)}
-            className="p-2 hover:bg-gray-100 rounded-lg"
-          >
-            ‹
-          </button>
-          <h2 className="text-2xl font-semibold">
-            {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
-          </h2>
-          <button
-            onClick={() => navigateMonth(1)}
-            className="p-2 hover:bg-gray-100 rounded-lg"
-          >
-            ›
-          </button>
+      {/* STATS */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
+        <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-500 text-sm font-medium">
+                Total Bookings
+              </p>
+
+              <h2 className="text-3xl font-bold text-gray-900 mt-2">
+                {calendarBookings.length}
+              </h2>
+            </div>
+
+            <div className="w-14 h-14 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center">
+              <FaCalendarAlt size={20} />
+            </div>
+          </div>
         </div>
 
-        {/* Calendar Grid */}
-        <div className="grid grid-cols-7 gap-1">
-          {/* Day headers */}
-          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-            <div key={day} className="p-3 text-center font-medium text-gray-500 bg-gray-50 rounded-lg">
+        <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-500 text-sm font-medium">
+                Today's Bookings
+              </p>
+
+              <h2 className="text-3xl font-bold text-gray-900 mt-2">
+                {
+                  calendarBookings.filter(
+                    (b) =>
+                      new Date(b.date).toDateString() ===
+                      new Date().toDateString()
+                  ).length
+                }
+              </h2>
+            </div>
+
+            <div className="w-14 h-14 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center">
+              <FaClock size={20} />
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-500 text-sm font-medium">
+                Active Business
+              </p>
+
+              <h2 className="text-xl font-bold text-gray-900 mt-2">
+                {selectedBusinessId || "Not Selected"}
+              </h2>
+            </div>
+
+            <div className="w-14 h-14 rounded-2xl bg-purple-100 text-purple-600 flex items-center justify-center">
+              <FaUser size={20} />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* CALENDAR */}
+      <div className="bg-white rounded-[32px] border border-gray-100 shadow-sm overflow-hidden">
+        {/* TOP BAR */}
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 p-6 border-b border-gray-100">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900">
+              {monthNames[currentDate.getMonth()]}{" "}
+              {currentDate.getFullYear()}
+            </h2>
+
+            <p className="text-gray-500 text-sm mt-1">
+              Manage your appointments calendar
+            </p>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => navigateMonth(-1)}
+              className="w-11 h-11 rounded-2xl border border-gray-200 hover:bg-gray-50 flex items-center justify-center transition-all"
+            >
+              <FaChevronLeft className="text-gray-700" />
+            </button>
+
+            <button
+              onClick={() => setCurrentDate(new Date())}
+              className="px-5 h-11 rounded-2xl bg-gray-900 text-white font-medium hover:bg-black transition-all"
+            >
+              Today
+            </button>
+
+            <button
+              onClick={() => navigateMonth(1)}
+              className="w-11 h-11 rounded-2xl border border-gray-200 hover:bg-gray-50 flex items-center justify-center transition-all"
+            >
+              <FaChevronRight className="text-gray-700" />
+            </button>
+          </div>
+        </div>
+
+        {/* WEEK DAYS */}
+        <div className="grid grid-cols-7 bg-gray-50 border-b border-gray-100">
+          {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
+            <div
+              key={day}
+              className="py-4 text-center text-sm font-semibold text-gray-500"
+            >
               {day}
             </div>
           ))}
+        </div>
 
-          {/* Calendar days */}
+        {/* CALENDAR GRID */}
+        <div className="grid grid-cols-7">
           {days.map((day, index) => {
             const dayBookings = getBookingsForDate(day);
-            const isCurrentMonth = day.getMonth() === currentDate.getMonth();
-            const isToday = day.toDateString() === new Date().toDateString();
+
+            const isCurrentMonth =
+              day.getMonth() === currentDate.getMonth();
+
+            const isToday =
+              day.toDateString() === new Date().toDateString();
 
             return (
               <div
                 key={index}
-                className={`min-h-[120px] p-2 border rounded-lg ${
-                  isCurrentMonth ? 'bg-white' : 'bg-gray-50'
-                } ${isToday ? 'ring-2 ring-blue-500' : ''}`}
+                className={`min-h-[150px] border-b border-r border-gray-100 p-3 transition-all hover:bg-gray-50 ${
+                  isCurrentMonth ? "bg-white" : "bg-gray-50/60"
+                }`}
               >
-                <div className={`text-sm font-medium mb-1 ${
-                  isCurrentMonth ? 'text-gray-900' : 'text-gray-400'
-                }`}>
-                  {day.getDate()}
+                {/* DAY NUMBER */}
+                <div className="flex items-center justify-between mb-3">
+                  <div
+                    className={`w-8 h-8 flex items-center justify-center rounded-xl text-sm font-semibold ${
+                      isToday
+                        ? "bg-emerald-500 text-white"
+                        : isCurrentMonth
+                        ? "text-gray-900"
+                        : "text-gray-400"
+                    }`}
+                  >
+                    {day.getDate()}
+                  </div>
+
+                  {dayBookings.length > 0 && (
+                    <span className="text-[11px] px-2 py-1 rounded-full bg-gray-100 text-gray-500 font-medium">
+                      {dayBookings.length}
+                    </span>
+                  )}
                 </div>
-                <div className="space-y-1">
+
+                {/* BOOKINGS */}
+                <div className="space-y-2">
                   {dayBookings.slice(0, 3).map((booking, idx) => (
                     <div
                       key={idx}
-                      className={`text-xs p-1 rounded ${getRandomColor()} cursor-pointer hover:opacity-80`}
-                      onClick={() => alert(`Booking: ${booking.serviceName || 'Service'} - ${booking.customerName || 'Customer'}\nTime: ${booking.time}\nDescription: ${booking.description || 'No description'}`)}
+                      onClick={() =>
+                        alert(
+                          `Booking: ${
+                            booking.serviceName || "Service"
+                          }\nCustomer: ${
+                            booking.customerName || "Customer"
+                          }\nTime: ${booking.time}`
+                        )
+                      }
+                      className={`rounded-2xl border p-2 cursor-pointer hover:scale-[1.02] transition-all ${getBookingColor(
+                        idx
+                      )}`}
                     >
-                      {booking.time} - {booking.serviceName || 'Service'}
+                      <p className="text-[11px] font-semibold">
+                        {booking.time}
+                      </p>
+
+                      <p className="text-xs font-medium truncate">
+                        {booking.serviceName || "Service"}
+                      </p>
+
+                      <p className="text-[11px] opacity-70 truncate">
+                        {booking.customerName || "Customer"}
+                      </p>
                     </div>
                   ))}
+
                   {dayBookings.length > 3 && (
-                    <div className="text-xs text-gray-500">
-                      +{dayBookings.length - 3} more
+                    <div className="text-xs text-gray-500 px-2 py-1">
+                      +{dayBookings.length - 3} more bookings
                     </div>
                   )}
                 </div>
@@ -145,6 +309,28 @@ export default function CalendarPage() {
           })}
         </div>
       </div>
+
+      {/* EMPTY STATE */}
+      {!calendarBookings.length && (
+        <div className="mt-8 bg-white rounded-3xl border border-dashed border-gray-300 p-12 text-center">
+          <div className="w-20 h-20 rounded-full bg-gray-100 mx-auto flex items-center justify-center mb-5">
+            <FaCalendarAlt className="text-3xl text-gray-400" />
+          </div>
+
+          <h3 className="text-2xl font-bold text-gray-800 mb-2">
+            No bookings yet
+          </h3>
+
+          <p className="text-gray-500 max-w-md mx-auto">
+            Your appointment calendar is empty. Start by creating a new
+            booking.
+          </p>
+
+          <button className="mt-6 bg-gradient-to-r from-emerald-500 to-green-500 text-white px-6 py-3 rounded-2xl font-medium shadow-lg shadow-emerald-200">
+            Create Booking
+          </button>
+        </div>
+      )}
     </div>
   );
 }

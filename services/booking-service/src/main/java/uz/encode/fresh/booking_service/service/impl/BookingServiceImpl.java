@@ -15,7 +15,9 @@ import uz.encode.fresh.booking_service.dto.CreatePublicBookingRequest;
 import uz.encode.fresh.booking_service.dto.UpdateBookingStatusRequest;
 import uz.encode.fresh.booking_service.entity.Booking;
 import uz.encode.fresh.booking_service.integration.CoreServiceClient;
+import uz.encode.fresh.booking_service.integration.NotificationClient;
 import uz.encode.fresh.booking_service.integration.dto.BusinessDetailsResponse;
+import uz.encode.fresh.booking_service.integration.dto.EmailNotificationRequest;
 import uz.encode.fresh.booking_service.integration.dto.ServiceDetailsResponse;
 import uz.encode.fresh.booking_service.integration.dto.StaffDetailsResponse;
 import uz.encode.fresh.booking_service.integration.dto.WorkingHoursResponse;
@@ -34,6 +36,7 @@ public class BookingServiceImpl implements BookingService {
 
     private final BookingRepository bookingRepository;
     private final CoreServiceClient coreServiceClient;
+    private final NotificationClient notificationClient;
 
     @Override
     @Transactional
@@ -110,7 +113,12 @@ public class BookingServiceImpl implements BookingService {
         booking.setStatus(nextStatus);
         booking.setStatusReason(request.reason);
 
-        return toResponse(bookingRepository.save(booking));
+        BookingResponse response = toResponse(bookingRepository.save(booking));
+        
+        // Send notification to customer about booking status change
+        sendBookingStatusNotification(booking, nextStatus, request.reason);
+
+        return response;
     }
 
     @Override
@@ -242,6 +250,127 @@ public class BookingServiceImpl implements BookingService {
         }
 
         return availableSlots;
+    }
+
+    @Override
+    public List<String> getAvailableDates(Long businessId, Long serviceId, Long staffId) {
+        LocalDate today = LocalDate.now();
+        LocalDate endDate = today.plusDays(30); // Check next 30 days
+        List<String> availableDates = new java.util.ArrayList<>();
+
+        ServiceDetailsResponse service = getService(serviceId);
+        StaffDetailsResponse staff = staffId != null ? getStaff(staffId) : null;
+
+        for (LocalDate date = today; !date.isAfter(endDate); date = date.plusDays(1)) {
+            WorkingHoursResponse workingHours = getWorkingHours(businessId, date.getDayOfWeek());
+
+            if (!workingHours.closed() && workingHours.startTime() != null && workingHours.endTime() != null) {
+                // Check if there's at least one available slot for this date
+                LocalTime currentTime = workingHours.startTime();
+                boolean hasSlot = false;
+
+                while (currentTime.isBefore(workingHours.endTime())) {
+                    LocalTime endTime = currentTime.plusMinutes(service.durationMinutes());
+
+                    if (endTime.isAfter(workingHours.endTime())) {
+                        break;
+                    }
+
+                    // If no specific staff selected, check any staff; otherwise check specific staff
+                    if (staff == null) {
+                        List<StaffDetailsResponse> staffList = coreServiceClient.getStaffByBusiness(businessId);
+                        for (StaffDetailsResponse s : staffList) {
+                            if (Boolean.TRUE.equals(s.active())) {
+                                boolean hasOverlappingBooking = bookingRepository.existsOverlappingBooking(
+                                        s.id(), date, currentTime, endTime, ACTIVE_BOOKING_STATUSES
+                                );
+                                long bookingCount = bookingRepository.countByStaffIdAndBookingDateAndStatusIn(
+                                        s.id(), date, ACTIVE_BOOKING_STATUSES
+                                );
+                                Integer maxBookings = s.maxBookingsPerDay() != null ? s.maxBookingsPerDay() : 20;
+
+                                if (!hasOverlappingBooking && bookingCount < maxBookings) {
+                                    hasSlot = true;
+                                    break;
+                                }
+                            }
+                        }
+                    } else {
+                        boolean hasOverlappingBooking = bookingRepository.existsOverlappingBooking(
+                                staff.id(), date, currentTime, endTime, ACTIVE_BOOKING_STATUSES
+                        );
+                        long bookingCount = bookingRepository.countByStaffIdAndBookingDateAndStatusIn(
+                                staff.id(), date, ACTIVE_BOOKING_STATUSES
+                        );
+                        Integer maxBookings = staff.maxBookingsPerDay() != null ? staff.maxBookingsPerDay() : 20;
+
+                        if (!hasOverlappingBooking && bookingCount < maxBookings) {
+                            hasSlot = true;
+                            break;
+                        }
+                    }
+
+                    currentTime = currentTime.plusMinutes(30);
+                }
+
+                if (hasSlot) {
+                    availableDates.add(date.toString());
+                }
+            }
+        }
+
+        return availableDates;
+    }
+
+    @Override
+    public BookingResponse getStaffBooking(Long staffId, Long bookingId) {
+        Booking booking = getBookingEntity(bookingId);
+        if (!booking.getStaffId().equals(staffId)) {
+            throw new IllegalArgumentException("Booking not accessible");
+        }
+        return toResponse(booking);
+    }
+
+    @Override
+    public List<BookingResponse> getStaffBookings(Long staffId) {
+        return bookingRepository.findByStaffIdOrderByBookingDateDescStartTimeDesc(staffId)
+                .stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
+    private void sendBookingStatusNotification(Booking booking, BookingStatus status, String reason) {
+        try {
+            // Try to get customer email from request header or stored in booking
+            // For now, we'll use a placeholder - this should be stored in the Booking entity
+            String customerEmail = "customer@example.com";
+            
+            String statusText = status == BookingStatus.CONFIRMED ? "approved" : 
+                               status == BookingStatus.REJECTED ? "rejected" : status.name().toLowerCase();
+            
+            String htmlContent = buildBookingNotificationHtml(booking, statusText, reason);
+            
+            EmailNotificationRequest emailRequest = EmailNotificationRequest.builder()
+                    .to(customerEmail)
+                    .subject("Booking " + statusText)
+                    .htmlContent(htmlContent)
+                    .build();
+            
+            notificationClient.sendEmail(emailRequest);
+        } catch (Exception e) {
+            // Log but don't fail the booking update if notification fails
+            System.err.println("Failed to send notification: " + e.getMessage());
+        }
+    }
+
+    private String buildBookingNotificationHtml(Booking booking, String status, String reason) {
+        return "<html><body>" +
+                "<h2>Booking " + status + "</h2>" +
+                "<p>Your booking has been " + status + ".</p>" +
+                "<p>Booking Date: " + booking.getBookingDate() + "</p>" +
+                "<p>Time: " + booking.getStartTime() + " - " + booking.getEndTime() + "</p>" +
+                (reason != null ? "<p>Reason: " + reason + "</p>" : "") +
+                "</body></html>";
     }
 
     private void validateBusinessRelations(CreateBookingRequest request,
