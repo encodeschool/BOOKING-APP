@@ -1,164 +1,240 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { useBooking } from "../../../context/BookingContext";
 
-const Step6PaymentConfirmation = ({
-  service,
-  staff,
-  date,
-  time,
-  customer,
-  price = 50,
-  onBack,
-  onConfirm,
-}) => {
+const Step6PaymentConfirmation = () => {
+  const {
+    booking,
+    goBack,
+    closeBooking,
+  } = useBooking();
+
   const [paymentMethod, setPaymentMethod] = useState("card");
   const [loading, setLoading] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
 
+  const service = booking?.service;
+  const staff = booking?.staff;
+  const date = booking?.date;
+  const time = booking?.time;
+  const customer = booking?.customer;
+
+  const price = service?.price
+    ? parseInt(service.price.replace("€", ""))
+    : 50;
+
+  // CONFIRM BOOKING
   const handleConfirm = async () => {
     setLoading(true);
 
-    // simulate API call
+    // SIMULATE API
     setTimeout(() => {
       setLoading(false);
       setConfirmed(true);
-      onConfirm?.();
     }, 1500);
   };
 
-  const { updateBooking, goNext } = useBooking();
-
-  const selectType = (type) => {
-    updateBooking({ payment });
-    goNext();
-  };
-
+  // SUCCESS SCREEN
   if (confirmed) {
     return (
-      <div className="max-w-xl mx-auto bg-white p-8 rounded-2xl shadow text-center">
-        <div className="text-green-600 text-5xl mb-4">✓</div>
-        <h2 className="text-2xl font-semibold mb-2">
-          Booking Confirmed!
-        </h2>
-        <p className="text-gray-600">
-          Your appointment has been successfully booked.
-        </p>
+      <div className="w-full h-full flex items-center justify-center bg-white">
+
+        <div className="text-center max-w-md mx-auto p-8">
+
+          <div className="text-green-600 text-6xl mb-6">
+            ✓
+          </div>
+
+          <h2 className="text-3xl font-semibold mb-3">
+            Booking Confirmed!
+          </h2>
+
+          <p className="text-gray-600 mb-8">
+            Your appointment has been successfully booked.
+          </p>
+
+          <Link
+            to="/"
+            onClick={closeBooking}
+            className="inline-flex items-center justify-center px-6 py-3 bg-black text-white rounded-xl hover:opacity-90 transition"
+          >
+            Go Back Home
+          </Link>
+
+        </div>
+
       </div>
     );
   }
 
   return (
-    <div className="max-w-3xl mx-auto bg-white rounded-2xl shadow p-6">
+    <div className="w-full h-full flex items-center justify-center overflow-y-hidden">
 
-      {/* HEADER */}
-      <h2 className="text-xl font-semibold mb-6">
-        Confirm & Pay
-      </h2>
+      <div className="w-full max-w-5xl bg-white p-8">
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* HEADER */}
+        <div className="mb-8">
 
-        {/* LEFT: SUMMARY */}
-        <div className="space-y-4">
+          <h2 className="text-3xl font-semibold">
+            Confirm & Pay
+          </h2>
 
-          <div className="border rounded-xl p-4">
-            <p className="text-sm text-gray-500">Service</p>
-            <p className="font-medium">{service || "Massage"}</p>
-          </div>
-
-          <div className="border rounded-xl p-4">
-            <p className="text-sm text-gray-500">Staff</p>
-            <p className="font-medium">{staff || "Any available"}</p>
-          </div>
-
-          <div className="border rounded-xl p-4">
-            <p className="text-sm text-gray-500">Date & Time</p>
-            <p className="font-medium">
-              {date?.toDateString()} • {time}
-            </p>
-          </div>
-
-          <div className="border rounded-xl p-4">
-            <p className="text-sm text-gray-500">Customer</p>
-            <p className="font-medium">{customer?.name}</p>
-            <p className="text-sm text-gray-500">
-              {customer?.email}
-            </p>
-          </div>
+          <p className="text-gray-500 mt-2">
+            Review your booking details before confirming
+          </p>
 
         </div>
 
-        {/* RIGHT: PAYMENT */}
-        <div className="space-y-4">
+        {/* CONTENT */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
-          <div className="border rounded-xl p-4">
-            <p className="text-sm text-gray-500 mb-2">
-              Payment method
-            </p>
+          {/* LEFT SIDE */}
+          <div className="space-y-4">
 
-            <div className="space-y-2">
+            <div className="border rounded-2xl p-5">
+              <p className="text-sm text-gray-500 mb-1">
+                Service
+              </p>
 
-              <label className="flex items-center gap-2">
-                <input
-                  type="radio"
-                  checked={paymentMethod === "card"}
-                  onChange={() => setPaymentMethod("card")}
-                />
-                Credit / Debit Card
-              </label>
-
-              <label className="flex items-center gap-2">
-                <input
-                  type="radio"
-                  checked={paymentMethod === "cash"}
-                  onChange={() => setPaymentMethod("cash")}
-                />
-                Pay on arrival
-              </label>
-
+              <p className="font-semibold text-lg">
+                {service?.name || "Massage"}
+              </p>
             </div>
+
+            <div className="border rounded-2xl p-5">
+              <p className="text-sm text-gray-500 mb-1">
+                Staff
+              </p>
+
+              <p className="font-semibold text-lg">
+                {staff?.name || "Any available"}
+              </p>
+            </div>
+
+            <div className="border rounded-2xl p-5">
+              <p className="text-sm text-gray-500 mb-1">
+                Date & Time
+              </p>
+
+              <p className="font-semibold text-lg">
+                {date
+                  ? new Date(date).toDateString()
+                  : "No date selected"}{" "}
+                • {time || "No time selected"}
+              </p>
+            </div>
+
+            <div className="border rounded-2xl p-5">
+              <p className="text-sm text-gray-500 mb-1">
+                Customer
+              </p>
+
+              <p className="font-semibold">
+                {customer?.name}
+              </p>
+
+              <p className="text-sm text-gray-500">
+                {customer?.email}
+              </p>
+
+              <p className="text-sm text-gray-500">
+                {customer?.phone}
+              </p>
+            </div>
+
           </div>
 
-          {/* PRICE */}
-          <div className="border rounded-xl p-4">
-            <div className="flex justify-between mb-2">
-              <span>Service price</span>
-              <span>€{price}</span>
+          {/* RIGHT SIDE */}
+          <div className="space-y-6">
+
+            {/* PAYMENT */}
+            <div className="border rounded-2xl p-5">
+
+              <p className="font-medium mb-4">
+                Payment method
+              </p>
+
+              <div className="space-y-3">
+
+                <label className="flex items-center gap-3 border rounded-xl p-4 cursor-pointer hover:bg-gray-50">
+
+                  <input
+                    type="radio"
+                    checked={paymentMethod === "card"}
+                    onChange={() => setPaymentMethod("card")}
+                  />
+
+                  <span>Credit / Debit Card</span>
+
+                </label>
+
+                <label className="flex items-center gap-3 border rounded-xl p-4 cursor-pointer hover:bg-gray-50">
+
+                  <input
+                    type="radio"
+                    checked={paymentMethod === "cash"}
+                    onChange={() => setPaymentMethod("cash")}
+                  />
+
+                  <span>Pay on arrival</span>
+
+                </label>
+
+              </div>
+
             </div>
 
-            <div className="flex justify-between text-sm text-gray-500">
-              <span>Fee</span>
-              <span>€0</span>
+            {/* PRICE */}
+            <div className="border rounded-2xl p-5">
+
+              <div className="flex justify-between mb-3">
+                <span>Service price</span>
+                <span>€{price}</span>
+              </div>
+
+              <div className="flex justify-between text-gray-500 text-sm">
+                <span>Booking fee</span>
+                <span>€0</span>
+              </div>
+
+              <div className="border-t mt-4 pt-4 flex justify-between text-lg font-semibold">
+
+                <span>Total</span>
+
+                <span>€{price}</span>
+
+              </div>
+
             </div>
 
-            <div className="border-t mt-3 pt-3 flex justify-between font-semibold">
-              <span>Total</span>
-              <span>€{price}</span>
+            {/* ACTIONS */}
+            <div className="flex gap-4 pt-2">
+
+              <button
+                onClick={goBack}
+                className="flex-1 border rounded-2xl py-4 hover:bg-gray-100 transition font-medium"
+              >
+                Back
+              </button>
+
+              <button
+                onClick={handleConfirm}
+                disabled={loading}
+                className="flex-1 bg-black text-white rounded-2xl py-4 hover:opacity-90 transition font-medium disabled:opacity-50"
+              >
+                {loading
+                  ? "Processing..."
+                  : "Confirm Booking"}
+              </button>
+
             </div>
-          </div>
-
-          {/* BUTTONS */}
-          <div className="flex gap-3">
-
-            <button
-              onClick={onBack}
-              className="flex-1 border rounded-lg py-2 hover:bg-gray-100"
-            >
-              Back
-            </button>
-
-            <button
-              onClick={handleConfirm}
-              disabled={loading}
-              className="flex-1 bg-black text-white rounded-lg py-2 hover:opacity-90"
-            >
-              {loading ? "Processing..." : "Confirm booking"}
-            </button>
 
           </div>
 
         </div>
 
       </div>
+
     </div>
   );
 };

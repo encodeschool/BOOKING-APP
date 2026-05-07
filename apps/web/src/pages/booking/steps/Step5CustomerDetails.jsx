@@ -60,7 +60,7 @@ const Step5CustomerDetails = () => {
       [field]: value,
     }));
 
-    // REMOVE ERROR WHILE TYPING
+    // CLEAR ERROR WHILE TYPING
     if (errors[field]) {
       setErrors((prev) => ({
         ...prev,
@@ -83,14 +83,14 @@ const Step5CustomerDetails = () => {
   };
 
   return (
-    <div className="w-full max-w-3xl mx-auto bg-white rounded-2xl shadow p-6">
+    <div className="w-full h-full flex flex-col bg-white overflow-hidden">
 
       {/* HEADER */}
-      <div className="flex items-center gap-3 mb-8">
+      <div className="flex items-center gap-3 p-6 border-b shrink-0">
 
         <button
           onClick={goBack}
-          className="p-2 rounded-lg hover:bg-gray-100 transition"
+          className="p-2 rounded-xl hover:bg-gray-100 transition"
         >
           <ArrowLeft size={20} />
         </button>
@@ -107,136 +107,148 @@ const Step5CustomerDetails = () => {
 
       </div>
 
-      {/* FORM */}
-      <div className="space-y-5">
+      {/* SCROLLABLE CONTENT */}
+      <div className="flex-1 overflow-y-auto">
 
-        {/* NAME */}
-        <div>
+        <div className="max-w-3xl mx-auto w-full p-6">
 
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Full name
-          </label>
+          <div className="space-y-6">
 
-          <input
-            type="text"
-            value={customer.name}
-            onChange={(e) =>
-              handleChange("name", e.target.value)
-            }
-            placeholder="John Doe"
-            className={`w-full border rounded-xl p-4 outline-none transition ${
-              errors.name
-                ? "border-red-500 focus:ring-2 focus:ring-red-200"
-                : "focus:ring-2 focus:ring-black"
-            }`}
-          />
+            {/* NAME */}
+            <div>
 
-          {errors.name && (
-            <p className="text-red-500 text-sm mt-2">
-              {errors.name}
-            </p>
-          )}
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Full name
+              </label>
 
-        </div>
+              <input
+                type="text"
+                value={customer.name}
+                onChange={(e) =>
+                  handleChange("name", e.target.value)
+                }
+                placeholder="John Doe"
+                className={`w-full border rounded-2xl p-4 outline-none transition text-base ${
+                  errors.name
+                    ? "border-red-500 focus:ring-2 focus:ring-red-200"
+                    : "focus:ring-2 focus:ring-black"
+                }`}
+              />
 
-        {/* EMAIL */}
-        <div>
+              {errors.name && (
+                <p className="text-red-500 text-sm mt-2">
+                  {errors.name}
+                </p>
+              )}
 
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Email address
-          </label>
+            </div>
 
-          <input
-            type="email"
-            value={customer.email}
-            onChange={(e) =>
-              handleChange("email", e.target.value)
-            }
-            placeholder="john@email.com"
-            className={`w-full border rounded-xl p-4 outline-none transition ${
-              errors.email
-                ? "border-red-500 focus:ring-2 focus:ring-red-200"
-                : "focus:ring-2 focus:ring-black"
-            }`}
-          />
+            {/* EMAIL */}
+            <div>
 
-          {errors.email && (
-            <p className="text-red-500 text-sm mt-2">
-              {errors.email}
-            </p>
-          )}
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Email address
+              </label>
 
-        </div>
+              <input
+                type="email"
+                value={customer.email}
+                onChange={(e) =>
+                  handleChange("email", e.target.value)
+                }
+                placeholder="john@email.com"
+                className={`w-full border rounded-2xl p-4 outline-none transition text-base ${
+                  errors.email
+                    ? "border-red-500 focus:ring-2 focus:ring-red-200"
+                    : "focus:ring-2 focus:ring-black"
+                }`}
+              />
 
-        {/* PHONE */}
-        <div>
+              {errors.email && (
+                <p className="text-red-500 text-sm mt-2">
+                  {errors.email}
+                </p>
+              )}
 
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Phone number
-          </label>
+            </div>
 
-          <input
-            type="tel"
-            value={customer.phone}
-            onChange={(e) =>
-              handleChange("phone", e.target.value)
-            }
-            placeholder="+371 20 123 456"
-            className={`w-full border rounded-xl p-4 outline-none transition ${
-              errors.phone
-                ? "border-red-500 focus:ring-2 focus:ring-red-200"
-                : "focus:ring-2 focus:ring-black"
-            }`}
-          />
+            {/* PHONE */}
+            <div>
 
-          {errors.phone && (
-            <p className="text-red-500 text-sm mt-2">
-              {errors.phone}
-            </p>
-          )}
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Phone number
+              </label>
 
-        </div>
+              <input
+                type="tel"
+                value={customer.phone}
+                onChange={(e) =>
+                  handleChange("phone", e.target.value)
+                }
+                placeholder="+371 20 123 456"
+                className={`w-full border rounded-2xl p-4 outline-none transition text-base ${
+                  errors.phone
+                    ? "border-red-500 focus:ring-2 focus:ring-red-200"
+                    : "focus:ring-2 focus:ring-black"
+                }`}
+              />
 
-        {/* NOTES */}
-        <div>
+              {errors.phone && (
+                <p className="text-red-500 text-sm mt-2">
+                  {errors.phone}
+                </p>
+              )}
 
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Notes for provider
-            <span className="text-gray-400 ml-1">
-              (optional)
-            </span>
-          </label>
+            </div>
 
-          <textarea
-            rows={5}
-            value={customer.notes}
-            onChange={(e) =>
-              handleChange("notes", e.target.value)
-            }
-            placeholder="Any special requests, allergies, preferences, or additional information..."
-            className="w-full border rounded-xl p-4 outline-none resize-none focus:ring-2 focus:ring-black transition"
-          />
+            {/* NOTES */}
+            <div>
+
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Notes for provider
+                <span className="text-gray-400 ml-1">
+                  (optional)
+                </span>
+              </label>
+
+              <textarea
+                rows={6}
+                value={customer.notes}
+                onChange={(e) =>
+                  handleChange("notes", e.target.value)
+                }
+                placeholder="Any special requests, allergies, preferences, or additional information..."
+                className="w-full border rounded-2xl p-4 outline-none resize-none focus:ring-2 focus:ring-black transition text-base"
+              />
+
+            </div>
+
+          </div>
 
         </div>
 
       </div>
 
-      {/* ACTIONS */}
-      <div className="flex items-center justify-between mt-8">
+      {/* FOOTER ACTIONS */}
+      <div className="border-t p-6 shrink-0 bg-white">
 
-        <button
-          onClick={goBack}
-          className="px-6 py-3 border rounded-xl hover:bg-gray-100 transition"
-        >
-          Back
-        </button>
+        <div className="max-w-3xl mx-auto flex items-center justify-between">
 
-        <button
-          onClick={handleContinue}
-          className="px-8 py-3 bg-black text-white rounded-xl hover:opacity-90 transition"
-        >
-          Continue
-        </button>
+          <button
+            onClick={goBack}
+            className="px-6 py-3 border rounded-2xl hover:bg-gray-100 transition"
+          >
+            Back
+          </button>
+
+          <button
+            onClick={handleContinue}
+            className="px-8 py-3 bg-black text-white rounded-2xl hover:opacity-90 transition"
+          >
+            Continue
+          </button>
+
+        </div>
 
       </div>
 

@@ -69,7 +69,7 @@ const Step2ServiceSelection = () => {
   };
 
   return (
-    <div className="w-full min-h-[700px] bg-white flex flex-col rounded-2xl overflow-hidden">
+    <div className="w-full max-h-full bg-white flex flex-col rounded-2xl overflow-hidden">
 
       {/* HEADER */}
       <div className="flex items-center gap-3 p-5 border-b">
@@ -94,7 +94,7 @@ const Step2ServiceSelection = () => {
       </div>
 
       {/* SEARCH */}
-      <div className="p-5 border-b">
+      <div className="p-5 border-b flex justify-between">
 
         <div className="flex items-center gap-2 bg-gray-100 px-4 py-3 rounded-full">
 
@@ -110,29 +110,29 @@ const Step2ServiceSelection = () => {
 
         </div>
 
+        {/* CATEGORIES */}
+        <div className="px-5 flex gap-2 overflow-x-auto">
+
+          {categories.map((category) => (
+            <button
+              key={category}
+              onClick={() => setSelectedCategory(category)}
+              className={`px-5 py-2 rounded-full border text-sm whitespace-nowrap transition ${
+                selectedCategory === category
+                  ? "bg-black text-white border-black"
+                  : "bg-white hover:bg-gray-100"
+              }`}
+            >
+              {category}
+            </button>
+          ))}
+
+        </div>
       </div>
 
-      {/* CATEGORIES */}
-      <div className="px-5 py-4 flex gap-2 overflow-x-auto border-b">
-
-        {categories.map((category) => (
-          <button
-            key={category}
-            onClick={() => setSelectedCategory(category)}
-            className={`px-4 py-2 rounded-full border text-sm whitespace-nowrap transition ${
-              selectedCategory === category
-                ? "bg-black text-white border-black"
-                : "bg-white hover:bg-gray-100"
-            }`}
-          >
-            {category}
-          </button>
-        ))}
-
-      </div>
 
       {/* SERVICE LIST */}
-      <div className="flex-1 overflow-y-scroll p-5 space-y-3">
+      <div className="flex-1 overflow-y-auto p-5 space-y-3">
 
         {filtered.map((service) => {
           const isSelected =

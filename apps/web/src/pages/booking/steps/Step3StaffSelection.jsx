@@ -46,7 +46,7 @@ const Step3StaffSelection = () => {
   };
 
   return (
-    <div className="w-full min-h-[700px] bg-white flex flex-col rounded-2xl overflow-hidden">
+    <div className="w-full max-h-full bg-white flex flex-col rounded-2xl overflow-hidden">
 
       {/* HEADER */}
       <div className="flex items-center gap-3 p-5 border-b">
