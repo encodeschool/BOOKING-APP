@@ -27,4 +27,5 @@ public class BookingResponse {
 
     public String customerName;
     public String customerPhone;
+    public String customerEmail;
 }

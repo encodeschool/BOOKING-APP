@@ -533,6 +533,9 @@ public class BookingServiceImpl implements BookingService {
                 .statusReason(booking.getStatusReason())
                 .createdAt(booking.getCreatedAt())
                 .updatedAt(booking.getUpdatedAt())
+                .customerName(booking.getCustomerName())
+                .customerPhone(booking.getCustomerPhone())
+                .customerEmail(booking.getCustomerEmail())
                 .build();
     }
 
