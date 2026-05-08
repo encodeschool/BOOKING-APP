@@ -132,4 +132,10 @@ export async function saveStaffWorkingHours(
   return res.json();
 }
 
+export async function getDashboardMetrics(token, businessId) {
+  return request(`/api/bookings/dashboard/${businessId}/metrics`, {
+    token,
+  });
+}
+
 export { API_BASE_URL };

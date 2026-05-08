@@ -12,9 +12,7 @@ const Step4TimePicker = () => {
 
   const [selectedTime, setSelectedTime] = useState("");
 
-  const { hours } = useStaffWorkingHours(
-    booking?.staff?.id
-  );
+  const { hours } = useStaffWorkingHours(booking?.staff?.id ?? null);
 
   const today = new Date();
 
@@ -59,6 +57,8 @@ const Step4TimePicker = () => {
     if (workingDay.isOff) return [];
 
     const slots = [];
+
+    if (!workingDay.startTime || !workingDay.endTime) return [];
 
     const start = workingDay.startTime.slice(0, 5);
     const end = workingDay.endTime.slice(0, 5);

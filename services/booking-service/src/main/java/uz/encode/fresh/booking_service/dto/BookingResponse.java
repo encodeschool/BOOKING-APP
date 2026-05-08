@@ -6,6 +6,8 @@ import java.time.LocalTime;
 
 import lombok.Builder;
 import lombok.Value;
+import uz.encode.fresh.booking_service.integration.dto.ServiceDetailsResponse;
+import uz.encode.fresh.booking_service.integration.dto.StaffDetailsResponse;
 import uz.encode.fresh.booking_service.model.BookingStatus;
 
 @Value
@@ -28,4 +30,7 @@ public class BookingResponse {
     public String customerName;
     public String customerPhone;
     public String customerEmail;
+
+    private ServiceDetailsResponse service;
+    private StaffDetailsResponse staff;
 }

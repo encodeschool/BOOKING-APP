@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import uz.encode.fresh.booking_service.dto.BookingResponse;
 import uz.encode.fresh.booking_service.dto.CreateBookingRequest;
 import uz.encode.fresh.booking_service.dto.CreatePublicBookingRequest;
+import uz.encode.fresh.booking_service.dto.DashboardMetricsResponse;
 import uz.encode.fresh.booking_service.dto.UpdateBookingStatusRequest;
 import uz.encode.fresh.booking_service.entity.Booking;
 import uz.encode.fresh.booking_service.integration.CoreServiceClient;
@@ -519,6 +520,20 @@ public class BookingServiceImpl implements BookingService {
     }
 
     private BookingResponse toResponse(Booking booking) {
+
+        ServiceDetailsResponse service = null;
+        StaffDetailsResponse staff = null;
+
+        try {
+            service = coreServiceClient.getService(booking.getServiceId());
+        } catch (Exception ignored) {
+        }
+
+        try {
+            staff = coreServiceClient.getStaff(booking.getStaffId());
+        } catch (Exception ignored) {
+        }
+        
         return BookingResponse.builder()
                 .id(booking.getId())
                 .clientId(booking.getClientId())
@@ -536,6 +551,11 @@ public class BookingServiceImpl implements BookingService {
                 .customerName(booking.getCustomerName())
                 .customerPhone(booking.getCustomerPhone())
                 .customerEmail(booking.getCustomerEmail())
+
+                // ADD THESE
+                .service(service)
+                .staff(staff)
+
                 .build();
     }
 
@@ -548,5 +568,41 @@ public class BookingServiceImpl implements BookingService {
         return bookingRepository.findByBusinessIdAndBookingDateBetween(
                 businessId, start, end
         ).stream().map(this::toResponse).toList();
+    }
+
+    @Override
+    public DashboardMetricsResponse getDashboardMetrics(Long businessId) {
+
+        long totalBookings =
+                bookingRepository.countByBusinessId(businessId);
+
+        long pendingBookings =
+                bookingRepository.countByBusinessIdAndStatus(
+                        businessId,
+                        BookingStatus.PENDING
+                );
+
+        long completedBookings =
+                bookingRepository.countByBusinessIdAndStatus(
+                        businessId,
+                        BookingStatus.COMPLETED
+                );
+
+        // TODO: replace with real payment/revenue logic
+        double revenue = completedBookings * 50.0;
+
+        return DashboardMetricsResponse.builder()
+                .revenue(revenue)
+                .bookings(totalBookings)
+                .pending(pendingBookings)
+                .completed(completedBookings)
+
+                // temporary static growth
+                .revenueGrowth(18)
+                .bookingGrowth(12)
+                .pendingGrowth(4)
+                .completedGrowth(22)
+
+                .build();
     }
 }

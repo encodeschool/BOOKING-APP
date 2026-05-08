@@ -42,4 +42,11 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
         LocalDate from,
         LocalDate to
     );
+
+    long countByBusinessId(Long businessId);
+
+    long countByBusinessIdAndStatus(
+            Long businessId,
+            BookingStatus status
+    );
 }

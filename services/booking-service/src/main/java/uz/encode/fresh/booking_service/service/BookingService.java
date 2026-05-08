@@ -5,6 +5,7 @@ import java.util.List;
 import uz.encode.fresh.booking_service.dto.BookingResponse;
 import uz.encode.fresh.booking_service.dto.CreateBookingRequest;
 import uz.encode.fresh.booking_service.dto.CreatePublicBookingRequest;
+import uz.encode.fresh.booking_service.dto.DashboardMetricsResponse;
 import uz.encode.fresh.booking_service.dto.UpdateBookingStatusRequest;
 
 public interface BookingService {
@@ -32,4 +33,6 @@ public interface BookingService {
     List<BookingResponse> getStaffBookings(Long staffId);
 
     List<BookingResponse> getCalendar(Long businessId, String from, String to);
+
+    DashboardMetricsResponse getDashboardMetrics(Long businessId);
 }

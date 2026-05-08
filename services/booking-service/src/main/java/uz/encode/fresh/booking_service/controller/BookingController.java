@@ -17,6 +17,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import uz.encode.fresh.booking_service.dto.BookingResponse;
 import uz.encode.fresh.booking_service.dto.CreateBookingRequest;
+import uz.encode.fresh.booking_service.dto.DashboardMetricsResponse;
 import uz.encode.fresh.booking_service.dto.UpdateBookingStatusRequest;
 import uz.encode.fresh.booking_service.service.BookingService;
 
@@ -51,7 +52,7 @@ public class BookingController {
 
     @PatchMapping("/{bookingId}/status")
     public BookingResponse updateStatus(HttpServletRequest request,
-                                        @PathVariable Long bookingId,
+                                        @PathVariable("bookingId") Long bookingId,
                                         @Valid @RequestBody UpdateBookingStatusRequest body) {
         return bookingService.updateBusinessStatus((Long) request.getAttribute("userId"), bookingId, body);
     }
@@ -80,5 +81,12 @@ public class BookingController {
             @RequestParam("to") String to
     ) {
         return bookingService.getCalendar(businessId, from, to);
+    }
+
+    @GetMapping("/dashboard/{businessId}/metrics")
+    public DashboardMetricsResponse getDashboardMetrics(
+            @PathVariable("businessId") Long businessId
+    ) {
+        return bookingService.getDashboardMetrics(businessId);
     }
 }

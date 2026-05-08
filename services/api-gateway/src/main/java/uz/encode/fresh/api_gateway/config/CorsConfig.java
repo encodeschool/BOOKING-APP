@@ -23,7 +23,7 @@ public class CorsConfig {
         config.setAllowedHeaders(List.of("*"));
 
         // Allow all methods
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
 
         // Allow credentials (JWT)
         config.setAllowCredentials(true);
