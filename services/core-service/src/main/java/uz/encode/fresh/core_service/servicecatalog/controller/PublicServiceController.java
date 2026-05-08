@@ -19,7 +19,7 @@ public class PublicServiceController {
     private ServiceCatalogService service;
 
     @GetMapping("/business/{businessId}")
-    public List<ServiceResponse> getServicesByBusiness(@PathVariable Long businessId) {
+    public List<ServiceResponse> getServicesByBusiness(@PathVariable("businessId") Long businessId) {
         return service.getByBusinessPublic(businessId)
                 .stream()
                 .map(s -> {

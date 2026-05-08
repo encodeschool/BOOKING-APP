@@ -56,6 +56,25 @@
       "projectName": "core-service"
     },
 
+    // ==================== BOOKING SERVICE ====================
+
+    {
+      "type": "java",
+      "name": "Booking Service (DEV)",
+      "request": "launch",
+      "mainClass": "uz.encode.fresh.booking_service.BookingServiceApplication",
+      "vmArgs": "-Dspring.profiles.active=dev",
+      "projectName": "booking-service"
+    },
+    {
+      "type": "java",
+      "name": "Booking Service (PROD)",
+      "request": "launch",
+      "mainClass": "uz.encode.fresh.booking_service.BookingServiceApplication",
+      "vmArgs": "-Dspring.profiles.active=prod",
+      "projectName": "booking-service"
+    },
+
     // ==================== API GATEWAY ====================
     {
       "type": "java",

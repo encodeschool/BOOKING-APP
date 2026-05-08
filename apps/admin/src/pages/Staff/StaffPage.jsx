@@ -7,6 +7,7 @@ import {
   FiEdit2,
   FiTrash2,
   FiFilter,
+  FiX,
   FiUser,
 } from "react-icons/fi";
 
@@ -197,108 +198,107 @@ export default function StaffPage() {
 
       {/* CREATE FORM */}
       {showForm && (
-        <div className="bg-white border border-gray-100 rounded-3xl p-8 shadow-sm">
+        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="w-full max-w-2xl bg-white rounded-3xl shadow-2xl overflow-hidden">
+            <div className="flex items-center justify-between p-6 border-b border-gray-100">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900">
+                  Add New Staff
+                </h2>
 
-          <div className="flex items-center justify-between mb-8">
+                <p className="text-sm text-gray-500 mt-1">
+                  Create a new team member
+                </p>
+              </div>
 
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900">
-                Add New Staff
-              </h2>
+              <button
+                onClick={() => setShowForm(false)}
+                className="w-10 h-10 rounded-xl hover:bg-gray-100 flex items-center justify-center transition"
+              >
+                <FiX size={20} />
+              </button>
 
-              <p className="text-gray-500 mt-1">
-                Create a new team member
-              </p>
             </div>
 
-            <button
-              onClick={() => setShowForm(false)}
-              className="text-gray-400 hover:text-gray-700 text-2xl"
-            >
-              ×
-            </button>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 px-6 py-3">
 
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Full Name
+                </label>
+
+                <input
+                  type="text"
+                  placeholder="John Doe"
+                  value={form.name}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      name: e.target.value,
+                    })
+                  }
+                  className="w-full px-4 py-3 rounded-2xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-green-500 outline-none transition-all"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Role
+                </label>
+
+                <input
+                  type="text"
+                  placeholder="Manager"
+                  value={form.role}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      role: e.target.value,
+                    })
+                  }
+                  className="w-full px-4 py-3 rounded-2xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-green-500 outline-none transition-all"
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Phone Number
+                </label>
+
+                <input
+                  type="text"
+                  placeholder="+371 20 123 456"
+                  value={form.phone}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      phone: e.target.value,
+                    })
+                  }
+                  className="w-full px-4 py-3 rounded-2xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-green-500 outline-none transition-all"
+                />
+              </div>
+
+            </div>
+
+            <div className="flex items-center justify-end gap-3 mt-8 px-6 py-3">
+
+              <button
+                onClick={() => setShowForm(false)}
+                className="px-5 py-3 rounded-2xl border border-gray-200 text-gray-700 hover:bg-gray-50 transition-all"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={handleCreate}
+                className="px-6 py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-green-600 text-white font-medium shadow-lg shadow-green-100 hover:opacity-90 transition-all"
+              >
+                Create Staff
+              </button>
+
+            </div>
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Full Name
-              </label>
-
-              <input
-                type="text"
-                placeholder="John Doe"
-                value={form.name}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    name: e.target.value,
-                  })
-                }
-                className="w-full px-4 py-3 rounded-2xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-green-500 outline-none transition-all"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Role
-              </label>
-
-              <input
-                type="text"
-                placeholder="Manager"
-                value={form.role}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    role: e.target.value,
-                  })
-                }
-                className="w-full px-4 py-3 rounded-2xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-green-500 outline-none transition-all"
-              />
-            </div>
-
-            <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Phone Number
-              </label>
-
-              <input
-                type="text"
-                placeholder="+371 20 123 456"
-                value={form.phone}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    phone: e.target.value,
-                  })
-                }
-                className="w-full px-4 py-3 rounded-2xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-green-500 outline-none transition-all"
-              />
-            </div>
-
-          </div>
-
-          <div className="flex items-center justify-end gap-3 mt-8">
-
-            <button
-              onClick={() => setShowForm(false)}
-              className="px-5 py-3 rounded-2xl border border-gray-200 text-gray-700 hover:bg-gray-50 transition-all"
-            >
-              Cancel
-            </button>
-
-            <button
-              onClick={handleCreate}
-              className="px-6 py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-green-600 text-white font-medium shadow-lg shadow-green-100 hover:opacity-90 transition-all"
-            >
-              Create Staff
-            </button>
-
-          </div>
-
         </div>
       )}
 

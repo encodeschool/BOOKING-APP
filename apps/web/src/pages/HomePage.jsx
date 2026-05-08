@@ -4,13 +4,11 @@ import RollingNumber from "../components/RollingNumber";
 import { Search, MapPin } from "lucide-react";
 import { Calendar, Clock, Star, Users } from "lucide-react";
 import { useBusinesses } from "../hooks/useApi";
-import { useBooking } from "../context/BookingContext";
 
 const HomePage = () => {
   const [count, setCount] = useState(6972);
   const [hoverQR, setHoverQR] = useState(false);
   const { businesses = [], loading } = useBusinesses();
-  const { openBooking } = useBooking();
   
   const features = [
     {
@@ -126,12 +124,9 @@ const HomePage = () => {
 
         {/* CTA */}
         <div className="mt-8 flex gap-4 justify-center">
-          <button
-            onClick={openBooking}
-            className="bg-white text-black px-6 py-3 rounded-full"
-          >
+          <Link to="/map" className="btn-secondary"> 
             Book Now
-          </button>
+          </Link>
           <Link to="/services" className="btn-secondary">
             View Services
           </Link>

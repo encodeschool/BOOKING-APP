@@ -102,35 +102,6 @@ export default function Topbar() {
 
           </button>
 
-          {/* USER CARD */}
-          <div className="flex items-center gap-3 bg-gray-50 border border-gray-200 rounded-2xl px-3 py-2">
-
-            {/* AVATAR */}
-            <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-[#52b46ecc] to-[#3b8f59] flex items-center justify-center shadow-md">
-
-              <span className="text-white font-bold text-sm">
-                {profile?.name?.charAt(0)?.toUpperCase() ||
-                  profile?.email?.charAt(0)?.toUpperCase() ||
-                  "U"}
-              </span>
-
-            </div>
-
-            {/* USER INFO */}
-            <div className="hidden xl:block">
-
-              <p className="text-sm font-semibold text-gray-900 leading-none">
-                {profile?.name || "Admin"}
-              </p>
-
-              <p className="text-xs text-gray-500 mt-1">
-                {profile?.role || "Administrator"}
-              </p>
-
-            </div>
-
-          </div>
-
           {/* LOGOUT */}
           <button
             onClick={logout}

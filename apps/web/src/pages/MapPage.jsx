@@ -1,42 +1,19 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, {
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
 
-const NAVBAR_HEIGHT = 60;
+import { useBooking } from "../context/BookingContext";
+import { useBusinesses, useServices } from "../hooks/useApi";
 
-const mockVenues = [
-  {
-    id: 1,
-    name: "M87 Barber Shop",
-    address: "Dzirnavu iela 87, Rīga",
-    rating: 5.0,
-    reviews: 1337,
-    distance: "1.6 km",
-    image:
-      "https://images.fresha.com/locations/location-profile-images/2506300/4458503/51f9c977-77d0-4e2f-9db9-b3f8747b35e4-M87BarberShop-LV-Rga-CentraRajons-Fresha.jpg",
-    lat: 56.9659,
-    lng: 24.1433,
-    services: [
-      { name: "Haircut", price: "€30" },
-      { name: "Beard", price: "€20" },
-    ],
-  },
-  {
-    id: 2,
-    name: "Luxe Beauty Studio",
-    address: "Brīvības iela 45, Rīga",
-    rating: 4.8,
-    reviews: 200,
-    distance: "2.1 km",
-    image: "https://images.unsplash.com/photo-1600585154340-be6161a56a9c",
-    lat: 56.9721,
-    lng: 24.1587,
-    services: [{ name: "Facial", price: "€35" }],
-  },
-];
+const NAVBAR_HEIGHT = 60;
 
 export default function MapPage() {
   const mapRef = useRef(null);
@@ -44,78 +21,175 @@ export default function MapPage() {
   const markersRef = useRef([]);
   const listRef = useRef(null);
 
-  const [selectedVenue, setSelectedVenue] = useState(null);
-  const [activeTab, setActiveTab] = useState("venues");
-  const [showMap, setShowMap] = useState(true);
-  const [scrolled, setScrolled] = useState(false);
+  const [selectedVenue, setSelectedVenue] =
+    useState(null);
 
-  const filtered = mockVenues;
+  const [activeTab, setActiveTab] =
+    useState("venues");
 
+  const [showMap, setShowMap] =
+    useState(true);
+
+  const [scrolled, setScrolled] =
+    useState(false);
+
+  const { openBooking, updateBooking } =
+    useBooking();
+
+  // API
+  const {
+    businesses,
+    loading,
+    error,
+  } = useBusinesses();
+
+  // INIT MAP
   useEffect(() => {
-    if (!mapInstance.current && mapRef.current) {
-      mapInstance.current = L.map(mapRef.current).setView(
-        [56.96, 24.14],
-        13
-      );
+    if (
+      !mapInstance.current &&
+      mapRef.current
+    ) {
+      mapInstance.current = L.map(
+        mapRef.current
+      ).setView([56.9496, 24.1052], 12);
 
       L.tileLayer(
         "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-        { attribution: "&copy; OpenStreetMap" }
+        {
+          attribution:
+            "&copy; OpenStreetMap",
+        }
       ).addTo(mapInstance.current);
     }
   }, []);
 
+  // FIX MAP RESIZE
   useEffect(() => {
-    if (showMap && mapInstance.current) {
+    if (
+      showMap &&
+      mapInstance.current
+    ) {
       setTimeout(() => {
         mapInstance.current.invalidateSize();
       }, 200);
     }
   }, [showMap]);
 
+  // ADD MARKERS
   useEffect(() => {
     if (!mapInstance.current) return;
 
+    // REMOVE OLD MARKERS
     markersRef.current.forEach((m) =>
       mapInstance.current.removeLayer(m)
     );
+
     markersRef.current = [];
 
-    filtered.forEach((v) => {
-      const marker = L.marker([v.lat, v.lng], {
-        icon: L.icon({
-          iconUrl: markerIcon,
-          shadowUrl: markerShadow,
-        }),
-      })
-        .addTo(mapInstance.current)
-        .bindPopup(`<b>${v.name}</b>`);
+    businesses.forEach((business) => {
+      // skip businesses without coordinates
+      if (
+        !business.latitude ||
+        !business.longitude
+      ) {
+        return;
+      }
 
-      marker.on("click", () => setSelectedVenue(v));
+      const marker = L.marker(
+        [
+          business.latitude,
+          business.longitude,
+        ],
+        {
+          icon: L.icon({
+            iconUrl: markerIcon,
+            shadowUrl: markerShadow,
+          }),
+        }
+      )
+        .addTo(mapInstance.current)
+        .bindPopup(
+          `<b>${business.name}</b>`
+        );
+
+      marker.on("click", () =>
+        setSelectedVenue(business)
+      );
+
       markersRef.current.push(marker);
     });
-  }, [filtered]);
 
+    // AUTO FIT MAP
+    if (businesses.length > 0) {
+      const validBusinesses =
+        businesses.filter(
+          (b) =>
+            b.latitude &&
+            b.longitude
+        );
+
+      if (validBusinesses.length > 0) {
+        const bounds =
+          validBusinesses.map((b) => [
+            b.latitude,
+            b.longitude,
+          ]);
+
+        mapInstance.current.fitBounds(
+          bounds,
+          {
+            padding: [50, 50],
+          }
+        );
+      }
+    }
+  }, [businesses]);
+
+  // SCROLL EFFECT
   useEffect(() => {
     const el = listRef.current;
+
+    if (!el) return;
+
     const handleScroll = () => {
       setScrolled(el.scrollTop > 10);
     };
-    el.addEventListener("scroll", handleScroll);
-    return () => el.removeEventListener("scroll", handleScroll);
+
+    el.addEventListener(
+      "scroll",
+      handleScroll
+    );
+
+    return () =>
+      el.removeEventListener(
+        "scroll",
+        handleScroll
+      );
   }, []);
+
+  // BOOK
+  const handleBook = (business) => {
+    updateBooking({
+      business,
+    });
+
+    openBooking();
+  };
 
   return (
     <div className="flex">
-
       {/* LEFT */}
-      <div className={`${showMap ? "w-[60%]" : "w-full"} border-r bg-white`}>
-
+      <div
+        className={`${
+          showMap
+            ? "w-[60%]"
+            : "w-full"
+        } border-r bg-white`}
+      >
         <div
           ref={listRef}
           className="h-[calc(100vh-60px)] overflow-y-auto"
         >
-
           {/* HEADER */}
           <div
             className={`sticky top-0 z-20 border-b transition-all ${
@@ -125,16 +199,18 @@ export default function MapPage() {
             }`}
           >
             <div className="p-4 space-y-4">
-
-              {/* TOP ROW */}
               <div className="flex items-center justify-between">
-
-                {/* Tabs */}
+                {/* TABS */}
                 <div className="flex bg-gray-100 rounded-xl p-1">
                   <button
-                    onClick={() => setActiveTab("venues")}
+                    onClick={() =>
+                      setActiveTab(
+                        "venues"
+                      )
+                    }
                     className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium ${
-                      activeTab === "venues"
+                      activeTab ===
+                      "venues"
                         ? "bg-white shadow"
                         : "text-gray-500"
                     }`}
@@ -143,9 +219,14 @@ export default function MapPage() {
                   </button>
 
                   <button
-                    onClick={() => setActiveTab("professionals")}
+                    onClick={() =>
+                      setActiveTab(
+                        "professionals"
+                      )
+                    }
                     className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium ${
-                      activeTab === "professionals"
+                      activeTab ===
+                      "professionals"
                         ? "bg-white shadow"
                         : "text-gray-500"
                     }`}
@@ -155,7 +236,10 @@ export default function MapPage() {
                 </div>
 
                 <p className="text-sm text-gray-500">
-                  {filtered.length} venues in map area
+                  {
+                    businesses.length
+                  }{" "}
+                  venues in map area
                 </p>
 
                 <div className="flex gap-2">
@@ -164,81 +248,191 @@ export default function MapPage() {
                   </button>
 
                   <button
-                    onClick={() => setShowMap(!showMap)}
+                    onClick={() =>
+                      setShowMap(
+                        !showMap
+                      )
+                    }
                     className="px-4 py-2 border rounded-xl text-sm hover:bg-gray-50"
                   >
-                    {showMap ? "Hide map" : "Show map"}
+                    {showMap
+                      ? "Hide map"
+                      : "Show map"}
                   </button>
                 </div>
-
               </div>
             </div>
           </div>
 
+          {/* LOADING */}
+          {loading && (
+            <div className="p-10 text-center text-gray-500">
+              Loading businesses...
+            </div>
+          )}
+
+          {/* ERROR */}
+          {error && (
+            <div className="p-10 text-center text-red-500">
+              {error}
+            </div>
+          )}
+
           {/* LIST */}
-          <div className="p-5 grid grid-cols-2 gap-5">
-            {filtered.map((venue) => (
-              <div
-                key={venue.id}
-                onClick={() => setSelectedVenue(venue)}
-                className={`border rounded-3xl overflow-hidden cursor-pointer transition hover:shadow-xl ${
-                  selectedVenue?.id === venue.id
-                    ? "border-black shadow-xl"
-                    : "border-gray-200"
-                }`}
-              >
-                <div className="relative h-56">
-                  <img
-                    src={venue.image}
-                    className="w-full h-full object-cover"
-                    alt=""
-                  />
-                  <div className="absolute top-3 right-3 bg-white px-3 py-1 rounded-full text-sm shadow">
-                    {venue.distance}
-                  </div>
-                </div>
+          {!loading && (
+            <div className="p-5 grid grid-cols-2 gap-5">
+              {businesses.map(
+                (business) => (
+                  <div
+                    key={business.id}
+                    onClick={() =>
+                      setSelectedVenue(
+                        business
+                      )
+                    }
+                    className={`border rounded-3xl overflow-hidden cursor-pointer transition hover:shadow-xl ${
+                      selectedVenue?.id ===
+                      business.id
+                        ? "border-black shadow-xl"
+                        : "border-gray-200"
+                    }`}
+                  >
+                    {/* IMAGE */}
+                    <div className="relative h-56">
+                      <img
+                        src={
+                          business.imageUrl ||
+                          "https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?q=80&w=1200&auto=format&fit=crop"
+                        }
+                        className="w-full h-full object-cover"
+                        alt={
+                          business.name
+                        }
+                      />
+                    </div>
 
-                <div className="p-4">
-                  <div className="flex justify-between">
-                    <h3 className="font-semibold">{venue.name}</h3>
-                    <span>⭐ {venue.rating}</span>
-                  </div>
+                    {/* CONTENT */}
+                    <div className="p-4">
+                      <div className="flex justify-between">
+                        <h3 className="font-semibold">
+                          {
+                            business.name
+                          }
+                        </h3>
 
-                  <p className="text-sm text-gray-500">
-                    {venue.address}
-                  </p>
-
-                  <div className="mt-3 space-y-2">
-                    {venue.services.map((s, i) => (
-                      <div key={i} className="flex justify-between text-sm">
-                        <span>{s.name}</span>
-                        <span>{s.price}</span>
+                        {business.rating && (
+                          <span>
+                            ⭐{" "}
+                            {
+                              business.rating
+                            }
+                          </span>
+                        )}
                       </div>
-                    ))}
+
+                      <p className="text-sm text-gray-500 mt-1">
+                        {
+                          business.address
+                        }
+                      </p>
+
+                      <BusinessServices businessId={business.id} />
+
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+
+                          handleBook(
+                            business
+                          );
+                        }}
+                        className="mt-4 w-full bg-black text-white py-2 rounded-xl hover:bg-gray-900 transition"
+                      >
+                        Book
+                      </button>
+                    </div>
                   </div>
-
-                  <button className="mt-4 w-full bg-black text-white py-2 rounded-xl">
-                    Book
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-
+                )
+              )}
+            </div>
+          )}
         </div>
       </div>
 
-      {/* ✅ MAP (NOT unmounted, just hidden) */}
+      {/* MAP */}
       <div
-        className={`${showMap ? "block" : "hidden"} w-[40%]  h-screen sticky top-0`}
+        className={`${
+          showMap
+            ? "block"
+            : "hidden"
+        } w-[40%] h-screen sticky top-0`}
         style={{
           top: NAVBAR_HEIGHT,
           height: `calc(100vh - ${NAVBAR_HEIGHT}px)`,
         }}
       >
-        <div ref={mapRef} className="w-full h-full" />
+        <div
+          ref={mapRef}
+          className="w-full h-full"
+        />
       </div>
+    </div>
+  );
+}
 
+function BusinessServices({ businessId }) {
+  const {
+    services,
+    loading,
+  } = useServices(businessId);
+
+  if (loading) {
+    return (
+      <div className="mt-3 text-sm text-gray-400">
+        Loading services...
+      </div>
+    );
+  }
+
+  if (!services?.length) {
+    return (
+      <div className="mt-3 text-sm text-gray-400">
+        No services
+      </div>
+    );
+  }
+
+  return (
+    <div className="mt-4 space-y-2">
+      {services.slice(0, 3).map((service) => (
+        <div
+          key={service.id}
+          className="flex items-center justify-between text-sm"
+        >
+          <div>
+            <p className="font-medium text-gray-800">
+              {service.name}
+            </p>
+
+            <p className="text-xs text-gray-500">
+              {service.durationMinutes ||
+                service.duration ||
+                0}{" "}
+              min
+            </p>
+          </div>
+
+          <p className="font-semibold text-gray-900">
+            €{service.price}
+          </p>
+        </div>
+      ))}
+
+      {services.length > 3 && (
+        <p className="text-xs text-gray-400">
+          +{services.length - 3} more services
+        </p>
+      )}
     </div>
   );
 }

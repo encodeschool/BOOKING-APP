@@ -1,15 +1,20 @@
 package uz.encode.fresh.core_service.servicecatalog.controller;
 
 
-import jakarta.validation.Valid;
-import jakarta.servlet.http.HttpServletRequest;
-
-import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import uz.encode.fresh.core_service.servicecatalog.dto.CreateServiceRequest;
 import uz.encode.fresh.core_service.servicecatalog.dto.ServiceResponse;
 import uz.encode.fresh.core_service.servicecatalog.dto.UpdateServiceRequest;
@@ -29,7 +34,7 @@ public class ServiceController {
     }
 
     @GetMapping("/business/{businessId}")
-    public List<ServiceResponse> getByBusiness(@PathVariable Long businessId,
+    public List<ServiceResponse> getByBusiness(@PathVariable("businessId") Long businessId,
                                                HttpServletRequest request) {
         return service.getByBusiness(businessId, (Long) request.getAttribute("userId"));
     }

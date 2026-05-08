@@ -11,6 +11,7 @@ import {
   FaSpinner,
 } from "react-icons/fa";
 import { useAuth } from "../../app/providers/AuthProvider";
+import { getUsersApi } from "../../lib/api/users.api";
 
 export default function UsersPage() {
   const { token } = useAuth();
@@ -31,38 +32,32 @@ export default function UsersPage() {
     try {
       setLoading(true);
 
-      const response = await fetch(
-        "http://localhost:8080/api/users",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
+      const data =
+        await getUsersApi(token);
+
+      setUsers(data || []);
+    } catch (error) {
+      console.error(
+        "Failed to load users:",
+        error
       );
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch users");
-      }
-
-      const data = await response.json();
-
-      setUsers(data);
-    } catch (error) {
-      console.error("Failed to load users:", error);
       setUsers([]);
     } finally {
       setLoading(false);
     }
   }
 
-  const filteredUsers = users.filter(
-    (user) =>
-      user.fullName
-        .toLowerCase()
-        .includes(search.toLowerCase()) &&
+  const filteredUsers = users.filter((user) => {
+    const fullName = user.fullName || "";
+    const email = user.email || "";
+
+    return (
+      (fullName.toLowerCase().includes(search.toLowerCase()) ||
+        email.toLowerCase().includes(search.toLowerCase())) &&
       (filter === "" || user.role === filter)
-  );
+    );
+  });
 
   const getRoleBadge = (role) => {
     switch (role) {
@@ -279,12 +274,12 @@ export default function UsersPage() {
                       <td className="px-8 py-5">
                         <div className="flex items-center gap-4">
                           <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-500 text-white flex items-center justify-center font-bold shadow-md">
-                            {user.fullName.charAt(0)}
+                            {(user.fullName || user.email || "U").charAt(0).toUpperCase()}
                           </div>
 
                           <div>
                             <p className="font-semibold text-gray-900">
-                              {user.fullName}
+                              {user.fullName || "Unnamed User"}
                             </p>
 
                             <p className="text-sm text-gray-500">
@@ -296,7 +291,7 @@ export default function UsersPage() {
 
                       {/* EMAIL */}
                       <td className="px-8 py-5 text-gray-600">
-                        {user.email}
+                        {user.email || "No email"}
                       </td>
 
                       {/* ROLE */}
@@ -343,16 +338,16 @@ export default function UsersPage() {
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center gap-3">
                       <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-500 text-white flex items-center justify-center font-bold">
-                        {user.fullName.charAt(0)}
+                        {(user.fullName || user.email || "U").charAt(0).toUpperCase()}
                       </div>
 
                       <div>
                         <h3 className="font-bold text-gray-900">
-                          {user.fullName}
+                          {user.fullName || "Unnamed User"}
                         </h3>
 
                         <p className="text-sm text-gray-500">
-                          {user.email}
+                          {user.email || "No mail"}
                         </p>
                       </div>
                     </div>
