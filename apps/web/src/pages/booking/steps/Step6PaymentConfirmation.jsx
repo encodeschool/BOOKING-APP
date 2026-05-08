@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useBooking } from "../../../context/BookingContext";
 import { ArrowLeft, Star, User } from "lucide-react";
+import { apiClient } from '../../../lib/api';
 
 const Step6PaymentConfirmation = () => {
   const {
@@ -20,19 +21,47 @@ const Step6PaymentConfirmation = () => {
   const time = booking?.time;
   const customer = booking?.customer;
 
-  const price = service?.price
-    ? parseInt(service.price.replace("€", ""))
-    : 50;
+  const price = Number(service?.price || 0);
 
   // CONFIRM BOOKING
   const handleConfirm = async () => {
-    setLoading(true);
+    try {
+      setLoading(true);
 
-    // SIMULATE API
-    setTimeout(() => {
-      setLoading(false);
+      const payload = {
+        businessId: booking.business.id,
+        serviceId: booking.service.id,
+
+        staffId:
+          booking.staff?.id || null,
+
+        bookingDate: new Date(date)
+          .toISOString()
+          .split("T")[0],
+
+        startTime: time,
+
+        customerName: customer.name,
+        customerEmail: customer.email,
+        customerPhone: customer.phone,
+
+        notes: booking.notes || "",
+      };
+
+      await apiClient.createBooking(payload);
+
       setConfirmed(true);
-    }, 1500);
+
+    } catch (err) {
+      console.error(err);
+
+      alert(
+        err.message ||
+        "Failed to create booking"
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   // SUCCESS SCREEN

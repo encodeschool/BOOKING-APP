@@ -29,7 +29,7 @@ public class InternalController {
     private StaffService staffService;
 
     @GetMapping("/businesses/{id}")
-    public BusinessDetailsResponse getBusiness(@PathVariable Long id) {
+    public BusinessDetailsResponse getBusiness(@PathVariable("id") Long id) {
         Business business = businessService.getBusinessById(id);
         return new BusinessDetailsResponse(
                 business.getId(),
@@ -41,7 +41,7 @@ public class InternalController {
     }
 
     @GetMapping("/services/{id}")
-    public ServiceDetailsResponse getService(@PathVariable Long id) {
+    public ServiceDetailsResponse getService(@PathVariable("id") Long id) {
         ServiceEntity service = serviceCatalogService.getById(id);
         return new ServiceDetailsResponse(
                 service.getId(),
@@ -54,7 +54,7 @@ public class InternalController {
     }
 
     @GetMapping("/staff/{id}")
-    public StaffDetailsResponse getStaff(@PathVariable Long id) {
+    public StaffDetailsResponse getStaff(@PathVariable("id") Long id) {
         Staff staff = staffService.getById(id);
         return new StaffDetailsResponse(
                 staff.getId(),
@@ -66,7 +66,7 @@ public class InternalController {
     }
 
     @GetMapping("/staff/business/{businessId}")
-    public List<StaffDetailsResponse> getStaffByBusiness(@PathVariable Long businessId) {
+    public List<StaffDetailsResponse> getStaffByBusiness(@PathVariable("businessId") Long businessId) {
         return staffService.getByBusinessPublic(businessId)
                 .stream()
                 .map(staff -> new StaffDetailsResponse(
@@ -80,8 +80,8 @@ public class InternalController {
     }
 
     @GetMapping("/working-hours/{businessId}/{dayOfWeek}")
-    public WorkingHoursResponse getWorkingHours(@PathVariable Long businessId,
-                                                @PathVariable String dayOfWeek) {
+    public WorkingHoursResponse getWorkingHours(@PathVariable("businessId") Long businessId,
+                                                @PathVariable("dayOfWeek") String dayOfWeek) {
         // For now, return default working hours
         // In a real implementation, you'd have a working hours entity
         return new WorkingHoursResponse(

@@ -44,6 +44,10 @@ public class Booking {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+    private String customerName;
+    private String customerPhone;
+    private String customerEmail;
+
     @PrePersist
     public void prePersist() {
         LocalDateTime now = LocalDateTime.now();

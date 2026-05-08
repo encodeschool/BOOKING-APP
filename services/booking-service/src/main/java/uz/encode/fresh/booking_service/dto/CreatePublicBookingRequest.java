@@ -20,7 +20,6 @@ public class CreatePublicBookingRequest {
     @FutureOrPresent
     public LocalDate bookingDate;
 
-    @NotBlank
     public String bookingTime;
 
     @NotBlank
@@ -33,4 +32,7 @@ public class CreatePublicBookingRequest {
     public String customerPhone;
 
     public String notes;
+
+    @NotBlank
+    public String startTime;
 }

@@ -14,6 +14,7 @@ import {
 import { useAuth } from "../../app/providers/AuthProvider";
 import { useBusiness } from "../../app/providers/BusinessProvider";
 import { createStaff, getStaff } from "../../lib/api";
+import StaffWorkingHoursModal from './components/StaffWorkingHoursModal';
 
 export default function StaffPage() {
   const { token } = useAuth();
@@ -23,6 +24,7 @@ export default function StaffPage() {
   const [loading, setLoading] = useState(false);
 
   const [showForm, setShowForm] = useState(false);
+  const [selectedStaff, setSelectedStaff] = useState(null);
 
   const [form, setForm] = useState({
     name: "",
@@ -462,6 +464,15 @@ export default function StaffPage() {
                           <FiTrash2 />
                         </button>
 
+                        <button
+                          onClick={() =>
+                            setSelectedStaff(member)
+                          }
+                          className="px-4 h-10 rounded-xl border border-gray-200 hover:bg-black hover:text-white transition-all text-sm"
+                        >
+                          Schedule
+                        </button>
+
                       </div>
 
                     </td>
@@ -502,6 +513,16 @@ export default function StaffPage() {
         )}
 
       </div>
+
+      {selectedStaff && (
+        <StaffWorkingHoursModal
+          token={token}
+          staff={selectedStaff}
+          onClose={() =>
+            setSelectedStaff(null)
+          }
+        />
+      )}
 
     </div>
   );

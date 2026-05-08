@@ -127,3 +127,30 @@ export function useAvailableDates(businessId, serviceId, staffId) {
 
   return { dates, loading, error };
 }
+
+export function useStaffWorkingHours(staffId) {
+  const [hours, setHours] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (!staffId) return;
+
+    const fetchHours = async () => {
+      setLoading(true);
+
+      try {
+        const data = await apiClient.getStaffWorkingHours(staffId);
+        setHours(data || []);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchHours();
+  }, [staffId]);
+
+  return { hours, loading, error };
+}

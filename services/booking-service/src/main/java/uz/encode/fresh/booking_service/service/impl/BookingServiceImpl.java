@@ -65,6 +65,9 @@ public class BookingServiceImpl implements BookingService {
         booking.setEndTime(endTime);
         booking.setStatus(BookingStatus.PENDING);
         booking.setNotes(request.notes);
+        booking.setCustomerEmail(request.customerEmail);
+        booking.setCustomerName(request.customerName);
+        booking.setCustomerPhone(request.customerPhone);
 
         return toResponse(bookingRepository.save(booking));
     }
@@ -162,7 +165,7 @@ public class BookingServiceImpl implements BookingService {
         internalRequest.serviceId = request.serviceId;
         internalRequest.staffId = request.staffId != null ? request.staffId : getAvailableStaff(request.businessId);
         internalRequest.bookingDate = request.bookingDate;
-        internalRequest.bookingTime = request.bookingTime;
+        internalRequest.bookingTime = request.startTime;
         internalRequest.customerName = request.customerName;
         internalRequest.customerEmail = request.customerEmail;
         internalRequest.customerPhone = request.customerPhone;

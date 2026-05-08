@@ -9,7 +9,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import uz.encode.fresh.core_service.staff.dto.StaffResponse;
+import uz.encode.fresh.core_service.staff.dto.StaffWorkingHoursResponse;
 import uz.encode.fresh.core_service.staff.service.StaffService;
+import uz.encode.fresh.core_service.staff.service.StaffWorkingHoursService;
 
 @RestController
 @RequestMapping("/api/staff/public")
@@ -17,6 +19,9 @@ public class PublicStaffController {
 
     @Autowired
     private StaffService service;
+
+    @Autowired
+    private StaffWorkingHoursService serviceWorkingHours;
 
     @GetMapping("/business/{businessId}")
     public List<StaffResponse> getStaffByBusiness(@PathVariable("businessId") Long businessId) {
@@ -33,5 +38,10 @@ public class PublicStaffController {
                     return response;
                 })
                 .toList();
+    }
+
+    @GetMapping("/{staffId}")
+    public List<StaffWorkingHoursResponse> getPublic(@PathVariable("staffId") Long staffId) {
+        return serviceWorkingHours.getByStaff(staffId);
     }
 }

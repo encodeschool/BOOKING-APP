@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { ArrowLeft } from "lucide-react";
 import { useBooking } from "../../../context/BookingContext";
+import { useStaffWorkingHours } from "../../../hooks/useApi";
 
 const Step4TimePicker = () => {
   const { booking, updateBooking, goNext, goBack } = useBooking();
@@ -9,67 +10,129 @@ const Step4TimePicker = () => {
     booking.date ? new Date(booking.date) : new Date()
   );
 
-  const [selectedPeriod, setSelectedPeriod] = useState("");
   const [selectedTime, setSelectedTime] = useState("");
 
-  const today = useMemo(() => new Date(), []);
-  const currentHour = today.getHours();
+  const { hours } = useStaffWorkingHours(
+    booking?.staff?.id
+  );
+
+  const today = new Date();
+
+  // -----------------------------------
+  // HELPERS
+  // -----------------------------------
 
   const normalize = (d) =>
-    new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+    new Date(
+      d.getFullYear(),
+      d.getMonth(),
+      d.getDate()
+    ).getTime();
 
   const isToday =
-    selectedDate &&
     normalize(selectedDate) === normalize(today);
 
-  // -----------------------------
-  // TIME GENERATION LOGIC
-  // -----------------------------
-  const generateTimeSlots = (startHour, endHour) => {
-    const slots = [];
-    for (let h = startHour; h < endHour; h++) {
-      slots.push(`${String(h).padStart(2, "0")}:00`);
-      slots.push(`${String(h).padStart(2, "0")}:30`);
-    }
-    return slots;
-  };
+  const currentHour = today.getHours();
+  const currentMinute = today.getMinutes();
+
+  const dayName = selectedDate
+    .toLocaleDateString("en-US", {
+      weekday: "long",
+    })
+    .toUpperCase();
+
+  // -----------------------------------
+  // FIND STAFF WORKING DAY
+  // -----------------------------------
+
+  const workingDay = hours.find(
+    (h) => h.dayOfWeek === dayName
+  );
+
+  // -----------------------------------
+  // GENERATE REAL SLOTS
+  // -----------------------------------
 
   const timeSlots = useMemo(() => {
-    if (!selectedPeriod) return [];
+    if (!workingDay) return [];
 
-    let slots = [];
+    if (workingDay.isOff) return [];
 
-    if (selectedPeriod === "Morning") {
-      slots = generateTimeSlots(8, 12);
-    }
+    const slots = [];
 
-    if (selectedPeriod === "Afternoon") {
-      slots = generateTimeSlots(12, 17);
-    }
+    const start = workingDay.startTime.slice(0, 5);
+    const end = workingDay.endTime.slice(0, 5);
 
-    if (selectedPeriod === "Evening") {
-      slots = generateTimeSlots(17, 21);
-    }
+    let [startHour, startMinute] =
+      start.split(":").map(Number);
 
-    // disable past time if today
-    if (isToday) {
-      return slots.filter((t) => {
-        const hour = parseInt(t.split(":")[0]);
-        return hour > currentHour;
-      });
+    let [endHour, endMinute] =
+      end.split(":").map(Number);
+
+    let current = new Date();
+    current.setHours(startHour, startMinute, 0);
+
+    const endDate = new Date();
+    endDate.setHours(endHour, endMinute, 0);
+
+    while (current < endDate) {
+      const hour = current
+        .getHours()
+        .toString()
+        .padStart(2, "0");
+
+      const minute = current
+        .getMinutes()
+        .toString()
+        .padStart(2, "0");
+
+      const formatted = `${hour}:${minute}`;
+
+      // HIDE PAST TIME TODAY
+      if (isToday) {
+        const slotHour = current.getHours();
+        const slotMinute = current.getMinutes();
+
+        const isPast =
+          slotHour < currentHour ||
+          (slotHour === currentHour &&
+            slotMinute <= currentMinute);
+
+        if (!isPast) {
+          slots.push(formatted);
+        }
+      } else {
+        slots.push(formatted);
+      }
+
+      // NEXT 30 MIN
+      current.setMinutes(
+        current.getMinutes() + 30
+      );
     }
 
     return slots;
-  }, [selectedPeriod, isToday, currentHour]);
+  }, [workingDay, isToday]);
 
-  const days = Array.from({ length: 30 }, (_, i) => {
-    const d = new Date();
-    d.setDate(today.getDate() + i);
-    return d;
-  });
+  // -----------------------------------
+  // DAYS
+  // -----------------------------------
+
+  const days = Array.from(
+    { length: 30 },
+    (_, i) => {
+      const d = new Date();
+      d.setDate(today.getDate() + i);
+      return d;
+    }
+  );
+
+  // -----------------------------------
+  // CONTINUE
+  // -----------------------------------
 
   const handleContinue = () => {
-    if (!selectedDate || !selectedTime) return;
+    if (!selectedTime) return;
 
     updateBooking({
       date: selectedDate,
@@ -84,143 +147,116 @@ const Step4TimePicker = () => {
 
       {/* HEADER */}
       <div className="flex items-center gap-3 p-5 border-b">
-        <button onClick={goBack} className="p-2 hover:bg-gray-100 rounded-lg">
+        <button
+          onClick={goBack}
+          className="p-2 hover:bg-gray-100 rounded-lg"
+        >
           <ArrowLeft size={20} />
         </button>
 
         <div>
-          <h2 className="text-xl font-semibold">Choose time</h2>
+          <h2 className="text-xl font-semibold">
+            Choose time
+          </h2>
+
           <p className="text-sm text-gray-500">
             Select date and available time
           </p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 p-5 lg:grid-cols-3 gap-6">
+      <div className="p-5 space-y-6">
 
-        {/* LEFT */}
-        <div className="space-y-3">
-          <button
-            onClick={() => setSelectedDate(new Date())}
-            className="w-full border rounded-xl p-4 text-left hover:bg-gray-50"
-          >
-            <p className="font-medium">Today</p>
-            <p className="text-xs text-gray-500">
-              {today.toDateString()}
-            </p>
-          </button>
+        {/* CALENDAR */}
+        <div className="grid grid-cols-7 gap-2">
+          {days.slice(0, 14).map((day, index) => {
+            const isSelected =
+              normalize(selectedDate) ===
+              normalize(day);
 
-          <button
-            onClick={() => {
-              const t = new Date();
-              t.setDate(t.getDate() + 1);
-              setSelectedDate(t);
-            }}
-            className="w-full border rounded-xl p-4 text-left hover:bg-gray-50"
-          >
-            <p className="font-medium">Tomorrow</p>
-            <p className="text-xs text-gray-500">
-              {days[1].toDateString()}
-            </p>
-          </button>
-        </div>
-
-        {/* RIGHT */}
-        <div className="lg:col-span-2 space-y-6">
-
-          {/* CALENDAR */}
-          <div className="grid grid-cols-7 gap-2 text-center">
-            {days.slice(0, 14).map((day, index) => {
-              const isSelected =
-                normalize(selectedDate) === normalize(day);
-
-              return (
-                <button
-                  key={index}
-                  onClick={() => {
-                    setSelectedDate(day);
-                    setSelectedTime("");
-                  }}
-                  className={`p-3 rounded-lg border text-sm ${
-                    isSelected
-                      ? "bg-black text-white border-black"
-                      : "hover:bg-gray-100"
-                  }`}
-                >
-                  <div>{day.toLocaleDateString("en-US", { weekday: "short" })}</div>
-                  <div className="font-medium">{day.getDate()}</div>
-                </button>
-              );
-            })}
-          </div>
-
-          {/* PERIOD SELECTION */}
-          <div className="flex gap-3 flex-wrap">
-            {["Morning", "Afternoon", "Evening"].map((p) => (
+            return (
               <button
-                key={p}
+                key={index}
                 onClick={() => {
-                  setSelectedPeriod(p);
+                  setSelectedDate(day);
                   setSelectedTime("");
                 }}
-                className={`px-4 py-2 rounded-lg border ${
-                  selectedPeriod === p
-                    ? "bg-black text-white"
+                className={`p-3 rounded-lg border text-sm ${
+                  isSelected
+                    ? "bg-black text-white border-black"
                     : "hover:bg-gray-100"
                 }`}
               >
-                {p}
+                <div>
+                  {day.toLocaleDateString(
+                    "en-US",
+                    {
+                      weekday: "short",
+                    }
+                  )}
+                </div>
+
+                <div className="font-medium">
+                  {day.getDate()}
+                </div>
               </button>
-            ))}
-          </div>
+            );
+          })}
+        </div>
 
-          {/* TIME SLOTS */}
-          {selectedPeriod && (
-            <div>
-              <p className="text-sm text-gray-500 mb-3">
-                Available time slots
-              </p>
+        {/* SLOTS */}
+        <div>
 
-              <div className="flex flex-wrap gap-3">
-                {timeSlots.length > 0 ? (
-                  timeSlots.map((t) => (
-                    <button
-                      key={t}
-                      onClick={() => setSelectedTime(t)}
-                      className={`px-4 py-2 rounded-lg border text-sm ${
-                        selectedTime === t
-                          ? "bg-black text-white"
-                          : "hover:bg-gray-100"
-                      }`}
-                    >
-                      {t}
-                    </button>
-                  ))
-                ) : (
-                  <p className="text-gray-500 text-sm">
-                    No available slots
-                  </p>
-                )}
-              </div>
+          <p className="text-sm text-gray-500 mb-4">
+            Available slots
+          </p>
+
+          {workingDay?.isOff ? (
+            <div className="text-red-500 text-sm">
+              Staff is not working this day
+            </div>
+          ) : (
+            <div className="flex flex-wrap gap-3">
+              {timeSlots.length > 0 ? (
+                timeSlots.map((slot) => (
+                  <button
+                    key={slot}
+                    onClick={() =>
+                      setSelectedTime(slot)
+                    }
+                    className={`px-4 py-2 rounded-lg border ${
+                      selectedTime === slot
+                        ? "bg-black text-white"
+                        : "hover:bg-gray-100"
+                    }`}
+                  >
+                    {slot}
+                  </button>
+                ))
+              ) : (
+                <p className="text-gray-500 text-sm">
+                  No available slots
+                </p>
+              )}
             </div>
           )}
-
-          {/* CONTINUE */}
-          <div className="flex justify-end pt-4">
-            <button
-              onClick={handleContinue}
-              disabled={!selectedTime}
-              className={`px-6 py-3 rounded-xl ${
-                selectedTime
-                  ? "bg-black text-white"
-                  : "bg-gray-300 text-gray-500"
-              }`}
-            >
-              Continue
-            </button>
-          </div>
-
         </div>
+
+        {/* CONTINUE */}
+        <div className="flex justify-end">
+          <button
+            onClick={handleContinue}
+            disabled={!selectedTime}
+            className={`px-6 py-3 rounded-xl ${
+              selectedTime
+                ? "bg-black text-white"
+                : "bg-gray-300 text-gray-500"
+            }`}
+          >
+            Continue
+          </button>
+        </div>
+
       </div>
     </div>
   );

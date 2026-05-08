@@ -95,6 +95,9 @@ class ApiClient {
       },
     });
   }
+  async getStaffWorkingHours(staffId) {
+    return this.request(`/api/staff/public/${staffId}`);
+  }
 }
 
 export const apiClient = new ApiClient();

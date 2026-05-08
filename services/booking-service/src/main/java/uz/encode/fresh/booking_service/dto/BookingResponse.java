@@ -24,4 +24,7 @@ public class BookingResponse {
     String statusReason;
     LocalDateTime createdAt;
     LocalDateTime updatedAt;
+
+    public String customerName;
+    public String customerPhone;
 }

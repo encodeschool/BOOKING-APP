@@ -13,7 +13,7 @@ spring:
         - id: core-service
           uri: lb://CORE-SERVICE
           predicates:
-            - Path=/api/businesses/**,/api/services/**,/api/staff/**,/api/working-hours/**
+            - Path=/api/businesses/**,/api/services/**,/api/staff/**,/api/working-hours/**, /api/staff/working-hours/**
 
         - id: auth-service
           uri: lb://AUTH-SERVICE

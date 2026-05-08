@@ -89,4 +89,47 @@ export async function updateBookingStatus(token, bookingId, body) {
   });
 }
 
+export async function getStaffWorkingHours(
+  token,
+  staffId
+) {
+  const res = await fetch(
+    `${API_BASE_URL}/api/staff/working-hours/staff/${staffId}/owner`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  if (!res.ok) {
+    throw new Error("Failed to load working hours");
+  }
+
+  return res.json();
+}
+
+export async function saveStaffWorkingHours(
+  token,
+  data
+) {
+  const res = await fetch(
+    `${API_BASE_URL}/api/staff/working-hours`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(data),
+    }
+  );
+
+  if (!res.ok) {
+    throw new Error("Failed to save working hours");
+  }
+
+  return res.json();
+}
+
 export { API_BASE_URL };
