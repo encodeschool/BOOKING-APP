@@ -1,9 +1,12 @@
 package uz.encode.fresh.core_service.business.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import uz.encode.fresh.core_service.business.dto.BusinessResponse;
 import uz.encode.fresh.core_service.business.service.BusinessService;
@@ -26,7 +29,9 @@ public class PublicBusinessController {
                         b.getAddress(),
                         b.getPhone(),
                         b.getCategory(),
-                        b.getWorkingHours()
+                        b.getWorkingHours(),
+                        b.getLatitude(),
+                        b.getLongitude()
                 ))
                 .toList();
     }
@@ -41,7 +46,9 @@ public class PublicBusinessController {
                 business.getAddress(),
                 business.getPhone(),
                 business.getCategory(),
-                business.getWorkingHours()
+                business.getWorkingHours(),
+                business.getLatitude(),
+                business.getLongitude()
         );
     }
 }

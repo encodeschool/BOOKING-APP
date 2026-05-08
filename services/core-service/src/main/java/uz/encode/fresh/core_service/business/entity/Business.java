@@ -29,4 +29,8 @@ public class Business {
     private String category;
     private String workingHours;
 
+    // NEW
+    private Double latitude;
+
+    private Double longitude;
 }

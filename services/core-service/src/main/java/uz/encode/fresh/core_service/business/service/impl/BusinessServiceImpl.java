@@ -1,21 +1,24 @@
 package uz.encode.fresh.core_service.business.service.impl;
 
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import uz.encode.fresh.core_service.business.dto.CreateBusinessRequest;
 import uz.encode.fresh.core_service.business.entity.Business;
 import uz.encode.fresh.core_service.business.repository.BusinessRepository;
 import uz.encode.fresh.core_service.business.service.BusinessService;
+import uz.encode.fresh.core_service.business.service.GeocodingService;
 
 @Service
 public class BusinessServiceImpl implements BusinessService {
 
     @Autowired
     private BusinessRepository repo;
+
+    @Autowired
+    private GeocodingService geocodingService;
 
     @Override
     public Business create(Long ownerId, CreateBusinessRequest req) {
@@ -28,6 +31,9 @@ public class BusinessServiceImpl implements BusinessService {
         b.setPhone(req.phone);
         b.setCategory(req.category);
         b.setWorkingHours(req.workingHours);
+
+        b.setLatitude(req.latitude);
+        b.setLongitude(req.longitude);
 
         return repo.save(b);
     }

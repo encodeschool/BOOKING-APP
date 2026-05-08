@@ -16,4 +16,9 @@ public class BusinessResponse {
     public String phone;
     public String category;
     public String workingHours;
+
+    // NEW
+    public Double latitude;
+
+    public Double longitude;
 }

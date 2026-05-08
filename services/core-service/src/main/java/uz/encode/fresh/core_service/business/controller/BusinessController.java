@@ -1,14 +1,18 @@
 package uz.encode.fresh.core_service.business.controller;
 
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
-
-import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import uz.encode.fresh.core_service.business.dto.BusinessResponse;
 import uz.encode.fresh.core_service.business.dto.CreateBusinessRequest;
 import uz.encode.fresh.core_service.business.entity.Business;
@@ -30,14 +34,16 @@ public class BusinessController {
         Business b = service.create(userId, req);
 
         return new BusinessResponse(
-                b.getId(),
-                b.getName(),
-                b.getDescription(),
-                b.getAddress(),
-                b.getPhone(),
-                b.getCategory(),
-                b.getWorkingHours()
-        );
+            b.getId(),
+            b.getName(),
+            b.getDescription(),
+            b.getAddress(),
+            b.getPhone(),
+            b.getCategory(),
+            b.getWorkingHours(),
+            b.getLatitude(),
+            b.getLongitude()
+    );
     }
 
     @GetMapping
@@ -54,7 +60,9 @@ public class BusinessController {
                         b.getAddress(),
                         b.getPhone(),
                         b.getCategory(),
-                        b.getWorkingHours()
+                        b.getWorkingHours(),
+                        b.getLatitude(),
+                        b.getLongitude()
                 ))
                 .toList();
     }

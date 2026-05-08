@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -25,4 +24,9 @@ public class CreateBusinessRequest {
     public String category;
 
     public String workingHours;
+
+    // NEW
+    public Double latitude;
+
+    public Double longitude;
 }

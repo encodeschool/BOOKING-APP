@@ -13,6 +13,7 @@ import {
 import { useAuth } from "../../app/providers/AuthProvider";
 import { useBusiness } from "../../app/providers/BusinessProvider";
 import { createBusiness } from "../../lib/api";
+import { geocodeAddress } from "../../lib//api/geocode";
 
 export default function BusinessesPage() {
   const { token } = useAuth();
@@ -35,8 +36,17 @@ export default function BusinessesPage() {
     try {
       setLoading(true);
 
-      await createBusiness(token, form);
+      // 1. GET COORDINATES FROM ADDRESS
+      const geo = await geocodeAddress(form.address);
 
+      // 2. SEND TO BACKEND
+      await createBusiness(token, {
+        ...form,
+        latitude: geo.latitude,
+        longitude: geo.longitude,
+      });
+
+      // 3. RESET FORM
       setForm({
         name: "",
         address: "",
@@ -44,7 +54,6 @@ export default function BusinessesPage() {
       });
 
       setShowForm(false);
-
       load();
     } catch (error) {
       console.error("Failed to create business:", error);
