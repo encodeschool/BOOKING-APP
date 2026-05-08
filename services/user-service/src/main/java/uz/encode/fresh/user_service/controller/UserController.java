@@ -1,10 +1,13 @@
 package uz.encode.fresh.user_service.controller;
 
+import java.util.List;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,6 +17,7 @@ import uz.encode.fresh.user_service.dto.UpdateUserRequest;
 import uz.encode.fresh.user_service.entity.Role;
 import uz.encode.fresh.user_service.entity.User;
 import uz.encode.fresh.user_service.service.UserService;
+
 
 @RestController
 @RequestMapping("/api/users")
@@ -37,6 +41,11 @@ public class UserController {
 
         Long userId = (Long) request.getAttribute("userId");
         return service.update(userId, req);
+    }
+
+    @GetMapping
+    public List<User> getUsers(@RequestParam(required = false) String email) {
+        return service.getAll();
     }
 
     @PostMapping("/internal")

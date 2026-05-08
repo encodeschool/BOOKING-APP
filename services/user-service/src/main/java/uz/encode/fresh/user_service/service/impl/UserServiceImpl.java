@@ -1,5 +1,7 @@
 package uz.encode.fresh.user_service.service.impl;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -51,5 +53,10 @@ public class UserServiceImpl implements UserService {
         user.setPreferences(p);
 
         return repo.save(user);
+    }
+
+    @Override
+    public List<User> getAll() {
+        return repo.findAll();
     }
 }

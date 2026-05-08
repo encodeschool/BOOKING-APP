@@ -31,42 +31,34 @@ export default function UsersPage() {
     try {
       setLoading(true);
 
-      // Mock users data
-      const mockUsers = [
+      const response = await fetch(
+        "http://localhost:8080/api/users",
         {
-          id: 1,
-          name: "John Doe",
-          email: "john@example.com",
-          role: "USER",
-        },
-        {
-          id: 2,
-          name: "Jane Smith",
-          email: "jane@example.com",
-          role: "STAFF",
-        },
-        {
-          id: 3,
-          name: "Admin User",
-          email: "admin@example.com",
-          role: "SUPERADMIN",
-        },
-      ];
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
-      setTimeout(() => {
-        setUsers(mockUsers);
-        setLoading(false);
-      }, 800);
+      if (!response.ok) {
+        throw new Error("Failed to fetch users");
+      }
+
+      const data = await response.json();
+
+      setUsers(data);
     } catch (error) {
       console.error("Failed to load users:", error);
       setUsers([]);
+    } finally {
       setLoading(false);
     }
   }
 
   const filteredUsers = users.filter(
     (user) =>
-      user.name
+      user.fullName
         .toLowerCase()
         .includes(search.toLowerCase()) &&
       (filter === "" || user.role === filter)
@@ -287,12 +279,12 @@ export default function UsersPage() {
                       <td className="px-8 py-5">
                         <div className="flex items-center gap-4">
                           <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-500 text-white flex items-center justify-center font-bold shadow-md">
-                            {user.name.charAt(0)}
+                            {user.fullName.charAt(0)}
                           </div>
 
                           <div>
                             <p className="font-semibold text-gray-900">
-                              {user.name}
+                              {user.fullName}
                             </p>
 
                             <p className="text-sm text-gray-500">
@@ -351,12 +343,12 @@ export default function UsersPage() {
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center gap-3">
                       <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-500 text-white flex items-center justify-center font-bold">
-                        {user.name.charAt(0)}
+                        {user.fullName.charAt(0)}
                       </div>
 
                       <div>
                         <h3 className="font-bold text-gray-900">
-                          {user.name}
+                          {user.fullName}
                         </h3>
 
                         <p className="text-sm text-gray-500">
