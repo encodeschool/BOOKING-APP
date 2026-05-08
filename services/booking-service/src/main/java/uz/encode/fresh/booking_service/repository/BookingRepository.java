@@ -36,4 +36,10 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
                                      @Param("startTime") LocalTime startTime,
                                      @Param("endTime") LocalTime endTime,
                                      @Param("statuses") Collection<BookingStatus> statuses);
+
+    List<Booking> findByBusinessIdAndBookingDateBetween(
+        Long businessId,
+        LocalDate from,
+        LocalDate to
+    );
 }

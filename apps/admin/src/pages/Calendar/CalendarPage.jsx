@@ -19,6 +19,54 @@ export default function CalendarPage() {
   const [calendarBookings, setCalendarBookings] = useState([]);
 
   useEffect(() => {
+    if (!selectedBusinessId) return;
+    fetchBookings();
+  }, [selectedBusinessId, currentDate]);
+
+  const fetchBookings = async () => {
+    const from = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth(),
+      1
+    );
+
+    const to = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth() + 1,
+      0
+    );
+
+    try {
+      const res = await fetch(
+        `/api/bookings/calendar?businessId=${selectedBusinessId}&from=${
+          from.toISOString().split("T")[0]
+        }&to=${to.toISOString().split("T")[0]}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!res.ok) {
+        console.error(`Calendar fetch failed: ${res.status} ${res.statusText}`);
+        return;
+      }
+
+      const contentType = res.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        console.error("Expected JSON but got:", contentType);
+        return;
+      }
+
+      const data = await res.json();
+      setCalendarBookings(data);
+    } catch (err) {
+      console.error("Failed to fetch bookings:", err);
+    }
+  };
+
+  useEffect(() => {
     if (bookings) {
       setCalendarBookings(bookings);
     }
@@ -29,7 +77,6 @@ export default function CalendarPage() {
     const month = date.getMonth();
 
     const firstDay = new Date(year, month, 1);
-
     const days = [];
 
     const startDate = new Date(firstDay);
@@ -45,27 +92,19 @@ export default function CalendarPage() {
   };
 
   const getBookingsForDate = (date) => {
-    return calendarBookings.filter((booking) => {
-      const bookingDate = new Date(booking.date);
-      return bookingDate.toDateString() === date.toDateString();
+    return calendarBookings.filter((b) => {
+      return (
+        new Date(b.bookingDate).toDateString() === date.toDateString()
+      );
     });
   };
 
   const days = getDaysInMonth(currentDate);
 
   const monthNames = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
+    "January", "February", "March", "April",
+    "May", "June", "July", "August",
+    "September", "October", "November", "December",
   ];
 
   const navigateMonth = (direction) => {
@@ -85,9 +124,7 @@ export default function CalendarPage() {
     "bg-indigo-100 text-indigo-700 border-indigo-200",
   ];
 
-  const getBookingColor = (index) => {
-    return bookingColors[index % bookingColors.length];
-  };
+  const getBookingColor = (index) => bookingColors[index % bookingColors.length];
 
   return (
     <div className="min-h-screen">
@@ -97,11 +134,9 @@ export default function CalendarPage() {
           <p className="text-sm font-medium text-emerald-600 mb-2">
             Booking Management
           </p>
-
           <h1 className="text-4xl font-bold text-gray-900">
             Calendar Overview
           </h1>
-
           <p className="text-gray-500 mt-2">
             Manage appointments, bookings and schedules.
           </p>
@@ -118,15 +153,11 @@ export default function CalendarPage() {
         <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-500 text-sm font-medium">
-                Total Bookings
-              </p>
-
+              <p className="text-gray-500 text-sm font-medium">Total Bookings</p>
               <h2 className="text-3xl font-bold text-gray-900 mt-2">
                 {calendarBookings.length}
               </h2>
             </div>
-
             <div className="w-14 h-14 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center">
               <FaCalendarAlt size={20} />
             </div>
@@ -136,21 +167,17 @@ export default function CalendarPage() {
         <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-500 text-sm font-medium">
-                Today's Bookings
-              </p>
-
+              <p className="text-gray-500 text-sm font-medium">Today's Bookings</p>
               <h2 className="text-3xl font-bold text-gray-900 mt-2">
                 {
                   calendarBookings.filter(
                     (b) =>
-                      new Date(b.date).toDateString() ===
+                      new Date(b.bookingDate).toDateString() ===
                       new Date().toDateString()
                   ).length
                 }
               </h2>
             </div>
-
             <div className="w-14 h-14 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center">
               <FaClock size={20} />
             </div>
@@ -160,15 +187,11 @@ export default function CalendarPage() {
         <div className="bg-white rounded-3xl p-6 border border-gray-100 shadow-sm">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-500 text-sm font-medium">
-                Active Business
-              </p>
-
+              <p className="text-gray-500 text-sm font-medium">Active Business</p>
               <h2 className="text-xl font-bold text-gray-900 mt-2">
                 {selectedBusinessId || "Not Selected"}
               </h2>
             </div>
-
             <div className="w-14 h-14 rounded-2xl bg-purple-100 text-purple-600 flex items-center justify-center">
               <FaUser size={20} />
             </div>
@@ -182,10 +205,8 @@ export default function CalendarPage() {
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 p-6 border-b border-gray-100">
           <div>
             <h2 className="text-2xl font-bold text-gray-900">
-              {monthNames[currentDate.getMonth()]}{" "}
-              {currentDate.getFullYear()}
+              {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
             </h2>
-
             <p className="text-gray-500 text-sm mt-1">
               Manage your appointments calendar
             </p>
@@ -231,12 +252,8 @@ export default function CalendarPage() {
         <div className="grid grid-cols-7">
           {days.map((day, index) => {
             const dayBookings = getBookingsForDate(day);
-
-            const isCurrentMonth =
-              day.getMonth() === currentDate.getMonth();
-
-            const isToday =
-              day.toDateString() === new Date().toDateString();
+            const isCurrentMonth = day.getMonth() === currentDate.getMonth();
+            const isToday = day.toDateString() === new Date().toDateString();
 
             return (
               <div
@@ -273,27 +290,21 @@ export default function CalendarPage() {
                       key={idx}
                       onClick={() =>
                         alert(
-                          `Booking: ${
-                            booking.serviceName || "Service"
-                          }\nCustomer: ${
-                            booking.customerName || "Customer"
-                          }\nTime: ${booking.time}`
+                          `Booking: ${booking.serviceName || `Service #${booking.serviceId}`}\nCustomer: ${
+                            booking.customerName || booking.customerPhone || "Guest"
+                          }\nTime: ${booking.startTime}\nStatus: ${booking.status}`
                         )
                       }
-                      className={`rounded-2xl border p-2 cursor-pointer hover:scale-[1.02] transition-all ${getBookingColor(
-                        idx
-                      )}`}
+                      className={`rounded-2xl border p-2 cursor-pointer hover:scale-[1.02] transition-all ${getBookingColor(idx)}`}
                     >
                       <p className="text-[11px] font-semibold">
-                        {booking.time}
+                        {booking.startTime}
                       </p>
-
                       <p className="text-xs font-medium truncate">
-                        {booking.serviceName || "Service"}
+                        {booking.serviceName || `Service #${booking.serviceId}`}
                       </p>
-
                       <p className="text-[11px] opacity-70 truncate">
-                        {booking.customerName || "Customer"}
+                        {booking.customerName || booking.customerPhone || "Guest"}
                       </p>
                     </div>
                   ))}
@@ -316,16 +327,12 @@ export default function CalendarPage() {
           <div className="w-20 h-20 rounded-full bg-gray-100 mx-auto flex items-center justify-center mb-5">
             <FaCalendarAlt className="text-3xl text-gray-400" />
           </div>
-
           <h3 className="text-2xl font-bold text-gray-800 mb-2">
             No bookings yet
           </h3>
-
           <p className="text-gray-500 max-w-md mx-auto">
-            Your appointment calendar is empty. Start by creating a new
-            booking.
+            Your appointment calendar is empty. Start by creating a new booking.
           </p>
-
           <button className="mt-6 bg-gradient-to-r from-emerald-500 to-green-500 text-white px-6 py-3 rounded-2xl font-medium shadow-lg shadow-emerald-200">
             Create Booking
           </button>

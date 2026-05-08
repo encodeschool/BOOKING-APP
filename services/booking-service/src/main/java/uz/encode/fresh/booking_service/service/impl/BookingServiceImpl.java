@@ -535,4 +535,15 @@ public class BookingServiceImpl implements BookingService {
                 .updatedAt(booking.getUpdatedAt())
                 .build();
     }
+
+    @Override
+    public List<BookingResponse> getCalendar(Long businessId, String from, String to) {
+
+        LocalDate start = LocalDate.parse(from);
+        LocalDate end = LocalDate.parse(to);
+
+        return bookingRepository.findByBusinessIdAndBookingDateBetween(
+                businessId, start, end
+        ).stream().map(this::toResponse).toList();
+    }
 }

@@ -72,4 +72,13 @@ public class BookingController {
     public BookingResponse getStaffBooking(HttpServletRequest request, @PathVariable Long bookingId) {
         return bookingService.getStaffBooking((Long) request.getAttribute("userId"), bookingId);
     }
+
+    @GetMapping("/calendar")
+    public List<BookingResponse> getCalendar(
+            @RequestParam("businessId") Long businessId,
+            @RequestParam("from") String from,
+            @RequestParam("to") String to
+    ) {
+        return bookingService.getCalendar(businessId, from, to);
+    }
 }
