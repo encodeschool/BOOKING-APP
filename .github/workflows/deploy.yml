@@ -1,0 +1,49 @@
+name: Deploy Microservices
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Build services
+        run: |
+          mvn clean package -DskipTests
+
+      - name: Build Docker images
+        run: |
+          docker build -t api-gateway ./api-gateway
+          docker build -t auth-service ./auth-service
+          docker build -t user-service ./user-service
+          docker build -t core-service ./core-service
+          docker build -t booking-service ./booking-service
+
+      - name: Save SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+      - name: Deploy to VPS
+        run: |
+          ssh -o StrictHostKeyChecking=no root@${{ secrets.VPS_IP }} << 'EOF'
+            cd /opt/app
+
+            git pull origin main
+
+            docker compose -f infra/docker/docker-compose.yml down
+            docker compose -f infra/docker/docker-compose.yml up -d --build
+          EOF
