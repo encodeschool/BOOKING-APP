@@ -1,8 +1,10 @@
 package uz.encode.fresh.booking_service.controller;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import uz.encode.fresh.booking_service.dto.BookedSlotResponse;
 import uz.encode.fresh.booking_service.dto.BookingResponse;
 import uz.encode.fresh.booking_service.dto.CreatePublicBookingRequest;
 import uz.encode.fresh.booking_service.service.BookingService;
@@ -41,5 +44,13 @@ public class PublicBookingController {
             @RequestParam Long serviceId,
             @RequestParam(required = false) Long staffId) {
         return bookingService.getAvailableDates(businessId, serviceId, staffId);
+    }
+
+    @GetMapping("/booked/{staffId}/{date}")
+    public List<BookedSlotResponse> getBookedSlots(
+            @PathVariable("staffId") Long staffId,
+            @PathVariable("date") String date
+    ) {
+        return bookingService.getBookedSlots(staffId, LocalDate.parse(date));
     }
 }

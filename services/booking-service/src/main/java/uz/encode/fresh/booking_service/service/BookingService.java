@@ -1,7 +1,9 @@
 package uz.encode.fresh.booking_service.service;
 
+import java.time.LocalDate;
 import java.util.List;
 
+import uz.encode.fresh.booking_service.dto.BookedSlotResponse;
 import uz.encode.fresh.booking_service.dto.BookingResponse;
 import uz.encode.fresh.booking_service.dto.CreateBookingRequest;
 import uz.encode.fresh.booking_service.dto.CreatePublicBookingRequest;
@@ -35,4 +37,6 @@ public interface BookingService {
     List<BookingResponse> getCalendar(Long businessId, String from, String to);
 
     DashboardMetricsResponse getDashboardMetrics(Long businessId);
+
+    List<BookedSlotResponse> getBookedSlots(Long staffId, LocalDate date);
 }

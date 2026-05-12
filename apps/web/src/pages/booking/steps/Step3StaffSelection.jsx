@@ -133,7 +133,7 @@ const Step3StaffSelection = () => {
 
                     {/* AVATAR */}
                     <div className="w-14 h-14 rounded-full bg-black text-white flex items-center justify-center text-lg font-semibold">
-                      {(member.fullName || "?")
+                      {(member.name || "?")
                         .charAt(0)
                         .toUpperCase()}
                     </div>
@@ -142,7 +142,7 @@ const Step3StaffSelection = () => {
                     <div>
 
                       <h3 className="font-semibold text-lg">
-                        {member.fullName}
+                        {member.name}
                       </h3>
 
                       <p className="text-sm text-gray-500">

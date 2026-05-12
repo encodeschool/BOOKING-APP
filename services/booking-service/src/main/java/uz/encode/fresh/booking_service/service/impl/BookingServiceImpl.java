@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
+import uz.encode.fresh.booking_service.dto.BookedSlotResponse;
 import uz.encode.fresh.booking_service.dto.BookingResponse;
 import uz.encode.fresh.booking_service.dto.CreateBookingRequest;
 import uz.encode.fresh.booking_service.dto.CreatePublicBookingRequest;
@@ -604,5 +605,18 @@ public class BookingServiceImpl implements BookingService {
                 .completedGrowth(22)
 
                 .build();
+    }
+
+    public List<BookedSlotResponse> getBookedSlots(Long staffId, LocalDate date) {
+
+        return bookingRepository.findByStaffIdAndBookingDate(staffId, date)
+                .stream()
+                .map(b -> {
+                    BookedSlotResponse r = new BookedSlotResponse();
+                    r.date = b.getBookingDate().toString();
+                    r.time = b.getStartTime().toString(); // "14:30"
+                    return r;
+                })
+                .toList();
     }
 }

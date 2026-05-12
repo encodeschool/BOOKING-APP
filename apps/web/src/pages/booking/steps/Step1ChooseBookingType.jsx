@@ -4,6 +4,7 @@ import {
   Calendar,
   Gift,
   CreditCard,
+  Info
 } from "lucide-react";
 
 import { useBooking } from "../../../context/BookingContext";
@@ -21,21 +22,28 @@ const Step1ChooseBookingType = () => {
   };
 
   return (
-    <div className="w-full max-w-md mx-auto bg-white rounded-2xl">
+    <div className="w-full h-full bg-white flex flex-col rounded-3xl overflow-hidden">
 
-      {/* HEADER */}
-      <div className="flex items-center justify-between p-4 border-b">
-        <h2 className="text-xl font-semibold">
-          Choose an option
-        </h2>
+      <div className="flex items-center gap-3 p-6 border-b border-gray-100">
+        <button
+          className="p-2 hover:bg-gray-100 rounded-xl transition"
+        >
+          <Info size={20} />
+        </button>
 
-        {/* <button onClick={closeBooking}>
-          <X />
-        </button> */}
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900">
+            Choose an option
+          </h2>
+
+          <p className="text-sm text-gray-500 mt-1">
+            Order for yourself or others, or buy memberships and gift cards
+          </p>
+        </div>
       </div>
 
       {/* CONTENT */}
-      <div className="p-4 space-y-6">
+      <div className="p-5 border-b border-gray-100 flex-col lg:flex-row gap-4 lg:items-center lg:justify-between">
 
         {/* BOOK */}
         <div>
