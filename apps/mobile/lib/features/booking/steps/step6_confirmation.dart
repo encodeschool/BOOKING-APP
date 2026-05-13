@@ -375,41 +375,41 @@ class _Step6ConfirmationState
 
                   Row(
                     children: [
-                      Material(
-                        color:
-                        Colors.grey
-                            .shade100,
-                        borderRadius:
-                        BorderRadius
-                            .circular(
-                          14,
-                        ),
-                        child: InkWell(
-                          borderRadius:
-                          BorderRadius
-                              .circular(
-                            14,
-                          ),
-                          onTap: () =>
-                              goBack(ref),
-                          child: Container(
-                            width: 46,
-                            height: 46,
-                            alignment:
-                            Alignment
-                                .center,
-                            child:
-                            const Icon(
-                              Icons
-                                  .arrow_back_ios_new_rounded,
-                              size: 18,
-                            ),
-                          ),
-                        ),
-                      ),
-
-                      const SizedBox(
-                          width: 16),
+                      // Material(
+                      //   color:
+                      //   Colors.grey
+                      //       .shade100,
+                      //   borderRadius:
+                      //   BorderRadius
+                      //       .circular(
+                      //     14,
+                      //   ),
+                      //   child: InkWell(
+                      //     borderRadius:
+                      //     BorderRadius
+                      //         .circular(
+                      //       14,
+                      //     ),
+                      //     onTap: () =>
+                      //         goBack(ref),
+                      //     child: Container(
+                      //       width: 46,
+                      //       height: 46,
+                      //       alignment:
+                      //       Alignment
+                      //           .center,
+                      //       child:
+                      //       const Icon(
+                      //         Icons
+                      //             .arrow_back_ios_new_rounded,
+                      //         size: 18,
+                      //       ),
+                      //     ),
+                      //   ),
+                      // ),
+                      //
+                      // const SizedBox(
+                      //     width: 16),
 
                       Expanded(
                         child: Column(

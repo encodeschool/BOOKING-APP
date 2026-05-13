@@ -68,9 +68,11 @@ class _MapScreenState extends ConsumerState<MapScreen> {
               // =========================
               SafeArea(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 12,
+                  padding: const EdgeInsets.only(
+                    left: 6,
+                    right: 12,
+                    top: 12,
+                    bottom: 12
                   ),
                   child: Row(
                     children: [
@@ -100,7 +102,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
               // FILTER CHIPS
               // =========================
               Positioned(
-                top: 105,
+                top: 120,
                 left: 0,
                 right: 0,
                 child: SizedBox(
