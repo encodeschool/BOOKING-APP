@@ -1,31 +1,36 @@
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
 
-export async function request(path, options = {}) {
+async function request(path, options = {}) {
+  const isFormData = options.body instanceof FormData;
+
   const headers = {
-    "Content-Type": "application/json",
     ...(options.token ? { Authorization: `Bearer ${options.token}` } : {}),
+    ...(!isFormData && { "Content-Type": "application/json" }),
     ...options.headers,
   };
 
-  const response = await fetch(`${API_BASE_URL}${path}`, {
+  const res = await fetch(`${API_BASE_URL}${path}`, {
     method: options.method || "GET",
     headers,
-    body: options.body ? JSON.stringify(options.body) : undefined,
+    body: isFormData
+      ? options.body
+      : options.body
+      ? JSON.stringify(options.body)
+      : undefined,
   });
 
-  if (!response.ok) {
-    let message = `Request failed: ${response.status}`;
-
+  if (!res.ok) {
+    let msg = `Request failed ${res.status}`;
     try {
-      const data = await response.json();
-      message = data?.message || data?.error || message;
+      const err = await res.json();
+      msg = err?.message || err?.error || msg;
     } catch {}
-
-    throw new Error(message);
+    throw new Error(msg);
   }
 
-  if (response.status === 204) return null;
-
-  return response.json();
+  if (res.status === 204) return null;
+  return res.json();
 }
+
+export { request };

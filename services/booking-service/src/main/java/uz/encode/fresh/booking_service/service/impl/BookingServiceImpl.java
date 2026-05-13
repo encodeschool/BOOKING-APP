@@ -395,7 +395,7 @@ public class BookingServiceImpl implements BookingService {
             StaffDetailsResponse staff = getStaff(booking.getStaffId());
 
             // For now, send to a placeholder admin email - this should be configurable per business
-            String adminEmail = "admin@fresha.com"; // TODO: Get from business settings
+            String adminEmail = "nergashev.evolution@gmail.com"; // TODO: Get from business settings
 
             Map<String, Object> notificationData = new HashMap<>();
             notificationData.put("adminEmail", adminEmail);

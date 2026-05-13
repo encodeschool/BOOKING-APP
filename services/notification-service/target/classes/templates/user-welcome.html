@@ -1,98 +1,124 @@
+<!-- EXAMPLE UPDATED EMAIL -->
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       th:replace="~{base-template :: layout(~{::section})}">
 
 <section>
 
-    <h2>🎊 Welcome to Fresha!</h2>
+    <h2>🎊 Welcome to Fresha</h2>
 
     <p>
-        Dear <span th:text="${userName}">User</span>,
+        Hi <strong th:text="${userName}">John</strong>,
     </p>
 
     <p>
-        Welcome to Fresha! We're thrilled to have you join our community.
+        Your account has been successfully created and you’re now ready
+        to discover and book premium beauty & wellness experiences.
     </p>
 
-    <p>
-        Your account has been successfully created and you're now ready
-        to explore everything Fresha has to offer.
-    </p>
+    <div class="status-wrapper">
+        <div class="status-badge status-confirmed">
+            ✓ Account Created Successfully
+        </div>
+    </div>
 
-    <div class="info-box">
+    <div class="card soft-card">
+
+        <h3>👤 Account Information</h3>
 
         <div class="info-row">
-            <span class="info-label">Email:</span>
-            <span class="info-value"
-                  th:text="${email}">
+            <div class="info-label">Email</div>
+
+            <div class="info-value"
+                 th:text="${email}">
                 user@example.com
-            </span>
+            </div>
         </div>
 
         <div class="info-row">
-            <span class="info-label">Registration Date:</span>
-            <span class="info-value"
-                  th:text="${registrationDate}">
+            <div class="info-label">Registration Date</div>
+
+            <div class="info-value"
+                 th:text="${registrationDate}">
                 2026-05-13
-            </span>
+            </div>
         </div>
 
         <div class="info-row">
-            <span class="info-label">Account Type:</span>
-            <span class="info-value"
-                  th:text="${accountType}">
+            <div class="info-label">Account Type</div>
+
+            <div class="info-value"
+                 th:text="${accountType}">
                 Client
-            </span>
+            </div>
         </div>
 
     </div>
 
-    <h3>🚀 Get Started</h3>
+    <div class="card">
 
-    <div th:if="${accountType == 'Client'}">
+        <h3>🚀 What You Can Do</h3>
+
+        <div th:if="${accountType == 'Client'}">
+
+            <ul>
+                <li>Book appointments instantly</li>
+                <li>Manage upcoming bookings</li>
+                <li>Save favorite businesses</li>
+                <li>Receive reminders & updates</li>
+                <li>Leave ratings and reviews</li>
+            </ul>
+
+        </div>
+
+        <div th:if="${accountType == 'Business'}">
+
+            <ul>
+                <li>Manage your business profile</li>
+                <li>Handle appointments efficiently</li>
+                <li>Manage staff & schedules</li>
+                <li>Track analytics & performance</li>
+                <li>Grow your customer base</li>
+            </ul>
+
+        </div>
+
+    </div>
+
+    <div class="card highlight-card">
+
+        <h3>🛡️ Security Recommendations</h3>
 
         <ul>
-            <li>Book appointments</li>
-            <li>Manage bookings</li>
-            <li>Leave reviews</li>
-            <li>Save favorite businesses</li>
+            <li>Use a strong unique password</li>
+            <li>Do not share account credentials</li>
+            <li>Enable two-factor authentication when available</li>
+            <li>Review account activity regularly</li>
         </ul>
 
     </div>
 
-    <div th:if="${accountType == 'Business'}">
+    <div class="actions">
 
-        <ul>
-            <li>Manage your business</li>
-            <li>Handle bookings</li>
-            <li>Manage staff</li>
-            <li>Track analytics</li>
-        </ul>
-
-    </div>
-
-    <div style="text-align:center; margin:30px 0;">
-
-        <a href="#" class="button">
+        <a href="#"
+           class="button button-primary">
             Complete Your Profile
+        </a>
+
+        <a href="#"
+           class="button button-secondary">
+            Explore Businesses
         </a>
 
     </div>
 
-    <h3>🛡️ Security Tips</h3>
-
-    <ul>
-        <li>Use a strong password</li>
-        <li>Do not share credentials</li>
-        <li>Enable 2FA when available</li>
-    </ul>
-
     <p>
-        If you need help, our support team is here for you.
+        We’re excited to have you with us and can’t wait
+        to help you discover amazing experiences.
     </p>
 
     <p>
-        Welcome aboard,<br>
+        Warm regards,<br>
         <strong>The Fresha Team</strong>
     </p>
 

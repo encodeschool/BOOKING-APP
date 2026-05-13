@@ -9,153 +9,264 @@
     <h2>📅 New Booking Request</h2>
 
     <p>
-        Dear <span th:text="${adminName}">Admin</span>,
+        Hello
+        <strong th:text="${adminName}">Admin</strong>,
     </p>
 
     <p>
         A new booking request has been submitted for
-        <span th:text="${businessName}">your business</span>.
-        Please review and take action.
+        <strong th:text="${businessName}">your business</strong>.
+        Please review the details below and take action.
     </p>
 
-    <div class="info-box">
-
-        <div class="info-row">
-            <span class="info-label">Booking ID:</span>
-            <span class="info-value" th:text="${bookingId}">BK-123456</span>
+    <!-- STATUS -->
+    <div class="status-wrapper">
+        <div class="status-badge status-pending">
+            ⏳ Awaiting Approval
         </div>
+    </div>
+
+    <!-- BOOKING DETAILS -->
+    <div class="card soft-card">
+
+        <h3 style="margin-bottom: 18px;">
+            📋 Booking Details
+        </h3>
 
         <div class="info-row">
-            <span class="info-label">Customer:</span>
-            <span class="info-value" th:text="${customerName}">John Doe</span>
-        </div>
-
-        <div class="info-row">
-            <span class="info-label">Customer Email:</span>
-            <span class="info-value" th:text="${customerEmail}">john@example.com</span>
-        </div>
-
-        <div class="info-row">
-            <span class="info-label">Customer Phone:</span>
-            <span class="info-value" th:text="${customerPhone}">(555) 123-4567</span>
-        </div>
-
-        <div class="info-row">
-            <span class="info-label">Service:</span>
-            <span class="info-value" th:text="${serviceName}">Hair Styling</span>
-        </div>
-
-        <div class="info-row">
-            <span class="info-label">Staff:</span>
-            <span class="info-value" th:text="${staffName}">Sarah Johnson</span>
-        </div>
-
-        <div class="info-row">
-            <span class="info-label">Requested Date & Time:</span>
+            <span class="info-label">Booking ID</span>
             <span class="info-value"
-                  th:text="${bookingDate + ' at ' + bookingTime}">
-                March 15, 2024 at 2:00 PM
+                  th:text="${bookingId}">
+                BK-123456
             </span>
         </div>
 
         <div class="info-row">
-            <span class="info-label">Duration:</span>
-            <span class="info-value" th:text="${duration}">
+            <span class="info-label">Customer Name</span>
+            <span class="info-value"
+                  th:text="${customerName}">
+                John Doe
+            </span>
+        </div>
+
+        <div class="info-row">
+            <span class="info-label">Customer Email</span>
+            <span class="info-value"
+                  th:text="${customerEmail}">
+                john@example.com
+            </span>
+        </div>
+
+        <div class="info-row">
+            <span class="info-label">Customer Phone</span>
+            <span class="info-value"
+                  th:text="${customerPhone}">
+                +1 555 123 4567
+            </span>
+        </div>
+
+        <div class="info-row">
+            <span class="info-label">Service</span>
+            <span class="info-value"
+                  th:text="${serviceName}">
+                Hair Styling
+            </span>
+        </div>
+
+        <div class="info-row">
+            <span class="info-label">Assigned Staff</span>
+            <span class="info-value"
+                  th:text="${staffName}">
+                Sarah Johnson
+            </span>
+        </div>
+
+        <div class="info-row">
+            <span class="info-label">Date & Time</span>
+            <span class="info-value"
+                  th:text="${bookingDate + ' at ' + bookingTime}">
+                March 15, 2026 at 2:00 PM
+            </span>
+        </div>
+
+        <div class="info-row">
+            <span class="info-label">Duration</span>
+            <span class="info-value"
+                  th:text="${duration}">
                 60 minutes
             </span>
         </div>
 
     </div>
 
-    <div th:if="${notes != null and !#strings.isEmpty(notes)}">
-        <h3>Customer Notes:</h3>
+    <!-- CUSTOMER NOTES -->
+    <div th:if="${notes != null and !#strings.isEmpty(notes)}"
+         class="card highlight-card">
 
-        <p style="background-color: #f7fafc;
-                  padding: 15px;
-                  border-radius: 6px;
-                  border-left: 4px solid #667eea;"
+        <h3 style="margin-bottom: 14px;">
+            📝 Customer Notes
+        </h3>
+
+        <p style="margin:0;"
            th:text="${notes}">
-            Customer's special requests or notes...
+            Customer special requests...
         </p>
+
     </div>
 
-    <div class="status-badge status-pending">
-        ⏳ Awaiting Approval
+    <!-- ACTIONS -->
+    <div class="card">
+
+        <h3 style="margin-bottom: 14px;">
+            ⚡ Required Actions
+        </h3>
+
+        <p>
+            Please review this booking request and verify the following:
+        </p>
+
+        <ul>
+            <li>
+                Confirm the requested time slot is available
+            </li>
+
+            <li>
+                Verify the selected staff member is available
+            </li>
+
+            <li>
+                Review customer information if necessary
+            </li>
+
+            <li>
+                Approve or reject the booking request within 24 hours
+            </li>
+        </ul>
+
+        <div class="actions">
+
+            <a href="#"
+               class="button button-primary"
+               style="
+                    background: linear-gradient(135deg,#10b981 0%,#059669 100%);
+                    box-shadow: 0 12px 24px rgba(16,185,129,.25);
+               ">
+                ✅ Approve Booking
+            </a>
+
+            <a href="#"
+               class="button button-secondary"
+               style="
+                    background:#fff1f2;
+                    border:1px solid #fecdd3;
+                    color:#be123c !important;
+                    font-weight:700;
+               ">
+                ❌ Reject Booking
+            </a>
+
+        </div>
+
     </div>
 
-    <h3>⚡ Required Actions</h3>
+    <!-- INSIGHTS -->
+    <div class="card soft-card">
 
-    <p>Please review this booking request and:</p>
-
-    <ul>
-        <li>
-            <strong>Check availability:</strong>
-            Confirm the requested time slot is available
-        </li>
-
-        <li>
-            <strong>Staff assignment:</strong>
-            Verify the selected staff member is available
-        </li>
-
-        <li>
-            <strong>Customer verification:</strong>
-            Review customer details if needed
-        </li>
-
-        <li>
-            <strong>Approve or reject:</strong>
-            Take action within 24 hours
-        </li>
-    </ul>
-
-    <div style="text-align: center; margin: 30px 0;">
-        <a href="#" class="button">Approve Booking</a>
-        <a href="#" class="button button-secondary">Reject Booking</a>
-    </div>
-
-    <h3>📊 Business Insights</h3>
-
-    <div class="info-box">
+        <h3 style="margin-bottom:18px;">
+            📊 Business Insights
+        </h3>
 
         <div class="info-row">
-            <span class="info-label">Today's Bookings:</span>
-            <span class="info-value" th:text="${todayBookings}">5</span>
+            <span class="info-label">
+                Today's Bookings
+            </span>
+
+            <span class="info-value"
+                  th:text="${todayBookings}">
+                5
+            </span>
         </div>
 
         <div class="info-row">
-            <span class="info-label">Pending Requests:</span>
-            <span class="info-value" th:text="${pendingBookings}">3</span>
+            <span class="info-label">
+                Pending Requests
+            </span>
+
+            <span class="info-value"
+                  th:text="${pendingBookings}">
+                3
+            </span>
         </div>
 
         <div class="info-row">
-            <span class="info-label">Next Available Slot:</span>
-            <span class="info-value" th:text="${nextAvailable}">
+            <span class="info-label">
+                Next Available Slot
+            </span>
+
+            <span class="info-value"
+                  th:text="${nextAvailable}">
                 Tomorrow 10:00 AM
             </span>
         </div>
 
     </div>
 
-    <div style="background-color: #fff3cd;
-                border: 1px solid #ffeaa7;
-                border-radius: 8px;
-                padding: 20px;
-                margin: 20px 0;">
+    <!-- NOTICE -->
+    <div class="card"
+         style="
+            background: linear-gradient(
+                    135deg,
+                    rgba(245,158,11,.08),
+                    rgba(251,191,36,.04)
+            );
+            border:1px solid rgba(245,158,11,.16);
+         ">
 
-        <p style="margin: 0; color: #856404;">
-            <strong>⏰ Response Time:</strong>
-            For the best customer experience, please respond to booking requests within 24 hours.
+        <h3 style="margin-bottom:12px;">
+            ⏰ Response Time Reminder
+        </h3>
+
+        <p style="margin:0;">
+            For the best customer experience,
+            we recommend responding to booking requests
+            within <strong>24 hours</strong>.
         </p>
+
     </div>
 
-    <p>
-        If you have any questions about this booking or need assistance,
-        please contact our support team.
-    </p>
+    <!-- SUPPORT -->
+    <div class="card highlight-card">
 
-    <p>
-        Best regards,<br>
+        <h3 style="margin-bottom:14px;">
+            💬 Need Assistance?
+        </h3>
+
+        <p>
+            If you have any questions about this booking
+            or need additional support,
+            our team is always here to help.
+        </p>
+
+        <div class="actions"
+             style="margin-bottom:0;">
+
+            <a href="mailto:support@fresha.com"
+               class="button button-primary">
+                📩 Contact Support
+            </a>
+
+            <a href="#"
+               class="button button-secondary">
+                📖 Open Dashboard
+            </a>
+
+        </div>
+
+    </div>
+
+    <p style="margin-top:30px;">
+        Best regards,
+        <br><br>
         <strong>The Fresha Team</strong>
     </p>
 

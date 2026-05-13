@@ -5,6 +5,7 @@ class BusinessModel {
   final double latitude;
   final double longitude;
   final String? address;
+  final List<String>? images;
 
   BusinessModel({
     required this.id,
@@ -13,6 +14,7 @@ class BusinessModel {
     required this.longitude,
     this.imageUrl,
     this.address,
+    this.images,
   });
 
   factory BusinessModel.fromJson(Map<String, dynamic> json) {
@@ -25,6 +27,10 @@ class BusinessModel {
 
       imageUrl: json['imageUrl'],
       address: json['address'],
+
+      images: (json['images'] as List<dynamic>?)
+          ?.map((e) => e.toString())
+          .toList(),
     );
   }
 }

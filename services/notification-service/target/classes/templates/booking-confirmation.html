@@ -1,67 +1,246 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Booking Confirmation - Fresha</title>
-</head>
-<body>
-    <div th:replace="base-template.html :: .email-container">
-        <div th:fragment="content">
-            <h2>🎉 Your Booking is Confirmed!</h2>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{base-template :: layout(~{::section})}">
 
-            <p>Dear <span th:text="${customerName}">Customer</span>,</p>
+<section>
 
-            <p>Great news! Your booking has been confirmed and we're excited to serve you. Here are the details of your appointment:</p>
+    <h2>🎉 Your Booking is Confirmed!</h2>
 
-            <div class="info-box">
-                <div class="info-row">
-                    <span class="info-label">Booking ID:</span>
-                    <span class="info-value" th:text="${bookingId}">BK-123456</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Service:</span>
-                    <span class="info-value" th:text="${serviceName}">Hair Styling</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Staff:</span>
-                    <span class="info-value" th:text="${staffName}">Sarah Johnson</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Date & Time:</span>
-                    <span class="info-value" th:text="${bookingDate + ' at ' + bookingTime}">March 15, 2024 at 2:00 PM</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Duration:</span>
-                    <span class="info-value" th:text="${duration}">60 minutes</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Location:</span>
-                    <span class="info-value" th:text="${businessName + ', ' + businessAddress}">Salon Name, 123 Main St</span>
-                </div>
-            </div>
+    <p>
+        Hello
+        <strong th:text="${customerName}">Customer</strong>,
+    </p>
 
-            <div class="status-badge status-confirmed">✓ Confirmed</div>
+    <p>
+        Great news! Your booking has been officially confirmed.
+        We're excited to welcome you and provide you with an amazing experience.
+    </p>
 
-            <p><strong>What happens next?</strong></p>
-            <ul>
-                <li>You'll receive a reminder 24 hours before your appointment</li>
-                <li>Arrive 10 minutes early for your check-in</li>
-                <li>Bring any relevant documents or preferences</li>
-            </ul>
+    <!-- STATUS -->
+    <div class="status-wrapper">
 
-            <p>If you need to reschedule or cancel your appointment, please contact us at least 24 hours in advance.</p>
-
-            <div style="text-align: center; margin: 30px 0;">
-                <a href="#" class="button">View Booking Details</a>
-                <a href="#" class="button button-secondary">Contact Business</a>
-            </div>
-
-            <p>We look forward to seeing you soon!</p>
-
-            <p>Best regards,<br>
-            <strong>The Fresha Team</strong></p>
+        <div class="status-badge status-confirmed">
+            ✅ Confirmed Appointment
         </div>
+
     </div>
-</body>
+
+    <!-- BOOKING DETAILS -->
+    <div class="card soft-card">
+
+        <h3 style="margin-bottom:18px;">
+            📋 Appointment Details
+        </h3>
+
+        <div class="info-row">
+            <span class="info-label">
+                Booking ID
+            </span>
+
+            <span class="info-value"
+                  th:text="${bookingId}">
+                BK-123456
+            </span>
+        </div>
+
+        <div class="info-row">
+            <span class="info-label">
+                Service
+            </span>
+
+            <span class="info-value"
+                  th:text="${serviceName}">
+                Hair Styling
+            </span>
+        </div>
+
+        <div class="info-row">
+            <span class="info-label">
+                Staff Member
+            </span>
+
+            <span class="info-value"
+                  th:text="${staffName}">
+                Sarah Johnson
+            </span>
+        </div>
+
+        <div class="info-row">
+            <span class="info-label">
+                Date & Time
+            </span>
+
+            <span class="info-value"
+                  th:text="${bookingDate + ' at ' + bookingTime}">
+                March 15, 2026 at 2:00 PM
+            </span>
+        </div>
+
+        <div class="info-row">
+            <span class="info-label">
+                Duration
+            </span>
+
+            <span class="info-value"
+                  th:text="${duration}">
+                60 Minutes
+            </span>
+        </div>
+
+        <div class="info-row">
+            <span class="info-label">
+                Location
+            </span>
+
+            <span class="info-value"
+                  th:text="${businessName + ', ' + businessAddress}">
+                Salon Name, 123 Main Street
+            </span>
+        </div>
+
+    </div>
+
+    <!-- NEXT STEPS -->
+    <div class="card highlight-card">
+
+        <h3 style="margin-bottom:16px;">
+            ✨ What Happens Next?
+        </h3>
+
+        <ul>
+            <li>
+                You'll receive a reminder before your appointment
+            </li>
+
+            <li>
+                Please arrive 10–15 minutes early
+            </li>
+
+            <li>
+                Bring any required documents or preferences
+            </li>
+
+            <li>
+                Our team will be ready to welcome you
+            </li>
+        </ul>
+
+    </div>
+
+    <!-- IMPORTANT NOTICE -->
+    <div class="card"
+         style="
+            background: linear-gradient(
+                    135deg,
+                    rgba(59,130,246,.06),
+                    rgba(99,102,241,.04)
+            );
+            border:1px solid rgba(99,102,241,.14);
+         ">
+
+        <h3 style="margin-bottom:12px;">
+            📌 Appointment Policy
+        </h3>
+
+        <p style="margin:0;">
+            If you need to reschedule or cancel your appointment,
+            please contact the business at least
+            <strong>24 hours in advance</strong>.
+        </p>
+
+    </div>
+
+    <!-- ACTION BUTTONS -->
+    <div class="card">
+
+        <h3 style="margin-bottom:14px;">
+            ⚡ Quick Actions
+        </h3>
+
+        <p>
+            Manage your booking or get in touch with the business directly.
+        </p>
+
+        <div class="actions">
+
+            <a href="#"
+               class="button button-primary">
+                📅 View Booking Details
+            </a>
+
+            <a href="#"
+               class="button button-secondary">
+                💬 Contact Business
+            </a>
+
+        </div>
+
+    </div>
+
+    <!-- CALENDAR -->
+    <div class="card soft-card">
+
+        <h3 style="margin-bottom:14px;">
+            🗓️ Save Your Appointment
+        </h3>
+
+        <p>
+            Add this appointment to your calendar so you never miss it.
+        </p>
+
+        <div class="actions"
+             style="margin-bottom:0;">
+
+            <a href="#"
+               class="button button-primary"
+               style="
+                    background: linear-gradient(
+                            135deg,
+                            #2563eb 0%,
+                            #4f46e5 100%
+                    );
+               ">
+                ➕ Add to Calendar
+            </a>
+
+        </div>
+
+    </div>
+
+    <!-- SUPPORT -->
+    <div class="card highlight-card">
+
+        <h3 style="margin-bottom:14px;">
+            💬 Need Help?
+        </h3>
+
+        <p>
+            If you have any questions regarding your appointment,
+            our support team is always ready to assist you.
+        </p>
+
+        <div class="actions"
+             style="margin-bottom:0;">
+
+            <a href="mailto:support@fresha.com"
+               class="button button-secondary">
+                📩 Contact Support
+            </a>
+
+        </div>
+
+    </div>
+
+    <p style="margin-top:32px;">
+        We look forward to seeing you soon.
+    </p>
+
+    <p>
+        Warm regards,
+        <br><br>
+        <strong>The Fresha Team</strong>
+    </p>
+
+</section>
 </html>

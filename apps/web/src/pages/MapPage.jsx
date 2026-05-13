@@ -298,17 +298,18 @@ export default function MapPage() {
                     }`}
                   >
                     {/* IMAGE */}
-                    <div className="relative h-56">
+                    <div className="relative h-56 group">
+                      {/* MAIN IMAGE */}
                       <img
-                        src={
-                          business.imageUrl ||
-                          "https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?q=80&w=1200&auto=format&fit=crop"
-                        }
-                        className="w-full h-full object-cover"
-                        alt={
-                          business.name
-                        }
+                        src={`http://localhost:8080${business.images?.[0] || ""}`}
+                        className="w-full h-full object-cover rounded-xl"
+                        alt={business.name}
                       />
+
+                      {/* SLIDESHOW OVERLAY */}
+                      {business.images?.length > 1 && (
+                        <BusinessImageSlider images={business.images} />
+                      )}
                     </div>
 
                     {/* CONTENT */}
@@ -434,5 +435,62 @@ function BusinessServices({ businessId }) {
         </p>
       )}
     </div>
+  );
+}
+
+function BusinessImageSlider({ images }) {
+  const [index, setIndex] = useState(0);
+
+  const next = (e) => {
+    e.stopPropagation();
+    setIndex((prev) => (prev + 1) % images.length);
+  };
+
+  const prev = (e) => {
+    e.stopPropagation();
+    setIndex((prev) =>
+      prev === 0 ? images.length - 1 : prev - 1
+    );
+  };
+
+  return (
+    <>
+      {/* CURRENT IMAGE (OVERLAY) */}
+      <img
+        src={`http://localhost:8080${images[index]}`}
+        className="absolute inset-0 w-full h-full object-cover rounded-xl transition-all duration-300"
+        alt=""
+      />
+
+      {/* LEFT ARROW */}
+      <button
+        onClick={prev}
+        className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 text-white w-8 h-8 rounded-full opacity-0 group-hover:opacity-100 transition"
+      >
+        ‹
+      </button>
+
+      {/* RIGHT ARROW */}
+      <button
+        onClick={next}
+        className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 text-white w-8 h-8 rounded-full opacity-0 group-hover:opacity-100 transition"
+      >
+        ›
+      </button>
+
+      {/* DOT INDICATORS */}
+      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
+        {images.map((_, i) => (
+          <div
+            key={i}
+            className={`w-2 h-2 rounded-full ${
+              i === index
+                ? "bg-white"
+                : "bg-white/40"
+            }`}
+          />
+        ))}
+      </div>
+    </>
   );
 }

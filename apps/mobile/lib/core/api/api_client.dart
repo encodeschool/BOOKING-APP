@@ -3,57 +3,43 @@ import 'package:dio/dio.dart';
 import 'dart:io';
 
 class ApiClient {
-
   static String get baseUrl {
     if (Platform.isAndroid) {
       return "http://10.0.2.2:8080";
     } else if (Platform.isIOS) {
-      return "http://localhost:8080";
+      return "http://172.20.10.4:8080";
     }
-    return "http://localhost:8080";
+    return "http://172.20.10.4:8080";
     // return "http://localhost:8080";
   }
 
   final Dio dio = Dio(
     BaseOptions(
       baseUrl: baseUrl,
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: {"Content-Type": "application/json"},
     ),
   );
 
   Future<List<dynamic>> getBusinesses() async {
-    final res =
-    await dio.get("/api/businesses/public");
+    final res = await dio.get("/api/businesses/public");
 
     return res.data;
   }
 
-  Future<List<dynamic>> getServices(
-      int businessId) async {
-    final res = await dio.get(
-      "/api/services/public/business/$businessId",
-    );
+  Future<List<dynamic>> getServices(int businessId) async {
+    final res = await dio.get("/api/services/public/business/$businessId");
 
     return res.data;
   }
 
-  Future<List<dynamic>> getStaff(
-      int businessId) async {
-    final res = await dio.get(
-      "/api/staff/public/business/$businessId",
-    );
+  Future<List<dynamic>> getStaff(int businessId) async {
+    final res = await dio.get("/api/staff/public/business/$businessId");
 
     return res.data;
   }
 
-  Future<void> createBooking(
-      Map<String, dynamic> data) async {
-    await dio.post(
-      "/api/bookings/public",
-      data: data,
-    );
+  Future<void> createBooking(Map<String, dynamic> data) async {
+    await dio.post("/api/bookings/public", data: data);
   }
 
   // Notification methods
@@ -65,7 +51,10 @@ class ApiClient {
     );
   }
 
-  Future<void> sendCustomNotification(Map<String, dynamic> notificationData, String token) async {
+  Future<void> sendCustomNotification(
+    Map<String, dynamic> notificationData,
+    String token,
+  ) async {
     await dio.post(
       "/api/notifications/email",
       data: notificationData,
@@ -91,10 +80,7 @@ class ApiClient {
   }
 
   Future<void> forgotPassword(String email) async {
-    await dio.post(
-      "/api/auth/forgot-password",
-      data: {"email": email},
-    );
+    await dio.post("/api/auth/forgot-password", data: {"email": email});
   }
 
   Future<void> resetPassword(String token, String newPassword) async {
@@ -103,7 +89,6 @@ class ApiClient {
       data: {"token": token, "newPassword": newPassword},
     );
   }
-}
 }
 
 final apiClient = ApiClient();

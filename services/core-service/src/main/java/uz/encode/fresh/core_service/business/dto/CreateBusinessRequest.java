@@ -25,7 +25,6 @@ public class CreateBusinessRequest {
 
     public String workingHours;
 
-    // NEW
     public Double latitude;
 
     public Double longitude;

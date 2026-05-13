@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import {
   FiPlus,
   FiSearch,
@@ -12,12 +12,15 @@ import {
 
 import { useAuth } from "../../app/providers/AuthProvider";
 import { useBusiness } from "../../app/providers/BusinessProvider";
-import { createBusiness } from "../../lib/api";
+
+import {  createBusinessApi, getBusinessesApi, addBusinessImagesApi, deleteBusinessImageApi, updateBusinessApi, deleteBusinessApi, } from "../../lib/api/business.api";
+
 import { geocodeAddress } from "../../lib//api/geocode";
 
 export default function BusinessesPage() {
   const { token } = useAuth();
   const { businesses, load } = useBusiness();
+  const API_URL = "http://localhost:8080";
 
   const [showForm, setShowForm] = useState(false);
 
@@ -30,36 +33,125 @@ export default function BusinessesPage() {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
 
-  async function handleCreate() {
+  /* ===================== ADDED (IMAGES STATE) ===================== */
+  const [images, setImages] = useState([]);
+  const [dragActive, setDragActive] = useState(false);
+  const fileRef = useRef(null);
+
+  /* ===================== ADDED (EDIT / DETAILS STATE) ===================== */
+  const [editMode, setEditMode] = useState(false);
+  const [editId, setEditId] = useState(null);
+
+  const [details, setDetails] = useState(null);
+
+  const handleFiles = (files) => {
+    const arr = Array.from(files);
+    setImages((prev) => [...prev, ...arr]);
+  };
+
+  const removeImage = (index) => {
+    setImages((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const onDragOver = (e) => {
+    e.preventDefault();
+    setDragActive(true);
+  };
+
+  const onDragLeave = (e) => {
+    e.preventDefault();
+    setDragActive(false);
+  };
+
+  const onDrop = (e) => {
+    e.preventDefault();
+    setDragActive(false);
+    if (e.dataTransfer.files?.length) {
+      handleFiles(e.dataTransfer.files);
+    }
+  };
+
+  /* ===================== CREATE / UPDATE ===================== */
+  async function handleSubmit() {
     if (!form.name || !form.address || !form.phone) return;
 
     try {
       setLoading(true);
 
-      // 1. GET COORDINATES FROM ADDRESS
       const geo = await geocodeAddress(form.address);
 
-      // 2. SEND TO BACKEND
-      await createBusiness(token, {
-        ...form,
-        latitude: geo.latitude,
-        longitude: geo.longitude,
-      });
+      if (editMode && editId) {
+        await updateBusinessApi(token, editId, {
+          ...form,
+          latitude: geo.latitude,
+          longitude: geo.longitude,
+        });
 
-      // 3. RESET FORM
-      setForm({
-        name: "",
-        address: "",
-        phone: "",
-      });
+        if (images.length > 0) {
+          const fd = new FormData();
+          images.forEach((img) => fd.append("images", img));
 
+          await addBusinessImagesApi(token, editId, fd);
+        }
+      } else {
+        const fd = new FormData();
+
+        fd.append(
+          "req",
+          new Blob(
+            [
+              JSON.stringify({
+                ...form,
+                latitude: geo.latitude,
+                longitude: geo.longitude,
+              }),
+            ],
+            { type: "application/json" }
+          )
+        );
+
+        images.forEach((img) => fd.append("images", img));
+
+        await createBusinessApi(token, fd);
+      }
+
+      setForm({ name: "", address: "", phone: "" });
+      setImages([]);
+      setEditMode(false);
+      setEditId(null);
       setShowForm(false);
       load();
     } catch (error) {
-      console.error("Failed to create business:", error);
+      console.error(error);
     } finally {
       setLoading(false);
     }
+  }
+
+  /* ===================== EDIT ===================== */
+  function handleEdit(b) {
+    setForm({
+      name: b.name,
+      address: b.address,
+      phone: b.phone,
+    });
+
+    setEditMode(true);
+    setEditId(b.id);
+    setImages([]);
+    setShowForm(true);
+  }
+
+  /* ===================== DELETE ===================== */
+  async function handleDelete(id) {
+    if (!confirm("Delete business?")) return;
+    await deleteBusinessApi(token, id);
+    load();
+  }
+
+  /* ===================== VIEW DETAILS ===================== */
+  function handleView(b) {
+    setDetails(b);
   }
 
   const filteredBusinesses = businesses.filter((business) =>
@@ -201,6 +293,23 @@ export default function BusinessesPage() {
                         {business.phone}
                       </span>
                     </div>
+
+                    {/* ADDED PREVIEW (IF NEW UPLOADED IMAGES ARE LOCAL OR EXISTING) */}
+                    {business.images?.length > 0 && (
+                      <div className="flex gap-2 mt-3 flex-wrap">
+                        {business.images.map((img, i) => (
+                          <img
+                            key={i}
+                            src={
+                              img.imageUrl
+                              ? `${API_URL}${img.imageUrl}`
+                              : `${API_URL}${img}`
+                            }
+                            className="w-12 h-12 rounded-lg object-cover"
+                          />
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -213,18 +322,18 @@ export default function BusinessesPage() {
             {/* FOOTER */}
             <div className="p-5 flex items-center justify-between">
               <div className="flex gap-3">
-                <button className="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-600 transition">
+                <button onClick={() => handleEdit(business)} className="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-600 transition">
                   <FiEdit2 size={16} />
                   Edit
                 </button>
 
-                <button className="flex items-center gap-2 px-4 py-2 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 transition">
+                <button onClick={() => handleDelete(business.id)} className="flex items-center gap-2 px-4 py-2 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 transition">
                   <FiTrash2 size={16} />
                   Delete
                 </button>
               </div>
 
-              <button className="text-sm font-medium text-emerald-600 hover:text-emerald-700">
+              <button className="text-sm font-medium text-emerald-600 hover:text-emerald-700" onClick={() => handleView(business)}>
                 View Details →
               </button>
             </div>
@@ -232,14 +341,42 @@ export default function BusinessesPage() {
         ))}
       </div>
 
+      {/* DETAILS MODAL */}
+      {details && (
+        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white w-full max-w-xl rounded-3xl p-6">
+            <div className="flex justify-between items-center">
+              <h2 className="text-xl font-bold">{details.name}</h2>
+              <button onClick={() => setDetails(null)}>
+                <FiX />
+              </button>
+            </div>
+
+            <div className="mt-4 space-y-2">
+              <p><b>Address:</b> {details.address}</p>
+              <p><b>Phone:</b> {details.phone}</p>
+
+              {details.images?.length > 0 && (
+                <div className="flex gap-2 flex-wrap mt-3">
+                  {details.images.map((img, i) => (
+                    <img
+                      key={i}
+                      src={img.imageUrl || img}
+                      className="w-16 h-16 rounded-lg object-cover"
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* EMPTY STATE */}
       {filteredBusinesses.length === 0 && (
         <div className="bg-white rounded-3xl border border-dashed border-gray-300 p-16 text-center">
           <div className="w-20 h-20 rounded-full bg-gray-100 mx-auto flex items-center justify-center mb-5">
-            <FiBriefcase
-              size={34}
-              className="text-gray-400"
-            />
+            <FiBriefcase size={34} className="text-gray-400" />
           </div>
 
           <h3 className="text-xl font-semibold text-gray-900">
@@ -260,7 +397,7 @@ export default function BusinessesPage() {
             <div className="flex items-center justify-between p-6 border-b border-gray-100">
               <div>
                 <h2 className="text-2xl font-bold text-gray-900">
-                  Create Business
+                  {editMode ? "Edit Business" : "Create Business"}
                 </h2>
 
                 <p className="text-sm text-gray-500 mt-1">
@@ -334,6 +471,65 @@ export default function BusinessesPage() {
                   className="w-full bg-gray-50 border border-gray-200 rounded-2xl px-4 py-4 outline-none focus:ring-2 focus:ring-emerald-500"
                 />
               </div>
+
+              {/* ===================== ADDED UPLOAD ===================== */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Images
+                </label>
+
+                <div
+                  onDragOver={onDragOver}
+                  onDragLeave={onDragLeave}
+                  onDrop={onDrop}
+                  className={`border-2 border-dashed rounded-2xl p-5 text-center transition ${
+                    dragActive
+                      ? "border-emerald-500 bg-emerald-50"
+                      : "border-gray-300"
+                  }`}
+                >
+                  <p className="text-gray-500 text-sm">
+                    Drag & drop images here
+                  </p>
+
+                  <button
+                    type="button"
+                    className="text-emerald-600 text-sm mt-2"
+                    onClick={() => fileRef.current.click()}
+                  >
+                    or select files
+                  </button>
+
+                  <input
+                    ref={fileRef}
+                    type="file"
+                    multiple
+                    hidden
+                    onChange={(e) => handleFiles(e.target.files)}
+                  />
+                </div>
+
+                {/* PREVIEW */}
+                {images.length > 0 && (
+                  <div className="flex gap-2 flex-wrap mt-3">
+                    {images.map((img, i) => (
+                      <div key={i} className="relative">
+                        <img
+                          src={URL.createObjectURL(img)}
+                          className="w-14 h-14 rounded-lg object-cover"
+                        />
+                        <button
+                          onClick={() => removeImage(i)}
+                          className="absolute -top-1 -right-1 bg-red-500 text-white text-xs px-1 rounded"
+                        >
+                          x
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+              {/* ====================================================== */}
             </div>
 
             {/* FOOTER */}
@@ -346,11 +542,11 @@ export default function BusinessesPage() {
               </button>
 
               <button
-                onClick={handleCreate}
+                onClick={handleSubmit}
                 disabled={loading}
                 className="px-6 py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-green-600 hover:opacity-90 text-white font-medium shadow-lg transition"
               >
-                {loading ? "Creating..." : "Create Business"}
+                {editMode ? loading ? "Updating..." : "Update" : loading ? "Creating..." : "Create"}
               </button>
             </div>
           </div>

@@ -1,99 +1,256 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Booking Status Update - Fresha</title>
-</head>
-<body>
-    <div th:replace="base-template.html :: .email-container">
-        <div th:fragment="content">
-            <h2 th:if="${status == 'confirmed'}">✅ Your Booking Has Been Approved!</h2>
-            <h2 th:if="${status == 'rejected'}">❌ Booking Request Update</h2>
-            <h2 th:if="${status == 'cancelled'}">📅 Booking Cancellation Notice</h2>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{base-template :: layout(~{::section})}">
 
-            <p>Dear <span th:text="${customerName}">Customer</span>,</p>
+<section>
 
-            <div th:if="${status == 'confirmed'}">
-                <p>Great news! Your booking request has been approved by the business. Your appointment is now confirmed and ready to go.</p>
-                <div class="status-badge status-confirmed">✓ Approved</div>
+    <!-- CONFIRMED -->
+    <div th:if="${status == 'confirmed'}">
+
+        <h2>✅ Your Booking Has Been Approved!</h2>
+
+        <p>
+            Dear <strong th:text="${customerName}">Customer</strong>,
+        </p>
+
+        <p>
+            Great news! Your booking request has been approved by
+            <strong th:text="${businessName}">Salon Name</strong>.
+            Your appointment is now officially confirmed.
+        </p>
+
+        <div class="status-wrapper">
+            <div class="status-badge status-confirmed">
+                ✓ Approved & Confirmed
             </div>
-
-            <div th:if="${status == 'rejected'}">
-                <p>We regret to inform you that your booking request has been declined by the business.</p>
-                <div class="status-badge status-rejected">✗ Rejected</div>
-            </div>
-
-            <div th:if="${status == 'cancelled'}">
-                <p>Your booking has been cancelled as requested.</p>
-                <div class="status-badge status-cancelled">Cancelled</div>
-            </div>
-
-            <div class="info-box">
-                <div class="info-row">
-                    <span class="info-label">Booking ID:</span>
-                    <span class="info-value" th:text="${bookingId}">BK-123456</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Service:</span>
-                    <span class="info-value" th:text="${serviceName}">Hair Styling</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Requested Date & Time:</span>
-                    <span class="info-value" th:text="${bookingDate + ' at ' + bookingTime}">March 15, 2024 at 2:00 PM</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Business:</span>
-                    <span class="info-value" th:text="${businessName}">Salon Name</span>
-                </div>
-            </div>
-
-            <div th:if="${reason}">
-                <h3>Additional Information:</h3>
-                <p th:text="${reason}">The business provided the following reason for this decision.</p>
-            </div>
-
-            <div th:if="${status == 'confirmed'}">
-                <p><strong>Next Steps:</strong></p>
-                <ul>
-                    <li>You'll receive a reminder 24 hours before your appointment</li>
-                    <li>Arrive 10 minutes early for your check-in</li>
-                    <li>Bring any relevant documents or preferences</li>
-                </ul>
-
-                <div style="text-align: center; margin: 30px 0;">
-                    <a href="#" class="button">View Booking Details</a>
-                    <a href="#" class="button button-secondary">Add to Calendar</a>
-                </div>
-            </div>
-
-            <div th:if="${status == 'rejected'}">
-                <p><strong>What you can do next:</strong></p>
-                <ul>
-                    <li>Try booking a different time slot</li>
-                    <li>Choose an alternative service</li>
-                    <li>Contact the business directly for more information</li>
-                </ul>
-
-                <div style="text-align: center; margin: 30px 0;">
-                    <a href="#" class="button">Book Again</a>
-                    <a href="#" class="button button-secondary">Contact Business</a>
-                </div>
-            </div>
-
-            <div th:if="${status == 'cancelled'}">
-                <p>If this cancellation was made in error or you'd like to rebook, you can do so anytime.</p>
-
-                <div style="text-align: center; margin: 30px 0;">
-                    <a href="#" class="button">Book New Appointment</a>
-                </div>
-            </div>
-
-            <p>If you have any questions about this booking update, please don't hesitate to contact us.</p>
-
-            <p>Best regards,<br>
-            <strong>The Fresha Team</strong></p>
         </div>
+
     </div>
-</body>
+
+    <!-- REJECTED -->
+    <div th:if="${status == 'rejected'}">
+
+        <h2>❌ Booking Request Update</h2>
+
+        <p>
+            Dear <strong th:text="${customerName}">Customer</strong>,
+        </p>
+
+        <p>
+            Unfortunately, your booking request could not be approved
+            at this time by
+            <strong th:text="${businessName}">Salon Name</strong>.
+        </p>
+
+        <div class="status-wrapper">
+            <div class="status-badge status-rejected">
+                ✕ Booking Rejected
+            </div>
+        </div>
+
+    </div>
+
+    <!-- CANCELLED -->
+    <div th:if="${status == 'cancelled'}">
+
+        <h2>📅 Booking Cancellation Notice</h2>
+
+        <p>
+            Dear <strong th:text="${customerName}">Customer</strong>,
+        </p>
+
+        <p>
+            Your booking has been successfully cancelled.
+        </p>
+
+        <div class="status-wrapper">
+            <div class="status-badge status-cancelled">
+                Booking Cancelled
+            </div>
+        </div>
+
+    </div>
+
+    <!-- BOOKING DETAILS -->
+    <div class="card soft-card">
+
+        <h3>📋 Booking Details</h3>
+
+        <div class="info-row">
+            <span class="info-label">Booking ID</span>
+            <span class="info-value"
+                  th:text="${bookingId}">
+                BK-123456
+            </span>
+        </div>
+
+        <div class="info-row">
+            <span class="info-label">Service</span>
+            <span class="info-value"
+                  th:text="${serviceName}">
+                Hair Styling
+            </span>
+        </div>
+
+        <div class="info-row">
+            <span class="info-label">Date & Time</span>
+            <span class="info-value"
+                  th:text="${bookingDate + ' at ' + bookingTime}">
+                March 15, 2024 at 2:00 PM
+            </span>
+        </div>
+
+        <div class="info-row">
+            <span class="info-label">Business</span>
+            <span class="info-value"
+                  th:text="${businessName}">
+                Salon Name
+            </span>
+        </div>
+
+    </div>
+
+    <!-- REASON -->
+    <div th:if="${reason != null and !#strings.isEmpty(reason)}"
+         class="card highlight-card">
+
+        <h3>📝 Additional Information</h3>
+
+        <p th:text="${reason}">
+            The business provided additional details.
+        </p>
+
+    </div>
+
+    <!-- CONFIRMED ACTIONS -->
+    <div th:if="${status == 'confirmed'}">
+
+        <div class="card">
+
+            <h3>✨ What Happens Next?</h3>
+
+            <ul>
+                <li>
+                    You'll receive a reminder before your appointment
+                </li>
+
+                <li>
+                    Arrive 10–15 minutes early for check-in
+                </li>
+
+                <li>
+                    Bring any preferences or necessary documents
+                </li>
+
+                <li>
+                    Contact the business if you need changes
+                </li>
+            </ul>
+
+        </div>
+
+        <div class="actions">
+
+            <a href="#"
+               class="button button-primary">
+                View Booking
+            </a>
+
+            <a href="#"
+               class="button button-secondary">
+                Add to Calendar
+            </a>
+
+        </div>
+
+    </div>
+
+    <!-- REJECTED ACTIONS -->
+    <div th:if="${status == 'rejected'}">
+
+        <div class="card">
+
+            <h3>🔄 What You Can Do Next</h3>
+
+            <ul>
+                <li>
+                    Try booking another available time slot
+                </li>
+
+                <li>
+                    Select another specialist or service
+                </li>
+
+                <li>
+                    Contact the business directly for assistance
+                </li>
+
+            </ul>
+
+        </div>
+
+        <div class="actions">
+
+            <a href="#"
+               class="button button-primary">
+                Book Again
+            </a>
+
+            <a href="#"
+               class="button button-secondary">
+                Contact Business
+            </a>
+
+        </div>
+
+    </div>
+
+    <!-- CANCELLED ACTIONS -->
+    <div th:if="${status == 'cancelled'}">
+
+        <div class="card">
+
+            <h3>📌 Need Another Appointment?</h3>
+
+            <p>
+                You can create a new booking anytime through the Fresha platform.
+            </p>
+
+        </div>
+
+        <div class="actions">
+
+            <a href="#"
+               class="button button-primary">
+                Book New Appointment
+            </a>
+
+        </div>
+
+    </div>
+
+    <!-- SUPPORT -->
+    <div class="card highlight-card">
+
+        <h3>💬 Need Help?</h3>
+
+        <p>
+            If you have questions regarding this booking update,
+            please contact our support team or the business directly.
+        </p>
+
+    </div>
+
+    <!-- CLOSING -->
+    <p>
+        Thank you for choosing Fresha.
+    </p>
+
+    <p>
+        Best regards,<br>
+        <strong>The Fresha Team</strong>
+    </p>
+
+</section>
 </html>

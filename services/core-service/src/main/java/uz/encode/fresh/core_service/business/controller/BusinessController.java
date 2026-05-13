@@ -5,14 +5,17 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
 import uz.encode.fresh.core_service.business.dto.BusinessResponse;
 import uz.encode.fresh.core_service.business.dto.CreateBusinessRequest;
 import uz.encode.fresh.core_service.business.entity.Business;
@@ -25,25 +28,81 @@ public class BusinessController {
     @Autowired
     private BusinessService service;
 
-    @PostMapping
-    public BusinessResponse create(HttpServletRequest request,
-                                   @Valid @RequestBody CreateBusinessRequest req) {
+    @PostMapping(consumes = "multipart/form-data")
+    public BusinessResponse create(
+            HttpServletRequest request,
+            @ModelAttribute CreateBusinessRequest req,
+            @RequestParam(required = false)
+            List<MultipartFile> images
+    ) {
 
-        Long userId = (Long) request.getAttribute("userId");
+        Long userId =
+                (Long) request.getAttribute("userId");
 
-        Business b = service.create(userId, req);
+        Business b =
+                service.create(userId, req, images);
+
+        return map(b);
+    }
+
+    @PutMapping("/{id}")
+    public BusinessResponse update(
+            @PathVariable Long id,
+            HttpServletRequest request,
+            @RequestBody CreateBusinessRequest req
+    ) {
+
+        Long userId =
+                (Long) request.getAttribute("userId");
+
+        return map(service.update(id, userId, req));
+    }
+
+    @PostMapping("/{id}/images")
+    public void addImages(
+            @PathVariable Long id,
+            HttpServletRequest request,
+            @RequestParam List<MultipartFile> images
+    ) {
+
+        Long userId =
+                (Long) request.getAttribute("userId");
+
+        service.addImages(id, userId, images);
+    }
+
+    @DeleteMapping("/images/{imageId}")
+    public void deleteImage(
+            @PathVariable Long imageId,
+            HttpServletRequest request
+    ) {
+
+        Long userId =
+                (Long) request.getAttribute("userId");
+
+        service.deleteImage(imageId, userId);
+    }
+
+    private BusinessResponse map(Business b) {
+
+        List<String> images = b.getImages() == null
+        ? List.of()
+        : b.getImages().stream()
+            .map(i -> i.getImageUrl())
+            .toList();
 
         return new BusinessResponse(
-            b.getId(),
-            b.getName(),
-            b.getDescription(),
-            b.getAddress(),
-            b.getPhone(),
-            b.getCategory(),
-            b.getWorkingHours(),
-            b.getLatitude(),
-            b.getLongitude()
-    );
+                b.getId(),
+                b.getName(),
+                b.getDescription(),
+                b.getAddress(),
+                b.getPhone(),
+                b.getCategory(),
+                b.getWorkingHours(),
+                b.getLatitude(),
+                b.getLongitude(),
+                images
+        );
     }
 
     @GetMapping
@@ -53,17 +112,7 @@ public class BusinessController {
 
         return service.getByOwner(userId)
                 .stream()
-                .map(b -> new BusinessResponse(
-                        b.getId(),
-                        b.getName(),
-                        b.getDescription(),
-                        b.getAddress(),
-                        b.getPhone(),
-                        b.getCategory(),
-                        b.getWorkingHours(),
-                        b.getLatitude(),
-                        b.getLongitude()
-                ))
+                .map(this::map)
                 .toList();
     }
 

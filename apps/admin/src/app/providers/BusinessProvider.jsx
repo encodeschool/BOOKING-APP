@@ -11,9 +11,12 @@ export default function BusinessProvider({ children }) {
 
   const load = async () => {
     if (!token) return;
+
     const data = await getBusinessesApi(token);
+
     setBusinesses(data);
-    if (data.length > 0 && !selectedBusinessId) {
+
+    if (data?.length > 0 && !selectedBusinessId) {
       setSelectedBusinessId(data[0].id);
     }
   };
@@ -23,7 +26,15 @@ export default function BusinessProvider({ children }) {
   }, [token]);
 
   return (
-    <BusinessContext.Provider value={{ businesses, selectedBusinessId, setSelectedBusinessId, load }}>
+    <BusinessContext.Provider
+      value={{
+        businesses,
+        setBusinesses,
+        selectedBusinessId,
+        setSelectedBusinessId,
+        load,
+      }}
+    >
       {children}
     </BusinessContext.Provider>
   );

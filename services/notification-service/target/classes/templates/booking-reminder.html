@@ -1,87 +1,301 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Appointment Reminder - Fresha</title>
-</head>
-<body>
-    <div th:replace="base-template.html :: .email-container">
-        <div th:fragment="content">
-            <h2>⏰ Appointment Reminder</h2>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{base-template :: layout(~{::section})}">
 
-            <p>Dear <span th:text="${customerName}">Customer</span>,</p>
+<section>
 
-            <p>This is a friendly reminder about your upcoming appointment with <span th:text="${businessName}">Business Name</span>.</p>
+    <h2>⏰ Appointment Reminder</h2>
 
-            <div class="info-box">
-                <div class="info-row">
-                    <span class="info-label">Service:</span>
-                    <span class="info-value" th:text="${serviceName}">Hair Styling</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Staff:</span>
-                    <span class="info-value" th:text="${staffName}">Sarah Johnson</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Date & Time:</span>
-                    <span class="info-value" th:text="${bookingDate + ' at ' + bookingTime}">Tomorrow at 2:00 PM</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Duration:</span>
-                    <span class="info-value" th:text="${duration}">60 minutes</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Location:</span>
-                    <span class="info-value" th:text="${businessAddress}">123 Main Street, City</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Booking ID:</span>
-                    <span class="info-value" th:text="${bookingId}">BK-123456</span>
-                </div>
-            </div>
+    <p>
+        Hello
+        <strong th:text="${customerName}">Customer</strong>,
+    </p>
 
-            <div class="status-badge status-confirmed">📅 Upcoming</div>
+    <p>
+        This is a friendly reminder about your upcoming appointment with
+        <strong th:text="${businessName}">Business Name</strong>.
+        We're looking forward to seeing you soon.
+    </p>
 
-            <h3>📍 How to Find Us</h3>
-            <p><strong>Address:</strong> <span th:text="${businessAddress}">123 Main Street, City, State 12345</span></p>
-            <p><strong>Phone:</strong> <span th:text="${businessPhone}">(555) 123-4567</span></p>
+    <!-- STATUS -->
+    <div class="status-wrapper">
 
-            <div th:if="${directions}">
-                <p><strong>Directions:</strong> <span th:text="${directions}">From downtown, take Main St north for 2 miles...</span></p>
-            </div>
-
-            <h3>✅ What to Bring</h3>
-            <ul>
-                <li>Valid ID (if required)</li>
-                <li>Any referral documents</li>
-                <li>Your insurance card (if applicable)</li>
-                <li>Comfortable clothing</li>
-                <li>Any personal items you may need</li>
-            </ul>
-
-            <h3>📞 Contact Information</h3>
-            <p>If you need to reschedule or have questions:</p>
-            <ul>
-                <li><strong>Phone:</strong> <span th:text="${businessPhone}">(555) 123-4567</span></li>
-                <li><strong>Email:</strong> <span th:text="${businessEmail}">contact@business.com</span></li>
-                <li><strong>Website:</strong> <a th:href="${businessWebsite}" th:text="${businessWebsite}">www.business.com</a></li>
-            </ul>
-
-            <div style="text-align: center; margin: 30px 0;">
-                <a href="#" class="button">View Full Details</a>
-                <a href="#" class="button button-secondary">Reschedule</a>
-            </div>
-
-            <div style="background-color: #e6fffa; border: 1px solid #b2f5ea; border-radius: 8px; padding: 20px; margin: 20px 0;">
-                <p style="margin: 0; color: #234e52;"><strong>💡 Pro Tip:</strong> Arrive 10-15 minutes early to complete any necessary paperwork and relax before your service.</p>
-            </div>
-
-            <p>We look forward to seeing you soon!</p>
-
-            <p>Best regards,<br>
-            <strong>The Fresha Team</strong></p>
+        <div class="status-badge status-confirmed">
+            📅 Upcoming Appointment
         </div>
+
     </div>
-</body>
+
+    <!-- APPOINTMENT DETAILS -->
+    <div class="card soft-card">
+
+        <h3 style="margin-bottom:18px;">
+            📋 Appointment Details
+        </h3>
+
+        <div class="info-row">
+            <span class="info-label">
+                Service
+            </span>
+
+            <span class="info-value"
+                  th:text="${serviceName}">
+                Hair Styling
+            </span>
+        </div>
+
+        <div class="info-row">
+            <span class="info-label">
+                Staff Member
+            </span>
+
+            <span class="info-value"
+                  th:text="${staffName}">
+                Sarah Johnson
+            </span>
+        </div>
+
+        <div class="info-row">
+            <span class="info-label">
+                Date & Time
+            </span>
+
+            <span class="info-value"
+                  th:text="${bookingDate + ' at ' + bookingTime}">
+                Tomorrow at 2:00 PM
+            </span>
+        </div>
+
+        <div class="info-row">
+            <span class="info-label">
+                Duration
+            </span>
+
+            <span class="info-value"
+                  th:text="${duration}">
+                60 Minutes
+            </span>
+        </div>
+
+        <div class="info-row">
+            <span class="info-label">
+                Location
+            </span>
+
+            <span class="info-value"
+                  th:text="${businessAddress}">
+                123 Main Street, City
+            </span>
+        </div>
+
+        <div class="info-row">
+            <span class="info-label">
+                Booking ID
+            </span>
+
+            <span class="info-value"
+                  th:text="${bookingId}">
+                BK-123456
+            </span>
+        </div>
+
+    </div>
+
+    <!-- LOCATION -->
+    <div class="card highlight-card">
+
+        <h3 style="margin-bottom:16px;">
+            📍 Business Information
+        </h3>
+
+        <div class="info-row">
+            <span class="info-label">
+                Address
+            </span>
+
+            <span class="info-value"
+                  th:text="${businessAddress}">
+                123 Main Street, City, State
+            </span>
+        </div>
+
+        <div class="info-row">
+            <span class="info-label">
+                Phone
+            </span>
+
+            <span class="info-value"
+                  th:text="${businessPhone}">
+                (555) 123-4567
+            </span>
+        </div>
+
+        <div class="info-row">
+            <span class="info-label">
+                Email
+            </span>
+
+            <span class="info-value"
+                  th:text="${businessEmail}">
+                contact@business.com
+            </span>
+        </div>
+
+        <div class="info-row">
+            <span class="info-label">
+                Website
+            </span>
+
+            <span class="info-value">
+                <a th:href="${businessWebsite}"
+                   th:text="${businessWebsite}"
+                   style="
+                        color:#4f46e5;
+                        font-weight:700;
+                   ">
+                    www.business.com
+                </a>
+            </span>
+        </div>
+
+    </div>
+
+    <!-- DIRECTIONS -->
+    <div th:if="${directions}"
+         class="card">
+
+        <h3 style="margin-bottom:14px;">
+            🧭 Directions
+        </h3>
+
+        <p style="margin:0;"
+           th:text="${directions}">
+            From downtown, take Main Street north...
+        </p>
+
+    </div>
+
+    <!-- WHAT TO BRING -->
+    <div class="card soft-card">
+
+        <h3 style="margin-bottom:16px;">
+            ✅ What to Bring
+        </h3>
+
+        <ul>
+            <li>
+                Valid identification if required
+            </li>
+
+            <li>
+                Any referral or booking documents
+            </li>
+
+            <li>
+                Insurance information if applicable
+            </li>
+
+            <li>
+                Comfortable clothing and personal essentials
+            </li>
+
+            <li>
+                Any notes or preferences for your appointment
+            </li>
+        </ul>
+
+    </div>
+
+    <!-- QUICK ACTIONS -->
+    <div class="card">
+
+        <h3 style="margin-bottom:14px;">
+            ⚡ Quick Actions
+        </h3>
+
+        <p>
+            Need to review details or make changes to your appointment?
+        </p>
+
+        <div class="actions">
+
+            <a href="#"
+               class="button button-primary">
+                📅 View Full Details
+            </a>
+
+            <a href="#"
+               class="button button-secondary">
+                🔄 Reschedule Appointment
+            </a>
+
+        </div>
+
+    </div>
+
+    <!-- ARRIVAL TIP -->
+    <div class="card"
+         style="
+            background: linear-gradient(
+                    135deg,
+                    rgba(16,185,129,.08),
+                    rgba(5,150,105,.04)
+            );
+            border:1px solid rgba(16,185,129,.14);
+         ">
+
+        <h3 style="margin-bottom:12px;">
+            💡 Arrival Tip
+        </h3>
+
+        <p style="margin:0;">
+            Please arrive
+            <strong>10–15 minutes early</strong>
+            to complete any necessary paperwork
+            and enjoy a relaxed check-in experience.
+        </p>
+
+    </div>
+
+    <!-- SUPPORT -->
+    <div class="card highlight-card">
+
+        <h3 style="margin-bottom:14px;">
+            💬 Need Assistance?
+        </h3>
+
+        <p>
+            If you have any questions or need to update your appointment,
+            our support team is here to help.
+        </p>
+
+        <div class="actions"
+             style="margin-bottom:0;">
+
+            <a href="mailto:support@fresha.com"
+               class="button button-primary">
+                📩 Contact Support
+            </a>
+
+            <a href="#"
+               class="button button-secondary">
+                📞 Call Business
+            </a>
+
+        </div>
+
+    </div>
+
+    <p style="margin-top:32px;">
+        We look forward to welcoming you soon.
+    </p>
+
+    <p>
+        Warm regards,
+        <br><br>
+        <strong>The Fresha Team</strong>
+    </p>
+
+</section>
 </html>
