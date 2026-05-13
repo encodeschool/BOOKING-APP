@@ -3,6 +3,8 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../booking/screens/booking_sheet.dart';
+import '../models/business_model.dart';
 import '../providers/business_provider.dart';
 import '../widgets/business_list.dart';
 import '../widgets/map_widget.dart';
@@ -20,6 +22,17 @@ class _MapScreenState extends ConsumerState<MapScreen> {
 
   bool _isExpanded = false;
 
+  void _openBooking(BusinessModel business) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => BookingSheet(
+        business: business,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final businesses = ref.watch(businessesProvider);
@@ -30,25 +43,20 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         data: (items) {
           return Stack(
             children: [
-              // =========================
-              // MAP
-              // =========================
               Positioned.fill(
                 child: MapWidget(
                   businesses: items,
                 ),
               ),
 
-              // =========================
-              // TOP GRADIENT OVERLAY
-              // =========================
+              // TOP SHADOW
               Positioned(
                 top: 0,
                 left: 0,
                 right: 0,
                 child: IgnorePointer(
                   child: Container(
-                    height: 170,
+                    height: 180,
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         begin: Alignment.topCenter,
@@ -63,23 +71,21 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                 ),
               ),
 
-              // =========================
-              // TOP APP BAR
-              // =========================
+              // TOP BAR
               SafeArea(
                 child: Padding(
-                  padding: const EdgeInsets.only(
-                    left: 6,
-                    right: 12,
-                    top: 12,
-                    bottom: 12
+                  padding: const EdgeInsets.fromLTRB(
+                    12,
+                    12,
+                    12,
+                    0,
                   ),
                   child: Row(
                     children: [
-                      // _glassButton(
-                      //   icon: Icons.menu_rounded,
-                      //   onTap: () {},
-                      // ),
+                      _glassButton(
+                        icon: Icons.menu_rounded,
+                        onTap: () {},
+                      ),
 
                       const SizedBox(width: 12),
 
@@ -98,17 +104,16 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                 ),
               ),
 
-              // =========================
-              // FILTER CHIPS
-              // =========================
+              // FILTERS
               Positioned(
-                top: 120,
+                top: 125,
                 left: 0,
                 right: 0,
                 child: SizedBox(
-                  height: 42,
+                  height: 46,
                   child: ListView(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    padding:
+                    const EdgeInsets.symmetric(horizontal: 16),
                     scrollDirection: Axis.horizontal,
                     children: [
                       _filterChip(
@@ -128,18 +133,12 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                         label: 'Shopping',
                         icon: Icons.shopping_bag_rounded,
                       ),
-                      _filterChip(
-                        label: 'Parks',
-                        icon: Icons.park_rounded,
-                      ),
                     ],
                   ),
                 ),
               ),
 
-              // =========================
               // FLOATING ACTIONS
-              // =========================
               Positioned(
                 right: 16,
                 bottom: 340,
@@ -158,14 +157,13 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                 ),
               ),
 
-              // =========================
-              // DRAGGABLE SHEET
-              // =========================
-              NotificationListener<DraggableScrollableNotification>(
+              // SHEET
+              NotificationListener<
+                  DraggableScrollableNotification>(
                 onNotification: (notification) {
                   final expanded = notification.extent > 0.75;
 
-                  if (expanded != _isExpanded) {
+                  if (_isExpanded != expanded) {
                     setState(() {
                       _isExpanded = expanded;
                     });
@@ -175,48 +173,53 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                 },
                 child: DraggableScrollableSheet(
                   controller: _sheetController,
-                  initialChildSize: 0.32,
+                  initialChildSize: 0.30,
                   minChildSize: 0.14,
                   maxChildSize: 0.94,
                   snap: true,
-                  snapSizes: const [0.14, 0.32, 0.94],
+                  snapSizes: const [
+                    0.14,
+                    0.30,
+                    0.94,
+                  ],
                   builder: (context, scrollController) {
-                    return AnimatedContainer(
-                      duration: const Duration(milliseconds: 250),
+                    return Container(
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: const BorderRadius.vertical(
+                        borderRadius:
+                        const BorderRadius.vertical(
                           top: Radius.circular(30),
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.18),
-                            blurRadius: 24,
+                            color:
+                            Colors.black.withOpacity(0.15),
+                            blurRadius: 20,
                             offset: const Offset(0, -6),
                           ),
                         ],
                       ),
                       child: Column(
                         children: [
-                          // HANDLE
                           const SizedBox(height: 10),
 
                           Container(
-                            width: 46,
+                            width: 50,
                             height: 5,
                             decoration: BoxDecoration(
                               color: Colors.grey.shade300,
-                              borderRadius: BorderRadius.circular(20),
+                              borderRadius:
+                              BorderRadius.circular(30),
                             ),
                           ),
 
-                          // HEADER
                           Padding(
-                            padding: const EdgeInsets.fromLTRB(
+                            padding:
+                            const EdgeInsets.fromLTRB(
                               20,
                               18,
                               20,
-                              12,
+                              14,
                             ),
                             child: Row(
                               children: [
@@ -231,52 +234,25 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                                             .textTheme
                                             .titleLarge
                                             ?.copyWith(
-                                          fontWeight: FontWeight.w700,
+                                          fontWeight:
+                                          FontWeight.w800,
                                         ),
                                       ),
                                       const SizedBox(height: 4),
                                       Text(
-                                        '${items.length} results found',
+                                        '${items.length} places found',
                                         style: TextStyle(
-                                          color: Colors.grey.shade600,
-                                          fontSize: 14,
+                                          color:
+                                          Colors.grey.shade600,
                                         ),
                                       ),
                                     ],
                                   ),
                                 ),
-
-                                AnimatedContainer(
-                                  duration:
-                                  const Duration(milliseconds: 250),
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 14,
-                                    vertical: 10,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey.shade100,
-                                    borderRadius:
-                                    BorderRadius.circular(14),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        _isExpanded
-                                            ? Icons.map_rounded
-                                            : Icons.list_rounded,
-                                        size: 18,
-                                      ),
-                                      const SizedBox(width: 6),
-                                      Text(
-                                        _isExpanded
-                                            ? 'Map'
-                                            : 'List',
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
+                                Icon(
+                                  _isExpanded
+                                      ? Icons.map_rounded
+                                      : Icons.list_rounded,
                                 ),
                               ],
                             ),
@@ -287,18 +263,12 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                             color: Colors.grey.shade200,
                           ),
 
-                          // LIST
                           Expanded(
-                            child: ClipRRect(
-                              borderRadius:
-                              const BorderRadius.vertical(
-                                top: Radius.circular(30),
-                              ),
-                              child: BusinessList(
-                                businesses: items,
-                                scrollController:
-                                scrollController,
-                              ),
+                            child: BusinessList(
+                              businesses: items,
+                              scrollController:
+                              scrollController,
+                              onBusinessTap: _openBooking,
                             ),
                           ),
                         ],
@@ -311,99 +281,22 @@ class _MapScreenState extends ConsumerState<MapScreen> {
           );
         },
 
-        // =========================
-        // LOADING
-        // =========================
-        loading: () => Scaffold(
-          backgroundColor: Colors.white,
+        loading: () => const Scaffold(
           body: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SizedBox(
-                  width: 34,
-                  height: 34,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 3,
-                    color: Theme.of(context).primaryColor,
-                  ),
-                ),
-                const SizedBox(height: 18),
-                Text(
-                  'Loading places...',
-                  style: TextStyle(
-                    color: Colors.grey.shade700,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
+            child: CircularProgressIndicator(),
           ),
         ),
 
-        // =========================
-        // ERROR
-        // =========================
         error: (e, _) => Scaffold(
-          backgroundColor: Colors.white,
           body: Center(
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.location_off_rounded,
-                    size: 72,
-                    color: Colors.red.shade300,
-                  ),
-                  const SizedBox(height: 18),
-                  const Text(
-                    'Something went wrong',
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    e.toString(),
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.grey.shade600,
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  ElevatedButton(
-                    onPressed: () {
-                      ref.refresh(businessesProvider);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      elevation: 0,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 14,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius:
-                        BorderRadius.circular(14),
-                      ),
-                    ),
-                    child: const Text('Try Again'),
-                  ),
-                ],
-              ),
-            ),
+            child: Text(e.toString()),
           ),
         ),
       ),
     );
   }
 
-  // =====================================================
   // SEARCH BAR
-  // =====================================================
 
   Widget _searchBar() {
     return ClipRRect(
@@ -415,39 +308,29 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         ),
         child: Container(
           height: 54,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding:
+          const EdgeInsets.symmetric(horizontal: 16),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.18),
+            color: Colors.white.withOpacity(0.16),
             borderRadius: BorderRadius.circular(18),
             border: Border.all(
-              color: Colors.white.withOpacity(0.15),
+              color: Colors.white.withOpacity(0.12),
             ),
           ),
-          child: Row(
+          child: const Row(
             children: [
-              const Icon(
+              Icon(
                 Icons.search_rounded,
                 color: Colors.white,
               ),
-              const SizedBox(width: 10),
-              const Expanded(
+              SizedBox(width: 10),
+              Expanded(
                 child: Text(
                   'Search places...',
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 15,
                   ),
                 ),
-              ),
-              Container(
-                width: 1,
-                height: 18,
-                color: Colors.white24,
-              ),
-              const SizedBox(width: 10),
-              const Icon(
-                Icons.mic_none_rounded,
-                color: Colors.white,
               ),
             ],
           ),
@@ -456,9 +339,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     );
   }
 
-  // =====================================================
   // GLASS BUTTON
-  // =====================================================
 
   Widget _glassButton({
     required IconData icon,
@@ -472,22 +353,17 @@ class _MapScreenState extends ConsumerState<MapScreen> {
           sigmaY: 14,
         ),
         child: Material(
-          color: Colors.white.withOpacity(0.18),
+          color: Colors.white.withOpacity(0.16),
           borderRadius: BorderRadius.circular(18),
           child: InkWell(
-            borderRadius: BorderRadius.circular(18),
             onTap: onTap,
+            borderRadius: BorderRadius.circular(18),
             child: Container(
               width: 54,
               height: 54,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(18),
-                border: Border.all(
-                  color: Colors.white.withOpacity(0.15),
-                ),
-              ),
-              child: const Icon(
-                Icons.menu_rounded,
+              alignment: Alignment.center,
+              child: Icon(
+                icon,
                 color: Colors.white,
               ),
             ),
@@ -497,9 +373,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     );
   }
 
-  // =====================================================
   // FILTER CHIP
-  // =====================================================
 
   Widget _filterChip({
     required String label,
@@ -508,58 +382,40 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   }) {
     return Container(
       margin: const EdgeInsets.only(right: 10),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 250),
-        padding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 10,
-        ),
-        decoration: BoxDecoration(
-          color: selected
-              ? Colors.black
-              : Colors.white,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 16,
+        vertical: 10,
+      ),
+      decoration: BoxDecoration(
+        color:
+        selected ? Colors.black : Colors.white,
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            icon,
+            size: 18,
             color: selected
-                ? Colors.black
-                : Colors.grey.shade300,
+                ? Colors.white
+                : Colors.black,
           ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 3),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Icon(
-              icon,
-              size: 18,
+          const SizedBox(width: 8),
+          Text(
+            label,
+            style: TextStyle(
               color: selected
                   ? Colors.white
-                  : Colors.black87,
+                  : Colors.black,
+              fontWeight: FontWeight.w600,
             ),
-            const SizedBox(width: 8),
-            Text(
-              label,
-              style: TextStyle(
-                fontWeight: FontWeight.w600,
-                color: selected
-                    ? Colors.white
-                    : Colors.black87,
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
-  // =====================================================
   // FLOATING BUTTON
-  // =====================================================
 
   Widget _floatingMapButton({
     required IconData icon,
@@ -567,22 +423,15 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   }) {
     return Material(
       color: Colors.white,
-      elevation: 4,
-      shadowColor: Colors.black12,
       borderRadius: BorderRadius.circular(16),
+      elevation: 4,
       child: InkWell(
-        borderRadius: BorderRadius.circular(16),
         onTap: onTap,
-        child: Container(
+        borderRadius: BorderRadius.circular(16),
+        child: SizedBox(
           width: 52,
           height: 52,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Icon(
-            icon,
-            color: Colors.black87,
-          ),
+          child: Icon(icon),
         ),
       ),
     );

@@ -5,48 +5,31 @@ import 'business_card.dart';
 
 class BusinessList extends StatelessWidget {
   final List<BusinessModel> businesses;
+  final ScrollController scrollController;
 
-  final ScrollController
-  scrollController;
+  final Function(BusinessModel) onBusinessTap;
 
   const BusinessList({
     super.key,
     required this.businesses,
     required this.scrollController,
+    required this.onBusinessTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-
-        // HANDLE
-        Container(
-          margin: const EdgeInsets.only(
-            top: 10,
-            bottom: 10,
+    return ListView.builder(
+      controller: scrollController,
+      padding: const EdgeInsets.all(16),
+      itemCount: businesses.length,
+      itemBuilder: (context, index) {
+        return BusinessCard(
+          business: businesses[index],
+          onTap: () => onBusinessTap(
+            businesses[index],
           ),
-          width: 60,
-          height: 6,
-          decoration: BoxDecoration(
-            color: Colors.grey.shade300,
-            borderRadius:
-            BorderRadius.circular(20),
-          ),
-        ),
-
-        Expanded(
-          child: ListView.builder(
-            controller: scrollController,
-            itemCount: businesses.length,
-            itemBuilder: (context, index) {
-              return BusinessCard(
-                business: businesses[index],
-              );
-            },
-          ),
-        ),
-      ],
+        );
+      },
     );
   }
 }
