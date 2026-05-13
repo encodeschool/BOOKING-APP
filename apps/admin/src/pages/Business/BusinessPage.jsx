@@ -28,6 +28,8 @@ export default function BusinessesPage() {
     name: "",
     address: "",
     phone: "",
+    category: "",
+    description: "",
   });
 
   const [search, setSearch] = useState("");
@@ -115,12 +117,12 @@ export default function BusinessesPage() {
         await createBusinessApi(token, fd);
       }
 
-      setForm({ name: "", address: "", phone: "" });
+      setForm({ name: "", address: "", phone: "", category: "", description: "" });
       setImages([]);
       setEditMode(false);
       setEditId(null);
       setShowForm(false);
-      load();
+      await load();
     } catch (error) {
       console.error(error);
     } finally {
@@ -134,6 +136,8 @@ export default function BusinessesPage() {
       name: b.name,
       address: b.address,
       phone: b.phone,
+      category: b.category,
+      description: b.description,
     });
 
     setEditMode(true);
@@ -355,6 +359,8 @@ export default function BusinessesPage() {
             <div className="mt-4 space-y-2">
               <p><b>Address:</b> {details.address}</p>
               <p><b>Phone:</b> {details.phone}</p>
+              <p><b>Category:</b> {details.category}</p>
+              <p><b>Description:</b> {details.description}</p>
 
               {details.images?.length > 0 && (
                 <div className="flex gap-2 flex-wrap mt-3">
@@ -436,6 +442,34 @@ export default function BusinessesPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Category
+                </label>
+
+                <select
+                  value={form.category}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      category: e.target.value,
+                    })
+                  }
+                  className="w-full bg-gray-50 border border-gray-200 rounded-2xl px-4 py-4 outline-none focus:ring-2 focus:ring-emerald-500"
+                >
+                  <option value="">Select category</option>
+
+                  <option value="Restaurant">Restaurant</option>
+                  <option value="Coffee Shop">Coffee Shop</option>
+                  <option value="Barber Shop">Barber Shop</option>
+                  <option value="Beauty Salon">Beauty Salon</option>
+                  <option value="Hotel">Hotel</option>
+                  <option value="Hostel">Hostel</option>
+                  <option value="Gym">Gym</option>
+                  <option value="Spa">Spa</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Address
                 </label>
 
@@ -471,6 +505,22 @@ export default function BusinessesPage() {
                   className="w-full bg-gray-50 border border-gray-200 rounded-2xl px-4 py-4 outline-none focus:ring-2 focus:ring-emerald-500"
                 />
               </div>
+
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Description
+              </label>
+
+              <textarea
+              className="w-full bg-gray-50 border border-gray-200 rounded-2xl px-4 py-4 outline-none focus:ring-2 focus:ring-emerald-500"
+              placeholder="Add Description..."
+                value={form.description}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    description: e.target.value,
+                  })
+                }
+              />
 
               {/* ===================== ADDED UPLOAD ===================== */}
               <div>
