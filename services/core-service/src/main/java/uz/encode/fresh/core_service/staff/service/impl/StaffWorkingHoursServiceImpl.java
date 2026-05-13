@@ -1,8 +1,11 @@
 package uz.encode.fresh.core_service.staff.service.impl;
 
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+import java.util.Objects;
+
 import org.springframework.stereotype.Service;
 
+import lombok.RequiredArgsConstructor;
 import uz.encode.fresh.core_service.business.service.BusinessAuthorizationService;
 import uz.encode.fresh.core_service.staff.dto.StaffWorkingHoursRequest;
 import uz.encode.fresh.core_service.staff.dto.StaffWorkingHoursResponse;
@@ -12,8 +15,6 @@ import uz.encode.fresh.core_service.staff.exception.StaffWorkingHoursException;
 import uz.encode.fresh.core_service.staff.repository.StaffRepository;
 import uz.encode.fresh.core_service.staff.repository.StaffWorkingHoursRepository;
 import uz.encode.fresh.core_service.staff.service.StaffWorkingHoursService;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +26,7 @@ public class StaffWorkingHoursServiceImpl implements StaffWorkingHoursService {
 
     @Override
     public StaffWorkingHoursResponse save(Long ownerId, StaffWorkingHoursRequest req) {
+        Objects.requireNonNull(req.staffId, "Staff id is required");
 
         Staff staff = staffRepo.findById(req.staffId)
                 .orElseThrow(() -> new StaffWorkingHoursException("Staff not found"));
@@ -39,7 +41,7 @@ public class StaffWorkingHoursServiceImpl implements StaffWorkingHoursService {
 
         wh.setStaffId(req.staffId);
         wh.setDayOfWeek(req.dayOfWeek);
-        wh.setIsOff(req.isOff != null ? req.isOff : false);
+        wh.setIsOff(Boolean.TRUE.equals(req.isOff));
 
         if (Boolean.FALSE.equals(req.isOff)) {
             wh.setStartTime(req.startTime);
@@ -59,6 +61,7 @@ public class StaffWorkingHoursServiceImpl implements StaffWorkingHoursService {
 
     @Override
     public List<StaffWorkingHoursResponse> getByStaffForOwner(Long staffId, Long ownerId) {
+        Objects.requireNonNull(staffId, "Staff id is required");
 
         Staff staff = staffRepo.findById(staffId)
                 .orElseThrow(() -> new StaffWorkingHoursException("Staff not found"));

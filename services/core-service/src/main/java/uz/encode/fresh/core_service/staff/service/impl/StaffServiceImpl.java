@@ -1,6 +1,7 @@
 package uz.encode.fresh.core_service.staff.service.impl;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.stereotype.Service;
 
@@ -46,6 +47,7 @@ public class StaffServiceImpl implements StaffService {
 
     @Override
     public StaffResponse update(Long id, Long ownerId, UpdateStaffRequest req) {
+        Objects.requireNonNull(id, "Staff id is required");
 
         Staff s = repo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Staff not found"));
@@ -61,6 +63,7 @@ public class StaffServiceImpl implements StaffService {
 
     @Override
     public void delete(Long id, Long ownerId) {
+        Objects.requireNonNull(id, "Staff id is required");
         Staff s = repo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Staff not found"));
         businessAuthorizationService.assertOwner(s.getBusinessId(), ownerId);
@@ -74,6 +77,7 @@ public class StaffServiceImpl implements StaffService {
 
     @Override
     public Staff getById(Long id) {
+        Objects.requireNonNull(id, "Staff id is required");
         return repo.findById(id)
                 .orElseThrow(() -> new RuntimeException("Staff not found"));
     }

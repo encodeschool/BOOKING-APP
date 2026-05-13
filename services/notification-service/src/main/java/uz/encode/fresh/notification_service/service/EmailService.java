@@ -1,26 +1,32 @@
 package uz.encode.fresh.notification_service.service;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.util.Map;
+import java.util.Objects;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
-import uz.encode.fresh.notification_service.dto.EmailRequest;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
-import java.util.Map;
+import uz.encode.fresh.notification_service.dto.EmailRequest;
 
 @Service
-@RequiredArgsConstructor
-@Slf4j
 public class EmailService {
 
+    private static final Logger log = LoggerFactory.getLogger(EmailService.class);
     private final JavaMailSender mailSender;
     private final TemplateEngine templateEngine;
+
+    public EmailService(JavaMailSender mailSender, TemplateEngine templateEngine) {
+        this.mailSender = mailSender;
+        this.templateEngine = templateEngine;
+    }
 
     @Value("${spring.mail.username}")
     private String defaultFrom;
@@ -33,19 +39,19 @@ public class EmailService {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
-        String from = request.getFrom() != null ? request.getFrom() : defaultFrom;
-        helper.setFrom(from);
-        helper.setTo(request.getTo());
-        helper.setSubject(request.getSubject());
+        String from = Objects.requireNonNullElse(request.getFrom(), defaultFrom);
+        helper.setFrom(Objects.requireNonNull(from, "Email sender cannot be null"));
+        helper.setTo(Objects.requireNonNull(request.getTo(), "Email recipient cannot be null"));
+        helper.setSubject(Objects.requireNonNull(request.getSubject(), "Email subject cannot be null"));
 
-        String htmlContent = request.getHtmlContent();
+        String htmlContent = Objects.requireNonNull(request.getHtmlContent(), "Email content cannot be null");
         if (templateVariables != null && !templateVariables.isEmpty()) {
             Context context = new Context();
             templateVariables.forEach(context::setVariable);
             htmlContent = templateEngine.process(request.getHtmlContent(), context);
         }
 
-        helper.setText(htmlContent, true); // true indicates HTML
+        helper.setText(Objects.requireNonNull(htmlContent, "Email content cannot be null"), true); // true indicates HTML
 
         mailSender.send(message);
         log.info("HTML email sent to: {}", request.getTo());
@@ -59,10 +65,10 @@ public class EmailService {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
-        String sender = from != null ? from : defaultFrom;
-        helper.setFrom(sender);
-        helper.setTo(to);
-        helper.setSubject(subject);
+        String sender = Objects.requireNonNullElse(from, defaultFrom);
+        helper.setFrom(Objects.requireNonNull(sender, "Email sender cannot be null"));
+        helper.setTo(Objects.requireNonNull(to, "Email recipient cannot be null"));
+        helper.setSubject(Objects.requireNonNull(subject, "Email subject cannot be null"));
 
         Context context = new Context();
         if (variables != null) {
@@ -70,7 +76,7 @@ public class EmailService {
         }
 
         String htmlContent = templateEngine.process(templateName, context);
-        helper.setText(htmlContent, true);
+        helper.setText(Objects.requireNonNull(htmlContent, "Email content cannot be null"), true);
 
         mailSender.send(message);
         log.info("Template email sent to: {} using template: {}", to, templateName);

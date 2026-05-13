@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
@@ -26,5 +27,15 @@ public class AuthController {
     @PostMapping("/login")
     public AuthResponse login(@Valid @RequestBody AuthRequest request) {
         return service.login(request);
+    }
+
+    @PostMapping("/forgot-password")
+    public String forgotPassword(@RequestParam String email) {
+        return service.forgotPassword(email);
+    }
+
+    @PostMapping("/reset-password")
+    public String resetPassword(@RequestParam String token, @RequestParam String newPassword) {
+        return service.resetPassword(token, newPassword);
     }
 }

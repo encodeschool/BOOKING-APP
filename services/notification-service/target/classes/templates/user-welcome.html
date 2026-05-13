@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{base-template :: layout(~{::section})}">
+
+<section>
+
+    <h2>🎊 Welcome to Fresha!</h2>
+
+    <p>
+        Dear <span th:text="${userName}">User</span>,
+    </p>
+
+    <p>
+        Welcome to Fresha! We're thrilled to have you join our community.
+    </p>
+
+    <p>
+        Your account has been successfully created and you're now ready
+        to explore everything Fresha has to offer.
+    </p>
+
+    <div class="info-box">
+
+        <div class="info-row">
+            <span class="info-label">Email:</span>
+            <span class="info-value"
+                  th:text="${email}">
+                user@example.com
+            </span>
+        </div>
+
+        <div class="info-row">
+            <span class="info-label">Registration Date:</span>
+            <span class="info-value"
+                  th:text="${registrationDate}">
+                2026-05-13
+            </span>
+        </div>
+
+        <div class="info-row">
+            <span class="info-label">Account Type:</span>
+            <span class="info-value"
+                  th:text="${accountType}">
+                Client
+            </span>
+        </div>
+
+    </div>
+
+    <h3>🚀 Get Started</h3>
+
+    <div th:if="${accountType == 'Client'}">
+
+        <ul>
+            <li>Book appointments</li>
+            <li>Manage bookings</li>
+            <li>Leave reviews</li>
+            <li>Save favorite businesses</li>
+        </ul>
+
+    </div>
+
+    <div th:if="${accountType == 'Business'}">
+
+        <ul>
+            <li>Manage your business</li>
+            <li>Handle bookings</li>
+            <li>Manage staff</li>
+            <li>Track analytics</li>
+        </ul>
+
+    </div>
+
+    <div style="text-align:center; margin:30px 0;">
+
+        <a href="#" class="button">
+            Complete Your Profile
+        </a>
+
+    </div>
+
+    <h3>🛡️ Security Tips</h3>
+
+    <ul>
+        <li>Use a strong password</li>
+        <li>Do not share credentials</li>
+        <li>Enable 2FA when available</li>
+    </ul>
+
+    <p>
+        If you need help, our support team is here for you.
+    </p>
+
+    <p>
+        Welcome aboard,<br>
+        <strong>The Fresha Team</strong>
+    </p>
+
+</section>
+
+</html>

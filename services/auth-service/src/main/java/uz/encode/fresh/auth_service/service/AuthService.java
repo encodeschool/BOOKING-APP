@@ -7,4 +7,8 @@ public interface AuthService {
     AuthResponse register(AuthRequest request);
 
     AuthResponse login(AuthRequest request);
+
+    String forgotPassword(String email);
+
+    String resetPassword(String token, String newPassword);
 }

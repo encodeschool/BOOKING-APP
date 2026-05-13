@@ -1,8 +1,13 @@
 {
   "version": "0.2.0",
   "configurations": [
-    
-    // ==================== AUTH SERVICE ====================
+    {
+      "type": "java",
+      "name": "NotificationServiceApplication",
+      "request": "launch",
+      "mainClass": "uz.encode.fresh.notification_service.NotificationServiceApplication",
+      "projectName": "notification-service"
+    },
     {
       "type": "java",
       "name": "Auth Service (DEV)",
@@ -19,8 +24,6 @@
       "vmArgs": "-Dspring.profiles.active=prod",
       "projectName": "auth-service"
     },
-
-    // ==================== USER SERVICE ====================
     {
       "type": "java",
       "name": "User Service (DEV)",
@@ -37,8 +40,6 @@
       "vmArgs": "-Dspring.profiles.active=prod",
       "projectName": "user-service"
     },
-
-    // ==================== CORE SERVICE ====================
     {
       "type": "java",
       "name": "Core Service (DEV)",
@@ -55,9 +56,6 @@
       "vmArgs": "-Dspring.profiles.active=prod",
       "projectName": "core-service"
     },
-
-    // ==================== BOOKING SERVICE ====================
-
     {
       "type": "java",
       "name": "Booking Service (DEV)",
@@ -74,8 +72,22 @@
       "vmArgs": "-Dspring.profiles.active=prod",
       "projectName": "booking-service"
     },
-
-    // ==================== API GATEWAY ====================
+    {
+      "type": "java",
+      "name": "Notification Service (DEV)",
+      "request": "launch",
+      "mainClass": "uz.encode.fresh.notification_service.NotificationServiceApplication",
+      "vmArgs": "-Dspring.profiles.active=dev",
+      "projectName": "notification-service"
+    },
+    {
+      "type": "java",
+      "name": "Notification Service (PROD)",
+      "request": "launch",
+      "mainClass": "uz.encode.fresh.notification_service.NotificationServiceApplication",
+      "vmArgs": "-Dspring.profiles.active=prod",
+      "projectName": "notification-service"
+    },
     {
       "type": "java",
       "name": "API Gateway",
@@ -83,8 +95,6 @@
       "mainClass": "uz.encode.fresh.api_gateway.ApiGatewayApplication",
       "projectName": "api-gateway"
     },
-
-    // ==================== CONFIG SERVER ====================
     {
       "type": "java",
       "name": "Config Server",
@@ -92,9 +102,6 @@
       "mainClass": "uz.encode.fresh.config_server.ConfigServerApplication",
       "projectName": "config-server"
     },
-
-    // ==================== SERVICE REGISTRY ====================
-
     {
       "type": "java",
       "name": "Service Registry",
@@ -102,6 +109,5 @@
       "mainClass": "uz.encode.fresh.service_registry.ServiceRegistryApplication",
       "projectName": "service-registry"
     }
-
   ]
 }

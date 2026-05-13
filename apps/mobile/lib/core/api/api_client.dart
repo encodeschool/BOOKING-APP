@@ -55,6 +55,55 @@ class ApiClient {
       data: data,
     );
   }
+
+  // Notification methods
+  Future<void> sendBookingReminder(int bookingId, String token) async {
+    await dio.post(
+      "/api/notifications/booking/reminder",
+      data: {"bookingId": bookingId},
+      options: Options(headers: {"Authorization": "Bearer $token"}),
+    );
+  }
+
+  Future<void> sendCustomNotification(Map<String, dynamic> notificationData, String token) async {
+    await dio.post(
+      "/api/notifications/email",
+      data: notificationData,
+      options: Options(headers: {"Authorization": "Bearer $token"}),
+    );
+  }
+
+  // Auth methods
+  Future<Map<String, dynamic>> register(String email, String password) async {
+    final res = await dio.post(
+      "/api/auth/register",
+      data: {"email": email, "password": password},
+    );
+    return res.data;
+  }
+
+  Future<Map<String, dynamic>> login(String email, String password) async {
+    final res = await dio.post(
+      "/api/auth/login",
+      data: {"email": email, "password": password},
+    );
+    return res.data;
+  }
+
+  Future<void> forgotPassword(String email) async {
+    await dio.post(
+      "/api/auth/forgot-password",
+      data: {"email": email},
+    );
+  }
+
+  Future<void> resetPassword(String token, String newPassword) async {
+    await dio.post(
+      "/api/auth/reset-password",
+      data: {"token": token, "newPassword": newPassword},
+    );
+  }
+}
 }
 
 final apiClient = ApiClient();

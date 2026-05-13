@@ -3,6 +3,8 @@ package uz.encode.fresh.auth_service.security;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
+import javax.crypto.SecretKey;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -10,8 +12,6 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
-
-import javax.crypto.SecretKey;
 
 @Component
 public class JwtUtil {
@@ -34,8 +34,9 @@ public class JwtUtil {
     }
 
     private Claims parseClaims(String token) {
-        return Jwts.parser()
+        return Jwts.parserBuilder()
                 .setSigningKey(signingKey())
+                .build()
                 .parseClaimsJws(token)
                 .getBody();
     }
@@ -45,6 +46,6 @@ public class JwtUtil {
     }
 
     public Long extractUserId(String token) {
-        return Long.parseLong(parseClaims(token).getSubject());
+        return Long.valueOf(parseClaims(token).getSubject());
     }
 }

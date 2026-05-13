@@ -1,6 +1,8 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import AdminLayout from "../components/layout/AdminLayout";
 import LoginPage from "../pages/Login/LoginPage";
+import RegisterPage from "../pages/Login/RegisterPage";
+import ForgotPasswordPage from "../pages/Login/ForgotPasswordPage";
 import DashboardPage from "../pages/Dashboard/DashboardPage";
 import BusinessPage from "../pages/Business/BusinessPage";
 import ServicesPage from "../pages/Services/ServicesPage";
@@ -21,6 +23,8 @@ function AppRoutes() {
     <Routes>
       {/* Public */}
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
+      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
 
       {/* Protected */}
       <Route

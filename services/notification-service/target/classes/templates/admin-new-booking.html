@@ -1,0 +1,163 @@
+<!-- admin-new-booking.html -->
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{base-template :: layout(~{::section})}">
+
+<section>
+
+    <h2>📅 New Booking Request</h2>
+
+    <p>
+        Dear <span th:text="${adminName}">Admin</span>,
+    </p>
+
+    <p>
+        A new booking request has been submitted for
+        <span th:text="${businessName}">your business</span>.
+        Please review and take action.
+    </p>
+
+    <div class="info-box">
+
+        <div class="info-row">
+            <span class="info-label">Booking ID:</span>
+            <span class="info-value" th:text="${bookingId}">BK-123456</span>
+        </div>
+
+        <div class="info-row">
+            <span class="info-label">Customer:</span>
+            <span class="info-value" th:text="${customerName}">John Doe</span>
+        </div>
+
+        <div class="info-row">
+            <span class="info-label">Customer Email:</span>
+            <span class="info-value" th:text="${customerEmail}">john@example.com</span>
+        </div>
+
+        <div class="info-row">
+            <span class="info-label">Customer Phone:</span>
+            <span class="info-value" th:text="${customerPhone}">(555) 123-4567</span>
+        </div>
+
+        <div class="info-row">
+            <span class="info-label">Service:</span>
+            <span class="info-value" th:text="${serviceName}">Hair Styling</span>
+        </div>
+
+        <div class="info-row">
+            <span class="info-label">Staff:</span>
+            <span class="info-value" th:text="${staffName}">Sarah Johnson</span>
+        </div>
+
+        <div class="info-row">
+            <span class="info-label">Requested Date & Time:</span>
+            <span class="info-value"
+                  th:text="${bookingDate + ' at ' + bookingTime}">
+                March 15, 2024 at 2:00 PM
+            </span>
+        </div>
+
+        <div class="info-row">
+            <span class="info-label">Duration:</span>
+            <span class="info-value" th:text="${duration}">
+                60 minutes
+            </span>
+        </div>
+
+    </div>
+
+    <div th:if="${notes != null and !#strings.isEmpty(notes)}">
+        <h3>Customer Notes:</h3>
+
+        <p style="background-color: #f7fafc;
+                  padding: 15px;
+                  border-radius: 6px;
+                  border-left: 4px solid #667eea;"
+           th:text="${notes}">
+            Customer's special requests or notes...
+        </p>
+    </div>
+
+    <div class="status-badge status-pending">
+        ⏳ Awaiting Approval
+    </div>
+
+    <h3>⚡ Required Actions</h3>
+
+    <p>Please review this booking request and:</p>
+
+    <ul>
+        <li>
+            <strong>Check availability:</strong>
+            Confirm the requested time slot is available
+        </li>
+
+        <li>
+            <strong>Staff assignment:</strong>
+            Verify the selected staff member is available
+        </li>
+
+        <li>
+            <strong>Customer verification:</strong>
+            Review customer details if needed
+        </li>
+
+        <li>
+            <strong>Approve or reject:</strong>
+            Take action within 24 hours
+        </li>
+    </ul>
+
+    <div style="text-align: center; margin: 30px 0;">
+        <a href="#" class="button">Approve Booking</a>
+        <a href="#" class="button button-secondary">Reject Booking</a>
+    </div>
+
+    <h3>📊 Business Insights</h3>
+
+    <div class="info-box">
+
+        <div class="info-row">
+            <span class="info-label">Today's Bookings:</span>
+            <span class="info-value" th:text="${todayBookings}">5</span>
+        </div>
+
+        <div class="info-row">
+            <span class="info-label">Pending Requests:</span>
+            <span class="info-value" th:text="${pendingBookings}">3</span>
+        </div>
+
+        <div class="info-row">
+            <span class="info-label">Next Available Slot:</span>
+            <span class="info-value" th:text="${nextAvailable}">
+                Tomorrow 10:00 AM
+            </span>
+        </div>
+
+    </div>
+
+    <div style="background-color: #fff3cd;
+                border: 1px solid #ffeaa7;
+                border-radius: 8px;
+                padding: 20px;
+                margin: 20px 0;">
+
+        <p style="margin: 0; color: #856404;">
+            <strong>⏰ Response Time:</strong>
+            For the best customer experience, please respond to booking requests within 24 hours.
+        </p>
+    </div>
+
+    <p>
+        If you have any questions about this booking or need assistance,
+        please contact our support team.
+    </p>
+
+    <p>
+        Best regards,<br>
+        <strong>The Fresha Team</strong>
+    </p>
+
+</section>
+</html>

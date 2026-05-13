@@ -98,6 +98,55 @@ class ApiClient {
   async getStaffWorkingHours(staffId) {
     return this.request(`/api/staff/public/${staffId}`);
   }
+
+  // Auth endpoints
+  async register(email, password) {
+    return this.request("/api/auth/register", {
+      method: "POST",
+      body: { email, password },
+    });
+  }
+
+  async login(email, password) {
+    return this.request("/api/auth/login", {
+      method: "POST",
+      body: { email, password },
+    });
+  }
+
+  async forgotPassword(email) {
+    return this.request("/api/auth/forgot-password", {
+      method: "POST",
+      body: { email },
+    });
+  }
+
+  async resetPassword(token, newPassword) {
+    return this.request("/api/auth/reset-password", {
+      method: "POST",
+      body: { token, newPassword },
+    });
+  }
+
+  // Notification endpoints (for triggering notifications)
+  async sendBookingReminder(bookingId, token) {
+    return this.request(`/api/notifications/booking/${bookingId}/reminder`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+      },
+    });
+  }
+
+  async sendCustomNotification(notificationData, token) {
+    return this.request("/api/notifications/email", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+      },
+      body: notificationData,
+    });
+  }
 }
 
 export const apiClient = new ApiClient();

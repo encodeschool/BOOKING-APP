@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appointment Reminder - Fresha</title>
+</head>
+<body>
+    <div th:replace="base-template.html :: .email-container">
+        <div th:fragment="content">
+            <h2>⏰ Appointment Reminder</h2>
+
+            <p>Dear <span th:text="${customerName}">Customer</span>,</p>
+
+            <p>This is a friendly reminder about your upcoming appointment with <span th:text="${businessName}">Business Name</span>.</p>
+
+            <div class="info-box">
+                <div class="info-row">
+                    <span class="info-label">Service:</span>
+                    <span class="info-value" th:text="${serviceName}">Hair Styling</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Staff:</span>
+                    <span class="info-value" th:text="${staffName}">Sarah Johnson</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Date & Time:</span>
+                    <span class="info-value" th:text="${bookingDate + ' at ' + bookingTime}">Tomorrow at 2:00 PM</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Duration:</span>
+                    <span class="info-value" th:text="${duration}">60 minutes</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Location:</span>
+                    <span class="info-value" th:text="${businessAddress}">123 Main Street, City</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Booking ID:</span>
+                    <span class="info-value" th:text="${bookingId}">BK-123456</span>
+                </div>
+            </div>
+
+            <div class="status-badge status-confirmed">📅 Upcoming</div>
+
+            <h3>📍 How to Find Us</h3>
+            <p><strong>Address:</strong> <span th:text="${businessAddress}">123 Main Street, City, State 12345</span></p>
+            <p><strong>Phone:</strong> <span th:text="${businessPhone}">(555) 123-4567</span></p>
+
+            <div th:if="${directions}">
+                <p><strong>Directions:</strong> <span th:text="${directions}">From downtown, take Main St north for 2 miles...</span></p>
+            </div>
+
+            <h3>✅ What to Bring</h3>
+            <ul>
+                <li>Valid ID (if required)</li>
+                <li>Any referral documents</li>
+                <li>Your insurance card (if applicable)</li>
+                <li>Comfortable clothing</li>
+                <li>Any personal items you may need</li>
+            </ul>
+
+            <h3>📞 Contact Information</h3>
+            <p>If you need to reschedule or have questions:</p>
+            <ul>
+                <li><strong>Phone:</strong> <span th:text="${businessPhone}">(555) 123-4567</span></li>
+                <li><strong>Email:</strong> <span th:text="${businessEmail}">contact@business.com</span></li>
+                <li><strong>Website:</strong> <a th:href="${businessWebsite}" th:text="${businessWebsite}">www.business.com</a></li>
+            </ul>
+
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="#" class="button">View Full Details</a>
+                <a href="#" class="button button-secondary">Reschedule</a>
+            </div>
+
+            <div style="background-color: #e6fffa; border: 1px solid #b2f5ea; border-radius: 8px; padding: 20px; margin: 20px 0;">
+                <p style="margin: 0; color: #234e52;"><strong>💡 Pro Tip:</strong> Arrive 10-15 minutes early to complete any necessary paperwork and relax before your service.</p>
+            </div>
+
+            <p>We look forward to seeing you soon!</p>
+
+            <p>Best regards,<br>
+            <strong>The Fresha Team</strong></p>
+        </div>
+    </div>
+</body>
+</html>

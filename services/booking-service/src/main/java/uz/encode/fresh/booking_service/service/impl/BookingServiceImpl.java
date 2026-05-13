@@ -2,7 +2,10 @@ package uz.encode.fresh.booking_service.service.impl;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,7 +22,6 @@ import uz.encode.fresh.booking_service.entity.Booking;
 import uz.encode.fresh.booking_service.integration.CoreServiceClient;
 import uz.encode.fresh.booking_service.integration.NotificationClient;
 import uz.encode.fresh.booking_service.integration.dto.BusinessDetailsResponse;
-import uz.encode.fresh.booking_service.integration.dto.EmailNotificationRequest;
 import uz.encode.fresh.booking_service.integration.dto.ServiceDetailsResponse;
 import uz.encode.fresh.booking_service.integration.dto.StaffDetailsResponse;
 import uz.encode.fresh.booking_service.integration.dto.WorkingHoursResponse;
@@ -71,7 +73,12 @@ public class BookingServiceImpl implements BookingService {
         booking.setCustomerName(request.customerName);
         booking.setCustomerPhone(request.customerPhone);
 
-        return toResponse(bookingRepository.save(booking));
+        Booking savedBooking = bookingRepository.save(booking);
+
+        // Send notification to admin about new booking request
+        sendAdminNewBookingNotification(savedBooking);
+
+        return toResponse(savedBooking);
     }
 
     @Override
@@ -123,6 +130,11 @@ public class BookingServiceImpl implements BookingService {
         // Send notification to customer about booking status change
         sendBookingStatusNotification(booking, nextStatus, request.reason);
 
+        // If booking is confirmed, send confirmation email
+        if (nextStatus == BookingStatus.CONFIRMED) {
+            sendBookingConfirmation(booking);
+        }
+
         return response;
     }
 
@@ -148,20 +160,11 @@ public class BookingServiceImpl implements BookingService {
     @Override
     @Transactional
     public BookingResponse createPublicBooking(CreatePublicBookingRequest request) {
-        BusinessDetailsResponse business = getBusiness(request.businessId);
-        ServiceDetailsResponse service = getService(request.serviceId);
+        Objects.requireNonNull(request, "CreatePublicBookingRequest is required");
+        Objects.requireNonNull(request.businessId, "Business id is required");
+        Objects.requireNonNull(request.serviceId, "Service id is required");
 
-        StaffDetailsResponse staff = null;
-        if (request.staffId != null) {
-            staff = getStaff(request.staffId);
-            // Skip validation for public bookings - we'll validate during actual booking creation
-        }
-
-        // For public bookings, we'll create a temporary client ID or handle differently
-        // For now, let's use a default client ID or create a new client record
-        Long clientId = createOrGetPublicClient(request);
-
-        // Create a modified request for internal processing
+        // Skip detailed validation for public bookings - we'll validate during actual booking creation
         CreateBookingRequest internalRequest = new CreateBookingRequest();
         internalRequest.businessId = request.businessId;
         internalRequest.serviceId = request.serviceId;
@@ -173,16 +176,7 @@ public class BookingServiceImpl implements BookingService {
         internalRequest.customerPhone = request.customerPhone;
         internalRequest.notes = request.notes;
 
-        return create(clientId, internalRequest);
-    }
-
-    private Long createOrGetPublicClient(CreatePublicBookingRequest request) {
-        // For public bookings, we need to create a temporary client
-        // In a real implementation, this would create a client record in the user service
-        // For now, we'll use a default public client ID
-        // TODO: Integrate with user service to create proper client records
-        // TODO: Store customer information (name, email, phone) in booking or separate table
-        return -1L; // Default public client ID
+        return create(-1L, internalRequest); // Use default public client ID
     }
 
     private Long getAvailableStaff(Long businessId) {
@@ -238,7 +232,8 @@ public class BookingServiceImpl implements BookingService {
                                 ACTIVE_BOOKING_STATUSES
                         );
 
-                        Integer maxBookings = staff.maxBookingsPerDay() != null ? staff.maxBookingsPerDay() : 20;
+                        Integer maxBookingsValue = staff.maxBookingsPerDay();
+                        int maxBookings = maxBookingsValue != null ? maxBookingsValue : 20;
                         if (bookingCount < maxBookings) {
                             isAvailable = true;
                             break;
@@ -292,7 +287,8 @@ public class BookingServiceImpl implements BookingService {
                                 long bookingCount = bookingRepository.countByStaffIdAndBookingDateAndStatusIn(
                                         s.id(), date, ACTIVE_BOOKING_STATUSES
                                 );
-                                Integer maxBookings = s.maxBookingsPerDay() != null ? s.maxBookingsPerDay() : 20;
+                                Integer maxBookingsValue = s.maxBookingsPerDay();
+                                int maxBookings = maxBookingsValue != null ? maxBookingsValue : 20;
 
                                 if (!hasOverlappingBooking && bookingCount < maxBookings) {
                                     hasSlot = true;
@@ -307,7 +303,8 @@ public class BookingServiceImpl implements BookingService {
                         long bookingCount = bookingRepository.countByStaffIdAndBookingDateAndStatusIn(
                                 staff.id(), date, ACTIVE_BOOKING_STATUSES
                         );
-                        Integer maxBookings = staff.maxBookingsPerDay() != null ? staff.maxBookingsPerDay() : 20;
+                        Integer maxBookingsValue = staff.maxBookingsPerDay();
+                        int maxBookings = maxBookingsValue != null ? maxBookingsValue : 20;
 
                         if (!hasOverlappingBooking && bookingCount < maxBookings) {
                             hasSlot = true;
@@ -346,37 +343,86 @@ public class BookingServiceImpl implements BookingService {
 
     private void sendBookingStatusNotification(Booking booking, BookingStatus status, String reason) {
         try {
-            // Try to get customer email from request header or stored in booking
-            // For now, we'll use a placeholder - this should be stored in the Booking entity
-            String customerEmail = "customer@example.com";
-            
-            String statusText = status == BookingStatus.CONFIRMED ? "approved" : 
-                               status == BookingStatus.REJECTED ? "rejected" : status.name().toLowerCase();
-            
-            String htmlContent = buildBookingNotificationHtml(booking, statusText, reason);
-            
-            EmailNotificationRequest emailRequest = EmailNotificationRequest.builder()
-                    .to(customerEmail)
-                    .subject("Booking " + statusText)
-                    .htmlContent(htmlContent)
-                    .build();
-            
-            notificationClient.sendEmail(emailRequest);
+            Map<String, Object> notificationData = new HashMap<>();
+            notificationData.put("customerEmail", booking.getCustomerEmail());
+            notificationData.put("customerName", booking.getCustomerName());
+            notificationData.put("bookingId", "BK-" + booking.getId());
+            notificationData.put("serviceName", getService(booking.getServiceId()).name());
+            notificationData.put("staffName", getStaff(booking.getStaffId()).name());
+            notificationData.put("businessName", getBusiness(booking.getBusinessId()).name());
+            notificationData.put("bookingDate", booking.getBookingDate().toString());
+            notificationData.put("bookingTime", booking.getStartTime().toString());
+            notificationData.put("duration", getService(booking.getServiceId()).durationMinutes() + " minutes");
+            notificationData.put("status", status.name().toLowerCase());
+            notificationData.put("reason", reason != null ? reason : "");
+
+            notificationClient.sendBookingStatusUpdate(notificationData);
         } catch (Exception e) {
             // Log but don't fail the booking update if notification fails
-            System.err.println("Failed to send notification: " + e.getMessage());
+            System.err.println("Failed to send status notification: " + e.getMessage());
         }
     }
 
-    private String buildBookingNotificationHtml(Booking booking, String status, String reason) {
-        return "<html><body>" +
-                "<h2>Booking " + status + "</h2>" +
-                "<p>Your booking has been " + status + ".</p>" +
-                "<p>Booking Date: " + booking.getBookingDate() + "</p>" +
-                "<p>Time: " + booking.getStartTime() + " - " + booking.getEndTime() + "</p>" +
-                (reason != null ? "<p>Reason: " + reason + "</p>" : "") +
-                "</body></html>";
+    private void sendBookingConfirmation(Booking booking) {
+        try {
+            BusinessDetailsResponse business = getBusiness(booking.getBusinessId());
+            ServiceDetailsResponse service = getService(booking.getServiceId());
+            StaffDetailsResponse staff = getStaff(booking.getStaffId());
+
+            Map<String, Object> notificationData = new HashMap<>();
+            notificationData.put("customerEmail", booking.getCustomerEmail());
+            notificationData.put("customerName", booking.getCustomerName());
+            notificationData.put("bookingId", "BK-" + booking.getId());
+            notificationData.put("serviceName", service.name());
+            notificationData.put("staffName", staff.name());
+            notificationData.put("businessName", business.name());
+            notificationData.put("businessAddress", "Business Address"); // TODO: Add address field to BusinessDetailsResponse
+            notificationData.put("bookingDate", booking.getBookingDate().toString());
+            notificationData.put("bookingTime", booking.getStartTime().toString());
+            notificationData.put("duration", service.durationMinutes() + " minutes");
+
+            notificationClient.sendBookingConfirmation(notificationData);
+        } catch (Exception e) {
+            // Log but don't fail the booking confirmation if notification fails
+            System.err.println("Failed to send booking confirmation: " + e.getMessage());
+        }
     }
+
+    private void sendAdminNewBookingNotification(Booking booking) {
+        try {
+            BusinessDetailsResponse business = getBusiness(booking.getBusinessId());
+            ServiceDetailsResponse service = getService(booking.getServiceId());
+            StaffDetailsResponse staff = getStaff(booking.getStaffId());
+
+            // For now, send to a placeholder admin email - this should be configurable per business
+            String adminEmail = "admin@fresha.com"; // TODO: Get from business settings
+
+            Map<String, Object> notificationData = new HashMap<>();
+            notificationData.put("adminEmail", adminEmail);
+            notificationData.put("adminName", "Business Admin"); // TODO: Get actual admin name
+            notificationData.put("bookingId", "BK-" + booking.getId());
+            notificationData.put("customerName", booking.getCustomerName());
+            notificationData.put("customerEmail", booking.getCustomerEmail());
+            notificationData.put("customerPhone", booking.getCustomerPhone() != null ? booking.getCustomerPhone() : "");
+            notificationData.put("serviceName", service.name());
+            notificationData.put("staffName", staff.name());
+            notificationData.put("businessName", business.name());
+            notificationData.put("bookingDate", booking.getBookingDate().toString());
+            notificationData.put("bookingTime", booking.getStartTime().toString());
+            notificationData.put("duration", service.durationMinutes() + " minutes");
+            notificationData.put("notes", booking.getNotes() != null ? booking.getNotes() : "");
+            notificationData.put("todayBookings", "5"); // TODO: Get actual count
+            notificationData.put("pendingBookings", "3"); // TODO: Get actual count
+            notificationData.put("nextAvailable", "Tomorrow 10:00 AM"); // TODO: Calculate next available
+
+            notificationClient.sendAdminNewBookingNotification(notificationData);
+        } catch (Exception e) {
+            // Log but don't fail the booking creation if notification fails
+            System.err.println("Failed to send admin notification: " + e.getMessage());
+        }
+    }
+
+
 
     private void validateBusinessRelations(CreateBookingRequest request,
                                            ServiceDetailsResponse service,
@@ -477,6 +523,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     private Booking getBookingEntity(Long bookingId) {
+        Objects.requireNonNull(bookingId, "Booking id is required");
         return bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new IllegalArgumentException("Booking not found"));
     }
@@ -607,6 +654,7 @@ public class BookingServiceImpl implements BookingService {
                 .build();
     }
 
+    @Override
     public List<BookedSlotResponse> getBookedSlots(Long staffId, LocalDate date) {
 
         return bookingRepository.findByStaffIdAndBookingDate(staffId, date)

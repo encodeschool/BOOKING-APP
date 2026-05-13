@@ -1,0 +1,250 @@
+<!-- base-template.html -->
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title} ?: 'Fresha'">Fresha</title>
+
+    <style>
+        body, table, td, p, a, li, blockquote {
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+        }
+
+        table, td {
+            mso-table-lspace: 0pt;
+            mso-table-rspace: 0pt;
+        }
+
+        img {
+            -ms-interpolation-mode: bicubic;
+        }
+
+        body {
+            margin: 0 !important;
+            padding: 0 !important;
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px 30px;
+            text-align: center;
+            color: white;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+
+        .header p {
+            margin: 10px 0 0 0;
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px 30px;
+            color: #333333;
+            line-height: 1.6;
+        }
+
+        .content h2 {
+            color: #2d3748;
+            font-size: 24px;
+            font-weight: 600;
+            margin: 0 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .content h3 {
+            color: #4a5568;
+            font-size: 18px;
+            font-weight: 600;
+            margin: 30px 0 15px 0;
+        }
+
+        .content p {
+            margin: 0 0 20px 0;
+            font-size: 16px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-confirmed {
+            background-color: #48bb78;
+            color: white;
+        }
+
+        .status-pending {
+            background-color: #ed8936;
+            color: white;
+        }
+
+        .status-rejected {
+            background-color: #f56565;
+            color: white;
+        }
+
+        .status-cancelled {
+            background-color: #a0aec0;
+            color: white;
+        }
+
+        .info-box {
+            background-color: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .info-box .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .info-box .info-row:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #4a5568;
+            flex: 1;
+        }
+
+        .info-value {
+            color: #2d3748;
+            flex: 2;
+            text-align: right;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white !important;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 16px;
+            text-align: center;
+            margin: 20px 10px 0 10px;
+            box-shadow: 0 4px 6px rgba(102, 126, 234, 0.25);
+        }
+
+        .button-secondary {
+            background: #e2e8f0;
+            color: #4a5568 !important;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .footer {
+            background-color: #2d3748;
+            color: #a0aec0;
+            padding: 30px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        .footer .social-links {
+            margin: 20px 0;
+        }
+
+        @media only screen and (max-width: 600px) {
+            .email-container {
+                width: 100% !important;
+            }
+
+            .header,
+            .content,
+            .footer {
+                padding: 20px !important;
+            }
+
+            .info-box .info-row {
+                flex-direction: column;
+                text-align: left;
+            }
+
+            .info-value {
+                text-align: left;
+                margin-top: 5px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<div class="email-container" th:fragment="layout(content)">
+
+    <!-- Header -->
+    <div class="header">
+        <h1 th:text="${title} ?: 'Fresha'">Fresha</h1>
+        <p th:text="${subtitle} ?: 'Professional Beauty & Wellness Platform'">
+            Professional Beauty & Wellness Platform
+        </p>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+        <th:block th:replace="${content}"></th:block>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p>
+            <strong>Fresha</strong> - Your trusted beauty and wellness booking platform
+        </p>
+
+        <div class="social-links">
+            <a href="#">Facebook</a> |
+            <a href="#">Instagram</a> |
+            <a href="#">Twitter</a>
+        </div>
+
+        <p>
+            Need help?
+            <a href="mailto:support@fresha.com">Contact Support</a>
+            <br>
+            <a href="#">Privacy Policy</a> |
+            <a href="#">Terms of Service</a>
+        </p>
+
+        <p>&copy; 2026 Fresha. All rights reserved.</p>
+    </div>
+
+</div>
+</body>
+</html>

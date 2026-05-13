@@ -138,4 +138,29 @@ export async function getDashboardMetrics(token, businessId) {
   });
 }
 
+// Notification methods
+export async function sendBookingReminder(token, bookingId) {
+  return request(`/api/notifications/booking/reminder`, {
+    method: "POST",
+    token,
+    body: { bookingId },
+  });
+}
+
+export async function sendCustomEmail(token, emailData) {
+  return request("/api/notifications/email", {
+    method: "POST",
+    token,
+    body: emailData,
+  });
+}
+
+export async function sendBulkNotification(token, notificationData) {
+  return request("/api/notifications/bulk", {
+    method: "POST",
+    token,
+    body: notificationData,
+  });
+}
+
 export { API_BASE_URL };

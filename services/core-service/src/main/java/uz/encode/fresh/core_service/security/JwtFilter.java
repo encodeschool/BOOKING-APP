@@ -7,12 +7,14 @@ import java.util.Collections;
 import javax.crypto.SecretKey;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.FilterChain;
@@ -31,9 +33,9 @@ public class JwtFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain chain)
+    protected void doFilterInternal(@NonNull HttpServletRequest request,
+                                    @NonNull HttpServletResponse response,
+                                    @NonNull FilterChain chain)
             throws IOException, ServletException {
 
         String header = request.getHeader("Authorization");
@@ -42,12 +44,13 @@ public class JwtFilter extends OncePerRequestFilter {
             String token = header.substring(7);
 
             try {
-                Claims claims = Jwts.parser()
+                Claims claims = Jwts.parserBuilder()
                         .setSigningKey(signingKey())
+                        .build()
                         .parseClaimsJws(token)
                         .getBody();
 
-                Long userId = Long.parseLong(claims.getSubject());
+                Long userId = Long.valueOf(claims.getSubject());
                 String email = claims.get("email", String.class);
 
                 request.setAttribute("userId", userId);
@@ -56,7 +59,7 @@ public class JwtFilter extends OncePerRequestFilter {
                         new UsernamePasswordAuthenticationToken(email, null, Collections.emptyList())
                 );
 
-            } catch (Exception e) {
+            } catch (JwtException | IllegalArgumentException e) {
                 response.setStatus(401);
                 return;
             }

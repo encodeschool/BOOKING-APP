@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { useAuth } from "../../app/providers/AuthProvider";
 
 export default function LoginPage() {
@@ -78,6 +79,20 @@ export default function LoginPage() {
         >
           {loading ? "Signing in..." : "Sign In"}
         </button>
+
+        <div className="mt-6 text-center space-y-2">
+          <div>
+            <Link to="/forgot-password" className="text-blue-600 hover:text-blue-800 text-sm font-medium">
+              Forgot your password?
+            </Link>
+          </div>
+          <div>
+            <span className="text-gray-600 text-sm">Don't have an account? </span>
+            <Link to="/register" className="text-blue-600 hover:text-blue-800 text-sm font-medium">
+              Sign up
+            </Link>
+          </div>
+        </div>
       </form>
     </div>
   );

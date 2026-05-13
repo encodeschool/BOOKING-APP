@@ -1,9 +1,12 @@
 package uz.encode.fresh.notification_service.dto;
 
+import java.util.Map;
+
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
-public class EmailRequest {
+public class HtmlEmailRequest {
+
     @Email
     @NotBlank
     private String to;
@@ -14,7 +17,8 @@ public class EmailRequest {
     @NotBlank
     private String htmlContent;
 
-    private String from; // optional, defaults to configured
+    private String from;
+    private Map<String, Object> variables;
 
     public String getTo() {
         return to;
@@ -46,5 +50,22 @@ public class EmailRequest {
 
     public void setFrom(String from) {
         this.from = from;
+    }
+
+    public Map<String, Object> getVariables() {
+        return variables;
+    }
+
+    public void setVariables(Map<String, Object> variables) {
+        this.variables = variables;
+    }
+
+    public EmailRequest toEmailRequest() {
+        EmailRequest request = new EmailRequest();
+        request.setTo(to);
+        request.setSubject(subject);
+        request.setHtmlContent(htmlContent);
+        request.setFrom(from);
+        return request;
     }
 }
