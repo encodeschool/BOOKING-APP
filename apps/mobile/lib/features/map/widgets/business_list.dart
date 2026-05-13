@@ -20,7 +20,7 @@ class BusinessList extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListView.builder(
       controller: scrollController,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.only(bottom: 16, right: 16, left: 16),
       itemCount: businesses.length,
       itemBuilder: (context, index) {
         return BusinessCard(

@@ -104,40 +104,6 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                 ),
               ),
 
-              // FILTERS
-              Positioned(
-                top: 125,
-                left: 0,
-                right: 0,
-                child: SizedBox(
-                  height: 46,
-                  child: ListView(
-                    padding:
-                    const EdgeInsets.symmetric(horizontal: 16),
-                    scrollDirection: Axis.horizontal,
-                    children: [
-                      _filterChip(
-                        label: 'Restaurants',
-                        icon: Icons.restaurant_rounded,
-                        selected: true,
-                      ),
-                      _filterChip(
-                        label: 'Hotels',
-                        icon: Icons.hotel_rounded,
-                      ),
-                      _filterChip(
-                        label: 'Coffee',
-                        icon: Icons.coffee_rounded,
-                      ),
-                      _filterChip(
-                        label: 'Shopping',
-                        icon: Icons.shopping_bag_rounded,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
               // FLOATING ACTIONS
               Positioned(
                 right: 16,
@@ -261,6 +227,42 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                           Divider(
                             height: 1,
                             color: Colors.grey.shade200,
+                          ),
+
+                          SizedBox(
+                            height: 15
+                          ),
+
+                          SizedBox(
+                            height: 46,
+                            child: ListView(
+                              padding:
+                              const EdgeInsets.symmetric(horizontal: 16),
+                              scrollDirection: Axis.horizontal,
+                              children: [
+                                _filterChip(
+                                  label: 'Restaurants',
+                                  icon: Icons.restaurant_rounded,
+                                  selected: true,
+                                ),
+                                _filterChip(
+                                  label: 'Hotels',
+                                  icon: Icons.hotel_rounded,
+                                ),
+                                _filterChip(
+                                  label: 'Coffee',
+                                  icon: Icons.coffee_rounded,
+                                ),
+                                _filterChip(
+                                  label: 'Shopping',
+                                  icon: Icons.shopping_bag_rounded,
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          SizedBox(
+                              height: 15
                           ),
 
                           Expanded(
@@ -388,7 +390,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
       ),
       decoration: BoxDecoration(
         color:
-        selected ? Colors.black : Colors.white,
+        selected ? Colors.black : Colors.grey[100],
         borderRadius: BorderRadius.circular(14),
       ),
       child: Row(
