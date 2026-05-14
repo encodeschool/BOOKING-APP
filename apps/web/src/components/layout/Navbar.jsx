@@ -1,6 +1,12 @@
 import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Menu, X, Search, MapPin } from "lucide-react";
+import {
+  Menu,
+  X,
+  Search,
+  MapPin,
+  ChevronDown,
+} from "lucide-react";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -12,7 +18,7 @@ const Navbar = () => {
 
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedTime, setSelectedTime] = useState("Any time");
-  const [location, setLocation] = useState("Current location");
+  const [location, setLocation] = useState("Riga, Latvia");
   const [treatment, setTreatment] = useState("All treatments");
 
   const menuRef = useRef();
@@ -36,21 +42,23 @@ const Navbar = () => {
 
   const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
 
-  // close dropdowns on outside click
   useEffect(() => {
     const handler = (e) => {
       if (menuRef.current && !menuRef.current.contains(e.target)) {
         setMenuOpen(false);
       }
+
       if (timeRef.current && !timeRef.current.contains(e.target)) {
         setTimeOpen(false);
       }
+
       if (
         locationRef.current &&
         !locationRef.current.contains(e.target)
       ) {
         setLocationOpen(false);
       }
+
       if (
         treatmentsRef.current &&
         !treatmentsRef.current.contains(e.target)
@@ -59,17 +67,19 @@ const Navbar = () => {
       }
     };
 
-
-
     const handleScroll = () => {
       setScrolled(window.scrollY > 10);
     };
 
+    document.addEventListener("mousedown", handler);
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+
+    return () => {
+      document.removeEventListener("mousedown", handler);
+      window.removeEventListener("scroll", handleScroll);
+    };
   }, []);
 
-  // disable logic (ONLY for TODAY)
   const isToday =
     selectedDate &&
     normalizeDate(selectedDate) === todayNormalized;
@@ -79,288 +89,186 @@ const Navbar = () => {
   const isEveningDisabled = isToday && currentHour >= 21;
 
   return (
-    <nav
-      className={`sticky top-0 z-50 transition-all duration-300
-      ${scrolled
-        ? "bg-white/60 backdrop-blur-xl border-b border-gray-200 shadow-sm"
-        : "bg-white border-b"
-      }`}
-    >
-      <div className="max-w-7xl mx-auto px-4">
+    <>
+      <nav
+        className={`sticky top-0 z-50 transition-all duration-300 ${
+          scrolled
+            ? "bg-white/80 backdrop-blur-2xl border-b border-gray-200 shadow-sm"
+            : "bg-white border-b border-gray-100"
+        }`}
+      >
+        <div className="max-w-7xl mx-auto px-4 lg:px-6">
+          <div className="h-16 flex items-center justify-between gap-4">
 
-        {/* TOP BAR */}
-        <div className="flex items-center justify-between h-16 gap-4">
+            {/* LOGO */}
+            <Link
+              to="/"
+              className="flex items-center gap-2 shrink-0"
+            >
+              <div className="w-9 h-9 rounded-md bg-black text-white flex items-center justify-center font-bold">
+                EN
+              </div>
 
-          {/* LOGO */}
-          <Link to="/" className="text-xl font-bold">
-            BookEase
-          </Link>
+              <div className="hidden sm:flex flex-col leading-none">
+                <span className="text-lg font-bold text-gray-900">
+                  enroll
+                </span>
+                <span className="text-[11px] text-gray-500">
+                  beauty booking
+                </span>
+              </div>
+            </Link>
 
-          {/* SEARCH BAR */}
-          <div className="hidden lg:flex items-center bg-gray-100 rounded-full px-2 py-1 w-full max-w-xl">
+            {/* DESKTOP SEARCH */}
+            <div className="hidden xl:flex items-center bg-white border border-gray-200 shadow-sm rounded-full h-14 px-2 w-full max-w-3xl">
 
-            {/* TREATMENTS */}
-            <div className="relative w-1/3" ref={treatmentsRef}>
+              {/* TREATMENTS */}
+              <div
+                className="relative flex-1"
+                ref={treatmentsRef}
+              >
+                <button
+                  onClick={() =>
+                    setTreatmentsOpen(!treatmentsOpen)
+                  }
+                  className="w-full px-5 py-2 text-left rounded-full hover:bg-gray-100 transition"
+                >
+                  <p className="text-xs text-gray-500">
+                    Treatment
+                  </p>
 
-              <input
-                readOnly
-                value={treatment}
-                onClick={() => setTreatmentsOpen(!treatmentsOpen)}
-                className="bg-transparent px-3 py-1 w-full cursor-pointer outline-none"
-              />
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium truncate">
+                      {treatment}
+                    </span>
 
-              {treatmentsOpen && (
-                <div className="absolute top-12 left-0 w-[420px] bg-white border rounded-xl shadow-xl z-50 overflow-hidden">
-
-                  {/* FILTER HEADER */}
-                  <div className="p-3 border-b">
-                    <p className="text-sm font-semibold">Filter results</p>
-
-                    <div className="flex gap-2 mt-2 text-xs">
-                      <button className="px-2 py-1 border rounded-full bg-black text-white">
-                        All
-                      </button>
-                      <button className="px-2 py-1 border rounded-full">
-                        Treatments
-                      </button>
-                      <button className="px-2 py-1 border rounded-full">
-                        Venues
-                      </button>
-                      <button className="px-2 py-1 border rounded-full">
-                        Professionals
-                      </button>
-                    </div>
+                    <ChevronDown size={16} />
                   </div>
+                </button>
 
-                  {/* RECENTS */}
-                  <div className="p-3 border-b">
-                    <div className="flex justify-between items-center">
-                      <p className="text-xs text-gray-500">Recents</p>
-                      <button
-                        onClick={() => setTreatment("All treatments")}
-                        className="text-xs text-blue-600"
-                      >
-                        Clear
-                      </button>
-                    </div>
-
-                    <div className="mt-2 space-y-2">
-
-                      <div
-                        onClick={() => {
-                          setTreatment("All treatments");
-                          setTreatmentsOpen(false);
-                        }}
-                        className="p-2 hover:bg-gray-100 rounded cursor-pointer"
-                      >
-                        All treatments
-                      </div>
-
-                      <div
-                        onClick={() => {
-                          setTreatment("Massage");
-                          setTreatmentsOpen(false);
-                        }}
-                        className="p-2 hover:bg-gray-100 rounded cursor-pointer"
-                      >
-                        Massage
-                      </div>
-
-                    </div>
-                  </div>
-
-                  {/* RESULTS */}
-                  <div className="p-3">
-
-                    <p className="text-xs text-gray-500 mb-2">
-                      Suggestions
+                {treatmentsOpen && (
+                  <div className="absolute top-16 left-0 w-[360px] bg-white border border-gray-200 rounded-3xl shadow-2xl p-4 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                    <p className="text-sm font-semibold mb-4">
+                      Popular treatments
                     </p>
 
                     <div className="space-y-2">
-
-                      <div
-                        onClick={() => {
-                          setTreatment("Haircut");
-                          setTreatmentsOpen(false);
-                        }}
-                        className="flex items-center gap-3 p-2 hover:bg-gray-100 rounded cursor-pointer"
-                      >
-                        <div className="w-8 h-8 bg-gray-100 rounded-full" />
-                        <div>
-                          <p className="text-sm font-medium">Haircut</p>
-                          <p className="text-xs text-gray-500">
-                            Hair services
-                          </p>
-                        </div>
-                      </div>
-
-                      <div
-                        onClick={() => {
-                          setTreatment("Facial");
-                          setTreatmentsOpen(false);
-                        }}
-                        className="flex items-center gap-3 p-2 hover:bg-gray-100 rounded cursor-pointer"
-                      >
-                        <div className="w-8 h-8 bg-gray-100 rounded-full" />
-                        <div>
-                          <p className="text-sm font-medium">Facial</p>
-                          <p className="text-xs text-gray-500">
-                            Skincare
-                          </p>
-                        </div>
-                      </div>
-
+                      {[
+                        "Haircut",
+                        "Massage",
+                        "Facial",
+                        "Manicure",
+                        "Spa",
+                        "Barber",
+                      ].map((item) => (
+                        <button
+                          key={item}
+                          onClick={() => {
+                            setTreatment(item);
+                            setTreatmentsOpen(false);
+                          }}
+                          className="w-full text-left px-4 py-3 rounded-2xl hover:bg-gray-100 transition text-sm font-medium"
+                        >
+                          {item}
+                        </button>
+                      ))}
                     </div>
-
                   </div>
-
-                </div>
-              )}
-            </div>
-
-            <div className="h-5 w-px bg-gray-300"></div>
-
-            {/* LOCATION DROPDOWN */}
-            <div className="relative w-1/3" ref={locationRef}>
-
-              <div
-                onClick={() => setLocationOpen(!locationOpen)}
-                className="flex items-center gap-2 px-3 py-1 cursor-pointer"
-              >
-                <MapPin size={14} className="text-gray-500" />
-                <span className="text-sm truncate">
-                  {location}
-                </span>
+                )}
               </div>
 
-              {locationOpen && (
-                <div className="absolute top-12 left-0 w-[320px] bg-white border rounded-xl shadow-xl z-50 overflow-hidden">
+              <div className="w-px h-8 bg-gray-200" />
 
-                  <div className="p-2">
+              {/* LOCATION */}
+              <div
+                className="relative flex-1"
+                ref={locationRef}
+              >
+                <button
+                  onClick={() =>
+                    setLocationOpen(!locationOpen)
+                  }
+                  className="w-full px-5 py-2 text-left rounded-full hover:bg-gray-100 transition"
+                >
+                  <p className="text-xs text-gray-500">
+                    Location
+                  </p>
 
-                    {/* CURRENT LOCATION */}
-                    <div
-                      onClick={() => {
-                        setLocation("Current location");
-                        setLocationOpen(false);
-                      }}
-                      className="flex items-center gap-3 p-3 hover:bg-gray-100 cursor-pointer rounded-lg"
-                    >
-                      <div className="w-9 h-9 bg-blue-100 rounded-full flex items-center justify-center">
-                        <MapPin size={14} className="text-blue-600" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium">
-                          Current location
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          Use GPS location
-                        </p>
-                      </div>
-                    </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium truncate">
+                      {location}
+                    </span>
 
-                    {/* SUGGESTION 1 */}
-                    <div
-                      onClick={() => {
-                        setLocation("Riga, Latvia");
-                        setLocationOpen(false);
-                      }}
-                      className="flex items-center gap-3 p-3 hover:bg-gray-100 cursor-pointer rounded-lg"
-                    >
-                      <div className="w-9 h-9 bg-gray-100 rounded-full flex items-center justify-center">
-                        <MapPin size={14} />
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium">
-                          Riga
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          Latvia
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* SUGGESTION 2 */}
-                    <div
-                      onClick={() => {
-                        setLocation("Old Town Riga");
-                        setLocationOpen(false);
-                      }}
-                      className="flex items-center gap-3 p-3 hover:bg-gray-100 cursor-pointer rounded-lg"
-                    >
-                      <div className="w-9 h-9 bg-gray-100 rounded-full flex items-center justify-center">
-                        <MapPin size={14} />
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium">
-                          Old Town
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          Riga center
-                        </p>
-                      </div>
-                    </div>
-
+                    <ChevronDown size={16} />
                   </div>
-                </div>
-              )}
-            </div>
+                </button>
 
-            <div className="h-5 w-px bg-gray-300"></div>
+                {locationOpen && (
+                  <div className="absolute top-16 left-0 w-[320px] bg-white border border-gray-200 rounded-3xl shadow-2xl p-4 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                    <p className="text-sm font-semibold mb-4">
+                      Choose location
+                    </p>
 
-            {/* TIME DROPDOWN */}
-            <div className="relative w-1/3" ref={timeRef}>
+                    <div className="space-y-2">
+                      {[
+                        "Current location",
+                        "Riga, Latvia",
+                        "Old Town Riga",
+                        "Jurmala",
+                      ].map((item) => (
+                        <button
+                          key={item}
+                          onClick={() => {
+                            setLocation(item);
+                            setLocationOpen(false);
+                          }}
+                          className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl hover:bg-gray-100 transition"
+                        >
+                          <MapPin
+                            size={16}
+                            className="text-gray-500"
+                          />
 
-              <input
-                readOnly
-                value={
-                  selectedDate
-                    ? `${selectedDate.toDateString()} • ${selectedTime}`
-                    : "Any time"
-                }
-                onClick={() => setTimeOpen(!timeOpen)}
-                className="bg-transparent px-3 py-1 w-full cursor-pointer outline-none"
-              />
-
-              {timeOpen && (
-                <div className="absolute top-12 left-0 w-[520px] bg-white border rounded-xl shadow-xl z-50 p-4 flex gap-4">
-
-                  {/* LEFT SIDE */}
-                  <div className="w-1/3 flex flex-col gap-3">
-
-                    <button
-                      onClick={() => setSelectedDate(new Date())}
-                      className="p-4 border rounded-xl text-left hover:bg-gray-100"
-                    >
-                      <p className="font-semibold">Today</p>
-                      <p className="text-xs text-gray-500">
-                        {today.toDateString()}
-                      </p>
-                    </button>
-
-                    <button
-                      onClick={() =>
-                        setSelectedDate(
-                          new Date(today.getTime() + 86400000)
-                        )
-                      }
-                      className="p-4 border rounded-xl text-left hover:bg-gray-100"
-                    >
-                      <p className="font-semibold">Tomorrow</p>
-                      <p className="text-xs text-gray-500">
-                        {new Date(
-                          today.getTime() + 86400000
-                        ).toDateString()}
-                      </p>
-                    </button>
-
+                          <span className="text-sm font-medium">
+                            {item}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
                   </div>
+                )}
+              </div>
 
-                  {/* RIGHT SIDE */}
-                  <div className="w-2/3">
+              <div className="w-px h-8 bg-gray-200" />
 
-                    {/* CALENDAR */}
-                    <div className="grid grid-cols-7 gap-2 text-center text-sm mb-4">
+              {/* TIME */}
+              <div className="relative flex-1" ref={timeRef}>
+                <button
+                  onClick={() => setTimeOpen(!timeOpen)}
+                  className="w-full px-5 py-2 text-left rounded-full hover:bg-gray-100 transition"
+                >
+                  <p className="text-xs text-gray-500">
+                    Date & time
+                  </p>
+
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium truncate">
+                      {selectedDate
+                        ? `${selectedDate.toDateString()} • ${selectedTime}`
+                        : "Any time"}
+                    </span>
+
+                    <ChevronDown size={16} />
+                  </div>
+                </button>
+
+                {timeOpen && (
+                  <div className="absolute top-16 right-0 w-[500px] bg-white border border-gray-200 rounded-3xl shadow-2xl p-5 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                    <p className="text-sm font-semibold mb-4">
+                      Select date
+                    </p>
+
+                    <div className="grid grid-cols-7 gap-2 mb-6">
                       {days.map((d) => {
                         const date = new Date(
                           today.getFullYear(),
@@ -376,11 +284,13 @@ const Navbar = () => {
                         return (
                           <button
                             key={d}
-                            onClick={() => setSelectedDate(date)}
-                            className={`p-2 rounded-md hover:bg-gray-100 ${
+                            onClick={() =>
+                              setSelectedDate(date)
+                            }
+                            className={`h-10 rounded-xl text-sm transition ${
                               isSelected
                                 ? "bg-black text-white"
-                                : ""
+                                : "hover:bg-gray-100"
                             }`}
                           >
                             {d}
@@ -389,13 +299,11 @@ const Navbar = () => {
                       })}
                     </div>
 
-                    {/* TIME */}
-                    <p className="text-xs text-gray-500 mb-2">
-                      Select time
+                    <p className="text-sm font-semibold mb-3">
+                      Time
                     </p>
 
-                    <div className="flex gap-2 flex-wrap">
-
+                    <div className="flex flex-wrap gap-2">
                       {[
                         {
                           label: "Any time",
@@ -417,176 +325,224 @@ const Navbar = () => {
                         <button
                           key={t.label}
                           disabled={t.disabled}
-                          onClick={() => setSelectedTime(t.label)}
-                          className={`px-3 py-2 border rounded-lg text-sm
-                            ${
-                              t.disabled
-                                ? "opacity-40 cursor-not-allowed"
-                                : "hover:bg-gray-100"
-                            }
-                            ${
-                              selectedTime === t.label
-                                ? "bg-black text-white"
-                                : ""
-                            }
-                          `}
+                          onClick={() =>
+                            setSelectedTime(t.label)
+                          }
+                          className={`px-4 py-2 rounded-xl border text-sm transition ${
+                            selectedTime === t.label
+                              ? "bg-black text-white border-black"
+                              : "hover:bg-gray-100"
+                          } ${
+                            t.disabled
+                              ? "opacity-40 cursor-not-allowed"
+                              : ""
+                          }`}
                         >
                           {t.label}
                         </button>
                       ))}
-
                     </div>
-
                   </div>
-                </div>
-              )}
+                )}
+              </div>
+
+              {/* SEARCH BUTTON */}
+              <button className="ml-2 w-11 h-11 rounded-full bg-black text-white flex items-center justify-center hover:scale-105 transition">
+                <Search size={18} />
+              </button>
             </div>
 
-            {/* SEARCH BUTTON */}
-            <button className="ml-2 bg-black text-white p-2 rounded-full">
-              <Search size={16} />
-            </button>
+            {/* RIGHT */}
+            <div className="flex items-center gap-3">
 
-          </div>
+              {/* DESKTOP LINKS */}
+              <div className="hidden lg:flex items-center gap-6">
+                <Link
+                  to="/services"
+                  className="text-sm font-medium text-gray-700 hover:text-black transition"
+                >
+                  Services
+                </Link>
 
-          {/* RIGHT MENU */}
-          <div className="flex items-center gap-4">
+                <Link
+                  to="/map"
+                  className="text-sm font-medium text-gray-700 hover:text-black transition"
+                >
+                  Map
+                </Link>
 
-            <div className="relative" ref={menuRef}>
+                <Link
+                  to="/login"
+                  className="px-5 h-11 rounded-full bg-black text-white flex items-center justify-center text-sm font-medium hover:opacity-90 transition"
+                >
+                  Sign in
+                </Link>
+              </div>
+
+              {/* MOBILE MENU BUTTON */}
               <button
-                onClick={() => setMenuOpen(!menuOpen)}
-                className="flex items-center gap-2 border px-3 py-1 rounded-full"
+                onClick={() => setIsOpen(!isOpen)}
+                className="xl:hidden w-11 h-11 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-100 transition"
               >
-                <Menu size={18} />
-                <span className="hidden sm:block text-sm">
-                  Menu
-                </span>
+                {isOpen ? <X size={20} /> : <Menu size={20} />}
               </button>
 
-              {menuOpen && (
-                <div className="absolute right-0 mt-3 w-72 bg-white rounded-2xl shadow-xl border z-50 overflow-hidden">
+              {/* PROFILE MENU */}
+              <div className="hidden xl:block relative" ref={menuRef}>
+                <button
+                  onClick={() => setMenuOpen(!menuOpen)}
+                  className="w-11 h-11 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-100 transition"
+                >
+                  <Menu size={18} />
+                </button>
 
-                  {/* HEADER */}
-                  {/* <div className="flex items-center justify-between px-4 py-3 border-b">
-                    <span className="text-sm font-semibold">Menu</span>
-                    <button
-                      onClick={() => setMenuOpen(false)}
-                      className="text-gray-500 hover:text-black"
-                    >
-                      ✕
-                    </button>
-                  </div> */}
-
-                  {/* CONTENT */}
-                  <div className="py-2">
-
-                    {/* SECTION: CUSTOMERS */}
-                    <div className="px-4 py-2 text-xs text-gray-400 uppercase">
-                      For customers
+                {menuOpen && (
+                  <div className="absolute right-0 top-14 w-72 bg-white border border-gray-200 rounded-3xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                    <div className="p-2">
+                      {[
+                        {
+                          label: "All Services",
+                          to: "/services",
+                        },
+                        {
+                          label: "Book Now",
+                          to: "/booking",
+                        },
+                        {
+                          label: "Map",
+                          to: "/map",
+                        },
+                        {
+                          label: "About",
+                          to: "/about",
+                        },
+                        {
+                          label: "Contact",
+                          to: "/contact",
+                        },
+                      ].map((item) => (
+                        <Link
+                          key={item.label}
+                          to={item.to}
+                          className="block px-4 py-3 rounded-2xl hover:bg-gray-100 transition text-sm font-medium"
+                        >
+                          {item.label}
+                        </Link>
+                      ))}
                     </div>
-
-                    <Link
-                      to="/login"
-                      className="block px-4 py-3 hover:bg-gray-100 text-sm font-medium text-blue-600"
-                    >
-                      Log in or sign up
-                    </Link>
-
-                    <Link
-                      to="/map"
-                      className="block px-4 py-3 hover:bg-gray-100 text-sm font-medium text-blue-600"
-                    >
-                      Map of service
-                    </Link>
-
-                    <Link
-                      to="/services"
-                      className="block px-4 py-3 hover:bg-gray-100 text-sm font-medium text-blue-600"
-                    >
-                      All Services
-                    </Link>
-
-                    <Link
-                      to="/booking"
-                      className="block px-4 py-3 hover:bg-gray-100 text-sm font-medium text-blue-600"
-                    >
-                      Book right now
-                    </Link>
-
-                    <Link
-                      to="/download"
-                      className="block px-4 py-3 hover:bg-gray-100 text-sm"
-                    >
-                      Download the app
-                    </Link>
-
-                    <a
-                      href="https://www.fresha.com/help-center/get-support"
-                      target="_blank"
-                      rel="noreferrer"
-                      className="block px-4 py-3 hover:bg-gray-100 text-sm"
-                    >
-                      Help and support
-                    </a>
-
-                    <button
-                      className="w-full text-left px-4 py-3 hover:bg-gray-100 text-sm"
-                    >
-                      🌍 English (US)
-                    </button>
-
-                    {/* DIVIDER */}
-                    <div className="border-t my-2"></div>
-
-                    {/* SECTION: BUSINESS */}
-                    <div className="px-4 py-2 text-xs text-gray-400 uppercase">
-                      For business
-                    </div>
-
-                    <a
-                      href="https://www.fresha.com/for-business"
-                      target="_blank"
-                      rel="noreferrer"
-                      className="block px-4 py-3 hover:bg-gray-100 text-sm font-medium"
-                    >
-                      For businesses →
-                    </a>
-
-                    <div className="px-4 py-2 text-xs text-gray-400 uppercase">
-                      For customers
-                    </div>
-
-                    <Link
-                      to="/contact"
-                      className="block px-4 py-3 hover:bg-gray-100 text-sm font-medium text-blue-600"
-                    >
-                      Our contacts
-                    </Link>
-
-                    <Link
-                      to="/about"
-                      className="block px-4 py-3 hover:bg-gray-100 text-sm font-medium text-blue-600"
-                    >
-                      About us
-                    </Link>
-
                   </div>
-                </div>
-              )}
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* MOBILE SEARCH */}
+          <div className="xl:hidden pb-4">
+            <button className="w-full bg-white border border-gray-200 rounded-2xl h-14 px-4 flex items-center gap-3 shadow-sm">
+              <Search size={18} className="text-gray-500" />
+
+              <div className="text-left">
+                <p className="text-sm font-medium text-gray-900">
+                  Search treatments
+                </p>
+
+                <p className="text-xs text-gray-500">
+                  Nearby • Any time
+                </p>
+              </div>
+            </button>
+          </div>
+        </div>
+      </nav>
+
+      {/* MOBILE MENU */}
+      <div
+        className={`fixed inset-0 z-40 xl:hidden transition-all duration-300 ${
+          isOpen
+            ? "visible opacity-100"
+            : "invisible opacity-0"
+        }`}
+      >
+        <div
+          onClick={() => setIsOpen(false)}
+          className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+        />
+
+        <div
+          className={`absolute right-0 top-0 h-full w-[85%] max-w-sm bg-white shadow-2xl transition-transform duration-300 ${
+            isOpen
+              ? "translate-x-0"
+              : "translate-x-full"
+          }`}
+        >
+          <div className="h-16 px-5 border-b flex items-center justify-between">
+            <div>
+              <h2 className="font-bold text-lg">
+                enroll
+              </h2>
+
+              <p className="text-xs text-gray-500">
+                beauty booking
+              </p>
             </div>
 
             <button
-              className="lg:hidden"
-              onClick={() => setIsOpen(!isOpen)}
+              onClick={() => setIsOpen(false)}
+              className="w-10 h-10 rounded-full hover:bg-gray-100 flex items-center justify-center"
             >
-              {isOpen ? <X /> : <Menu />}
+              <X size={20} />
             </button>
-
           </div>
 
+          <div className="p-5 space-y-2">
+            {[
+              {
+                label: "Home",
+                to: "/",
+              },
+              {
+                label: "Services",
+                to: "/services",
+              },
+              {
+                label: "Map",
+                to: "/map",
+              },
+              {
+                label: "Booking",
+                to: "/booking",
+              },
+              {
+                label: "About",
+                to: "/about",
+              },
+              {
+                label: "Contact",
+                to: "/contact",
+              },
+            ].map((item) => (
+              <Link
+                key={item.label}
+                to={item.to}
+                onClick={() => setIsOpen(false)}
+                className="block px-4 py-4 rounded-2xl hover:bg-gray-100 transition text-sm font-medium"
+              >
+                {item.label}
+              </Link>
+            ))}
+
+            <div className="pt-6">
+              <Link
+                to="/login"
+                className="w-full h-12 rounded-2xl bg-black text-white flex items-center justify-center font-medium"
+              >
+                Sign in
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
-    </nav>
+    </>
   );
 };
 
