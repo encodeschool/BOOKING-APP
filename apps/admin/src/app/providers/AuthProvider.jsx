@@ -9,7 +9,9 @@ export default function AuthProvider({ children }) {
   const [loading, setLoading] = useState(false);
 
   const loadProfile = async () => {
-    if (!token) return;
+    if (!token) {
+      return <Navigate to="/login" replace />; // Redirect to login if no token
+    };
     try {
       const data = await getProfileApi(token);
       setProfile(data);
@@ -42,6 +44,8 @@ export default function AuthProvider({ children }) {
     localStorage.removeItem("admin-token");
     setToken(null);
     setProfile(null);
+
+    window.location.href = "/login";
   };
 
   return (

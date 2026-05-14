@@ -3,99 +3,75 @@
       xmlns:th="http://www.thymeleaf.org"
       th:replace="~{base-template :: layout(~{::section})}">
 
-<section>
+<section th:fragment="content" style="text-align: center;margin:0;padding:0;background:#f4f7fb;font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#111827;">
 
-    <h2>⏰ Appointment Reminder</h2>
+    <h2 style="margin:0 0 18px;font-size:28px;font-weight:800;color:#111827;">
+        ⏰ Appointment Reminder
+    </h2>
 
-    <p>
+    <p style="margin:0 0 16px;color:#4b5563;line-height:1.7;font-size:15px;">
         Hello
         <strong th:text="${customerName}">Customer</strong>,
     </p>
 
-    <p>
+    <p style="margin:0 0 18px;color:#4b5563;line-height:1.7;font-size:15px;">
         This is a friendly reminder about your upcoming appointment with
         <strong th:text="${businessName}">Business Name</strong>.
         We're looking forward to seeing you soon.
     </p>
 
     <!-- STATUS -->
-    <div class="status-wrapper">
-
-        <div class="status-badge status-confirmed">
+    <div style="margin:26px 0;text-align:center;">
+        <div style="display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 18px;border-radius:999px;font-size:13px;font-weight:800;letter-spacing:0.3px;text-transform:uppercase;background:#dcfce7;color:#166534;">
             📅 Upcoming Appointment
         </div>
-
     </div>
 
     <!-- APPOINTMENT DETAILS -->
-    <div class="card soft-card">
+    <div style="background:#f8fafc;border:1px solid #edf2f7;border-radius:22px;padding:24px;margin:22px 0;">
 
-        <h3 style="margin-bottom:18px;">
+        <h3 style="margin:0 0 18px;font-size:20px;font-weight:700;color:#111827;">
             📋 Appointment Details
         </h3>
 
-        <div class="info-row">
-            <span class="info-label">
-                Service
-            </span>
-
-            <span class="info-value"
-                  th:text="${serviceName}">
+        <div style="border-bottom:1px solid #edf2f7;padding:14px 0;display:flex;justify-content:space-between;">
+            <span style="color:#6b7280;font-size:14px;font-weight:600;">Service</span>
+            <span style="color:#111827;font-size:15px;font-weight:700;" th:text="${serviceName}">
                 Hair Styling
             </span>
         </div>
 
-        <div class="info-row">
-            <span class="info-label">
-                Staff Member
-            </span>
-
-            <span class="info-value"
-                  th:text="${staffName}">
+        <div style="border-bottom:1px solid #edf2f7;padding:14px 0;display:flex;justify-content:space-between;">
+            <span style="color:#6b7280;font-size:14px;font-weight:600;">Staff Member</span>
+            <span style="color:#111827;font-size:15px;font-weight:700;" th:text="${staffName}">
                 Sarah Johnson
             </span>
         </div>
 
-        <div class="info-row">
-            <span class="info-label">
-                Date & Time
-            </span>
-
-            <span class="info-value"
-                  th:text="${bookingDate + ' at ' + bookingTime}">
+        <div style="border-bottom:1px solid #edf2f7;padding:14px 0;display:flex;justify-content:space-between;">
+            <span style="color:#6b7280;font-size:14px;font-weight:600;">Date & Time</span>
+            <span style="color:#111827;font-size:15px;font-weight:700;" th:text="${bookingDate + ' at ' + bookingTime}">
                 Tomorrow at 2:00 PM
             </span>
         </div>
 
-        <div class="info-row">
-            <span class="info-label">
-                Duration
-            </span>
-
-            <span class="info-value"
-                  th:text="${duration}">
+        <div style="border-bottom:1px solid #edf2f7;padding:14px 0;display:flex;justify-content:space-between;">
+            <span style="color:#6b7280;font-size:14px;font-weight:600;">Duration</span>
+            <span style="color:#111827;font-size:15px;font-weight:700;" th:text="${duration}">
                 60 Minutes
             </span>
         </div>
 
-        <div class="info-row">
-            <span class="info-label">
-                Location
-            </span>
-
-            <span class="info-value"
-                  th:text="${businessAddress}">
+        <div style="border-bottom:1px solid #edf2f7;padding:14px 0;display:flex;justify-content:space-between;">
+            <span style="color:#6b7280;font-size:14px;font-weight:600;">Location</span>
+            <span style="color:#111827;font-size:15px;font-weight:700;" th:text="${businessAddress}">
                 123 Main Street, City
             </span>
         </div>
 
-        <div class="info-row">
-            <span class="info-label">
-                Booking ID
-            </span>
-
-            <span class="info-value"
-                  th:text="${bookingId}">
+        <div style="padding:14px 0;display:flex;justify-content:space-between;">
+            <span style="color:#6b7280;font-size:14px;font-weight:600;">Booking ID</span>
+            <span style="color:#111827;font-size:15px;font-weight:700;" th:text="${bookingId}">
                 BK-123456
             </span>
         </div>
@@ -103,57 +79,39 @@
     </div>
 
     <!-- LOCATION -->
-    <div class="card highlight-card">
+    <div style="background:linear-gradient(135deg,rgba(79,70,229,0.06),rgba(99,102,241,0.03));border:1px solid rgba(79,70,229,0.12);border-radius:22px;padding:24px;margin:22px 0;">
 
-        <h3 style="margin-bottom:16px;">
+        <h3 style="margin:0 0 16px;font-size:20px;font-weight:700;color:#111827;">
             📍 Business Information
         </h3>
 
-        <div class="info-row">
-            <span class="info-label">
-                Address
-            </span>
-
-            <span class="info-value"
-                  th:text="${businessAddress}">
+        <div style="border-bottom:1px solid #edf2f7;padding:14px 0;display:flex;justify-content:space-between;">
+            <span style="color:#6b7280;font-size:14px;font-weight:600;">Address</span>
+            <span style="color:#111827;font-size:15px;font-weight:700;" th:text="${businessAddress}">
                 123 Main Street, City, State
             </span>
         </div>
 
-        <div class="info-row">
-            <span class="info-label">
-                Phone
-            </span>
-
-            <span class="info-value"
-                  th:text="${businessPhone}">
+        <div style="border-bottom:1px solid #edf2f7;padding:14px 0;display:flex;justify-content:space-between;">
+            <span style="color:#6b7280;font-size:14px;font-weight:600;">Phone</span>
+            <span style="color:#111827;font-size:15px;font-weight:700;" th:text="${businessPhone}">
                 (555) 123-4567
             </span>
         </div>
 
-        <div class="info-row">
-            <span class="info-label">
-                Email
-            </span>
-
-            <span class="info-value"
-                  th:text="${businessEmail}">
+        <div style="border-bottom:1px solid #edf2f7;padding:14px 0;display:flex;justify-content:space-between;">
+            <span style="color:#6b7280;font-size:14px;font-weight:600;">Email</span>
+            <span style="color:#111827;font-size:15px;font-weight:700;" th:text="${businessEmail}">
                 contact@business.com
             </span>
         </div>
 
-        <div class="info-row">
-            <span class="info-label">
-                Website
-            </span>
-
-            <span class="info-value">
+        <div style="padding:14px 0;display:flex;justify-content:space-between;">
+            <span style="color:#6b7280;font-size:14px;font-weight:600;">Website</span>
+            <span style="color:#111827;font-size:15px;font-weight:700;">
                 <a th:href="${businessWebsite}"
                    th:text="${businessWebsite}"
-                   style="
-                        color:#4f46e5;
-                        font-weight:700;
-                   ">
+                   style="color:#4f46e5;font-weight:700;text-decoration:none;">
                     www.business.com
                 </a>
             </span>
@@ -163,13 +121,13 @@
 
     <!-- DIRECTIONS -->
     <div th:if="${directions}"
-         class="card">
+         style="background:#ffffff;border:1px solid #edf2f7;border-radius:22px;padding:24px;margin:22px 0;">
 
-        <h3 style="margin-bottom:14px;">
+        <h3 style="margin:0 0 14px;font-size:20px;font-weight:700;color:#111827;">
             🧭 Directions
         </h3>
 
-        <p style="margin:0;"
+        <p style="margin:0;color:#4b5563;line-height:1.7;font-size:15px;"
            th:text="${directions}">
             From downtown, take Main Street north...
         </p>
@@ -177,56 +135,42 @@
     </div>
 
     <!-- WHAT TO BRING -->
-    <div class="card soft-card">
+    <div style="background:#f8fafc;border:1px solid #edf2f7;border-radius:22px;padding:24px;margin:22px 0;">
 
-        <h3 style="margin-bottom:16px;">
+        <h3 style="margin:0 0 16px;font-size:20px;font-weight:700;color:#111827;">
             ✅ What to Bring
         </h3>
 
-        <ul>
-            <li>
-                Valid identification if required
-            </li>
-
-            <li>
-                Any referral or booking documents
-            </li>
-
-            <li>
-                Insurance information if applicable
-            </li>
-
-            <li>
-                Comfortable clothing and personal essentials
-            </li>
-
-            <li>
-                Any notes or preferences for your appointment
-            </li>
+        <ul style="margin:0;padding-left:20px;color:#4b5563;line-height:1.7;font-size:15px;">
+            <li>Valid identification if required</li>
+            <li>Any referral or booking documents</li>
+            <li>Insurance information if applicable</li>
+            <li>Comfortable clothing and personal essentials</li>
+            <li>Any notes or preferences for your appointment</li>
         </ul>
 
     </div>
 
     <!-- QUICK ACTIONS -->
-    <div class="card">
+    <div style="background:#ffffff;border:1px solid #edf2f7;border-radius:22px;padding:24px;margin:22px 0;">
 
-        <h3 style="margin-bottom:14px;">
+        <h3 style="margin:0 0 14px;font-size:20px;font-weight:700;color:#111827;">
             ⚡ Quick Actions
         </h3>
 
-        <p>
+        <p style="margin:0 0 18px;color:#4b5563;line-height:1.7;font-size:15px;">
             Need to review details or make changes to your appointment?
         </p>
 
-        <div class="actions">
+        <div style="text-align:center;">
 
             <a href="#"
-               class="button button-primary">
+               style="display:inline-block;padding:15px 28px;margin:8px;border-radius:16px;font-size:15px;font-weight:700;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:white;text-decoration:none;">
                 📅 View Full Details
             </a>
 
             <a href="#"
-               class="button button-secondary">
+               style="display:inline-block;padding:15px 28px;margin:8px;border-radius:16px;font-size:15px;font-weight:700;background:#f3f4f6;border:1px solid #e5e7eb;color:#111827;text-decoration:none;">
                 🔄 Reschedule Appointment
             </a>
 
@@ -235,51 +179,40 @@
     </div>
 
     <!-- ARRIVAL TIP -->
-    <div class="card"
-         style="
-            background: linear-gradient(
-                    135deg,
-                    rgba(16,185,129,.08),
-                    rgba(5,150,105,.04)
-            );
-            border:1px solid rgba(16,185,129,.14);
-         ">
+    <div style="background:linear-gradient(135deg,rgba(16,185,129,.08),rgba(5,150,105,.04));border:1px solid rgba(16,185,129,.14);border-radius:22px;padding:24px;margin:22px 0;">
 
-        <h3 style="margin-bottom:12px;">
+        <h3 style="margin:0 0 12px;font-size:20px;font-weight:700;color:#111827;">
             💡 Arrival Tip
         </h3>
 
-        <p style="margin:0;">
-            Please arrive
-            <strong>10–15 minutes early</strong>
-            to complete any necessary paperwork
+        <p style="margin:0;color:#4b5563;line-height:1.7;font-size:15px;">
+            Please arrive <strong>10–15 minutes early</strong> to complete any necessary paperwork
             and enjoy a relaxed check-in experience.
         </p>
 
     </div>
 
     <!-- SUPPORT -->
-    <div class="card highlight-card">
+    <div style="background:linear-gradient(135deg,rgba(79,70,229,0.06),rgba(99,102,241,0.03));border:1px solid rgba(79,70,229,0.12);border-radius:22px;padding:24px;margin:22px 0;">
 
-        <h3 style="margin-bottom:14px;">
+        <h3 style="margin:0 0 14px;font-size:20px;font-weight:700;color:#111827;">
             💬 Need Assistance?
         </h3>
 
-        <p>
+        <p style="margin:0 0 18px;color:#4b5563;line-height:1.7;font-size:15px;">
             If you have any questions or need to update your appointment,
             our support team is here to help.
         </p>
 
-        <div class="actions"
-             style="margin-bottom:0;">
+        <div style="text-align:center;">
 
             <a href="mailto:support@fresha.com"
-               class="button button-primary">
+               style="display:inline-block;padding:15px 28px;border-radius:16px;font-size:15px;font-weight:700;background:#f3f4f6;border:1px solid #e5e7eb;color:#111827;text-decoration:none;">
                 📩 Contact Support
             </a>
 
             <a href="#"
-               class="button button-secondary">
+               style="display:inline-block;padding:15px 28px;margin:8px;border-radius:16px;font-size:15px;font-weight:700;background:#4f46e5;color:white;text-decoration:none;">
                 📞 Call Business
             </a>
 
@@ -287,15 +220,15 @@
 
     </div>
 
-    <p style="margin-top:32px;">
+    <p style="margin-top:32px;color:#4b5563;line-height:1.7;font-size:15px;">
         We look forward to welcoming you soon.
     </p>
 
-    <p>
-        Warm regards,
-        <br><br>
+    <p style="margin:0;color:#4b5563;line-height:1.7;font-size:15px;">
+        Warm regards,<br><br>
         <strong>The Fresha Team</strong>
     </p>
 
 </section>
+
 </html>

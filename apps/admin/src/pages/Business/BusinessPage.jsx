@@ -98,19 +98,13 @@ export default function BusinessesPage() {
       } else {
         const fd = new FormData();
 
-        fd.append(
-          "req",
-          new Blob(
-            [
-              JSON.stringify({
-                ...form,
-                latitude: geo.latitude,
-                longitude: geo.longitude,
-              }),
-            ],
-            { type: "application/json" }
-          )
-        );
+        fd.append("name", form.name);
+        fd.append("description", form.description);
+        fd.append("address", form.address);
+        fd.append("phone", form.phone);
+        fd.append("category", form.category);
+        fd.append("latitude", geo.latitude);
+        fd.append("longitude", geo.longitude);
 
         images.forEach((img) => fd.append("images", img));
 
@@ -133,11 +127,11 @@ export default function BusinessesPage() {
   /* ===================== EDIT ===================== */
   function handleEdit(b) {
     setForm({
-      name: b.name,
-      address: b.address,
-      phone: b.phone,
-      category: b.category,
-      description: b.description,
+      name: b.name || "",
+      address: b.address || "",
+      phone: b.phone || "",
+      category: b.category || "",
+      description: b.description || "",
     });
 
     setEditMode(true);
@@ -357,18 +351,22 @@ export default function BusinessesPage() {
             </div>
 
             <div className="mt-4 space-y-2">
-              <p><b>Address:</b> {details.address}</p>
-              <p><b>Phone:</b> {details.phone}</p>
-              <p><b>Category:</b> {details.category}</p>
-              <p><b>Description:</b> {details.description}</p>
+              <p><b>Address:</b> {details.address || ""}</p>
+              <p><b>Phone:</b> {details.phone || ""}</p>
+              <p><b>Category:</b> {details.category || ""}</p>
+              <p><b>Description:</b> {details.description || ""}</p>
 
               {details.images?.length > 0 && (
                 <div className="flex gap-2 flex-wrap mt-3">
                   {details.images.map((img, i) => (
                     <img
-                      key={i}
-                      src={img.imageUrl || img}
-                      className="w-16 h-16 rounded-lg object-cover"
+                        key={i}
+                        src={
+                        img.imageUrl
+                        ? `${API_URL}${img.imageUrl}`
+                        : `${API_URL}${img}`
+                      }
+                      className="w-12 h-12 rounded-lg object-cover"
                     />
                   ))}
                 </div>
@@ -446,7 +444,7 @@ export default function BusinessesPage() {
                 </label>
 
                 <select
-                  value={form.category}
+                  value={form.category || ""}
                   onChange={(e) =>
                     setForm({
                       ...form,

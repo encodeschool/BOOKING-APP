@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.validation.Valid;
 import uz.encode.fresh.auth_service.dto.AuthRequest;
 import uz.encode.fresh.auth_service.dto.AuthResponse;
+import uz.encode.fresh.auth_service.dto.ForgotPasswordRequest;
 import uz.encode.fresh.auth_service.service.AuthService;
 
 @RestController
@@ -30,8 +31,10 @@ public class AuthController {
     }
 
     @PostMapping("/forgot-password")
-    public String forgotPassword(@RequestParam String email) {
-        return service.forgotPassword(email);
+    public String forgotPassword(
+            @RequestBody ForgotPasswordRequest request
+    ) {
+        return service.forgotPassword(request.getEmail());
     }
 
     @PostMapping("/reset-password")

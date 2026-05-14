@@ -155,7 +155,7 @@ const Step4TimePicker = () => {
         </button>
 
         <div>
-          <h2 className="text-xl font-semibold">
+          <h2 className="text-2xl font-bold text-gray-900">
             Choose time
           </h2>
 

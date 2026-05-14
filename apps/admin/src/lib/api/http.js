@@ -5,14 +5,21 @@ async function request(path, options = {}) {
   const isFormData = options.body instanceof FormData;
 
   const headers = {
-    ...(options.token ? { Authorization: `Bearer ${options.token}` } : {}),
-    ...(!isFormData && { "Content-Type": "application/json" }),
+    ...(options.token
+      ? { Authorization: `Bearer ${options.token}` }
+      : {}),
+
+    ...(!isFormData && {
+      "Content-Type": "application/json",
+    }),
+
     ...options.headers,
   };
 
   const res = await fetch(`${API_BASE_URL}${path}`, {
     method: options.method || "GET",
     headers,
+
     body: isFormData
       ? options.body
       : options.body
@@ -22,15 +29,37 @@ async function request(path, options = {}) {
 
   if (!res.ok) {
     let msg = `Request failed ${res.status}`;
+
     try {
       const err = await res.json();
-      msg = err?.message || err?.error || msg;
+
+      msg =
+        err?.message ||
+        err?.error ||
+        msg;
+
     } catch {}
+
     throw new Error(msg);
   }
 
-  if (res.status === 204) return null;
-  return res.json();
+  // NO CONTENT
+  if (res.status === 204) {
+    return null;
+  }
+
+  // EMPTY BODY SAFE
+  const text = await res.text();
+
+  if (!text) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(text);
+  } catch {
+    return text;
+  }
 }
 
 export { request };

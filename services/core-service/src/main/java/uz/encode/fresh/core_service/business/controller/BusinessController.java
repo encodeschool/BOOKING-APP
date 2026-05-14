@@ -3,6 +3,7 @@ package uz.encode.fresh.core_service.business.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -28,11 +29,13 @@ public class BusinessController {
     @Autowired
     private BusinessService service;
 
-    @PostMapping(consumes = "multipart/form-data")
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public BusinessResponse create(
             HttpServletRequest request,
+
             @ModelAttribute CreateBusinessRequest req,
-            @RequestParam(required = false)
+
+            @RequestParam(value = "images", required = false)
             List<MultipartFile> images
     ) {
 
@@ -47,8 +50,10 @@ public class BusinessController {
 
     @PutMapping("/{id}")
     public BusinessResponse update(
-            @PathVariable Long id,
+            @PathVariable("id") Long id,
+
             HttpServletRequest request,
+
             @RequestBody CreateBusinessRequest req
     ) {
 
@@ -58,11 +63,17 @@ public class BusinessController {
         return map(service.update(id, userId, req));
     }
 
-    @PostMapping("/{id}/images")
+    @PostMapping(
+            value = "/{id}/images",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
     public void addImages(
-            @PathVariable Long id,
+            @PathVariable("id") Long id,
+
             HttpServletRequest request,
-            @RequestParam List<MultipartFile> images
+
+            @RequestParam("images")
+            List<MultipartFile> images
     ) {
 
         Long userId =
@@ -73,7 +84,8 @@ public class BusinessController {
 
     @DeleteMapping("/images/{imageId}")
     public void deleteImage(
-            @PathVariable Long imageId,
+            @PathVariable("imageId") Long imageId,
+
             HttpServletRequest request
     ) {
 
@@ -83,13 +95,42 @@ public class BusinessController {
         service.deleteImage(imageId, userId);
     }
 
+    @GetMapping
+    public List<BusinessResponse> myBusinesses(
+            HttpServletRequest request
+    ) {
+
+        Long userId =
+                (Long) request.getAttribute("userId");
+
+        return service.getByOwner(userId)
+                .stream()
+                .map(this::map)
+                .toList();
+    }
+
+    @DeleteMapping("/{id}")
+    public void delete(
+            @PathVariable("id") Long id,
+
+            HttpServletRequest request
+    ) {
+
+        Long userId =
+                (Long) request.getAttribute("userId");
+
+        service.delete(id, userId);
+    }
+
     private BusinessResponse map(Business b) {
 
-        List<String> images = b.getImages() == null
-        ? List.of()
-        : b.getImages().stream()
-            .map(i -> i.getImageUrl())
-            .toList();
+        List<String> images =
+                b.getImages() == null
+                        ? List.of()
+                        : b.getImages()
+                                .stream()
+                                .map(i -> i.getImageUrl())
+                                .toList();
 
         return new BusinessResponse(
                 b.getId(),
@@ -103,25 +144,5 @@ public class BusinessController {
                 b.getLongitude(),
                 images
         );
-    }
-
-    @GetMapping
-    public List<BusinessResponse> myBusinesses(HttpServletRequest request) {
-
-        Long userId = (Long) request.getAttribute("userId");
-
-        return service.getByOwner(userId)
-                .stream()
-                .map(this::map)
-                .toList();
-    }
-
-    @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id,
-                       HttpServletRequest request) {
-
-        Long userId = (Long) request.getAttribute("userId");
-
-        service.delete(id, userId);
     }
 }

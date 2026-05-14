@@ -96,7 +96,7 @@ const Step5CustomerDetails = () => {
         </button>
 
         <div>
-          <h2 className="text-xl font-semibold">
+          <h2 className="text-2xl font-bold text-gray-900">
             Your details
           </h2>
 
