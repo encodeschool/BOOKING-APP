@@ -15,4 +15,5 @@ public class CreateStaffRequest {
 
     public String role;
     public String phone;
+    public Long userId;
 }

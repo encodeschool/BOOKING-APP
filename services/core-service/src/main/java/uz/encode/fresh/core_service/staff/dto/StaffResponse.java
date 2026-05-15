@@ -8,4 +8,5 @@ public class StaffResponse {
     public String role;
     public String phone;
     public Boolean active;
+    public Long userId;
 }

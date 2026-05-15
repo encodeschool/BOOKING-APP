@@ -23,14 +23,20 @@ public class JwtUtil {
         return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
 
-    public String generateToken(Long userId, String email) {
+    public String generateToken(Long userId, String email, String role) {
         return Jwts.builder()
                 .setSubject(String.valueOf(userId))
                 .claim("email", email)
+                .claim("role", role)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + 86400000))
                 .signWith(signingKey(), SignatureAlgorithm.HS256)
                 .compact();
+    }
+
+    // Backwards-compatible overload: default role to CLIENT when not provided
+    public String generateToken(Long userId, String email) {
+        return generateToken(userId, email, "CLIENT");
     }
 
     private Claims parseClaims(String token) {
@@ -46,6 +52,10 @@ public class JwtUtil {
     }
 
     public Long extractUserId(String token) {
-        return Long.valueOf(parseClaims(token).getSubject());
+        return Long.parseLong(parseClaims(token).getSubject());
+    }
+
+    public String extractRole(String token) {
+        return parseClaims(token).get("role", String.class);
     }
 }

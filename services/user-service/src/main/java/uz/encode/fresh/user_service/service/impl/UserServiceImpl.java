@@ -27,12 +27,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User createIfNotExists(Long id, String email, Role role) {
+    public User createIfNotExists(Long id, String email, Role role, String fullName) {
         return repo.findById(id).orElseGet(() -> {
             User u = new User();
             u.setId(id);
             u.setEmail(email);
             u.setRole(role);
+            u.setFullName(fullName);
             u.setPreferences(new Preferences());
             return repo.save(u);
         });
@@ -56,7 +57,26 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User updateById(Long id, UpdateUserRequest req) {
+        // admin-level update of any user's profile
+        return update(id, req);
+    }
+
+    @Override
+    public void delete(Long id) {
+        User user = repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        repo.delete(user);
+    }
+
+    @Override
     public List<User> getAll() {
         return repo.findAll();
+    }
+
+    @Override
+    public User setRole(Long id, Role role) {
+        User user = getById(id);
+        user.setRole(role);
+        return repo.save(user);
     }
 }

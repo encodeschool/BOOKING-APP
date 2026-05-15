@@ -31,6 +31,9 @@ public class StaffServiceImpl implements StaffService {
         s.setSpecialization(req.specialization);
         s.setRole(req.role);
         s.setPhone(req.phone);
+        if (req.userId != null) {
+            s.setUserId(req.userId);
+        }
 
         Staff saved = repo.save(s);
         return map(saved);
@@ -90,6 +93,7 @@ public class StaffServiceImpl implements StaffService {
         r.role = s.getRole();
         r.phone = s.getPhone();
         r.active = s.getActive();
+        r.userId = s.getUserId();
         return r;
     }
 }

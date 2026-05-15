@@ -32,14 +32,17 @@ public class Staff {
 
     private Integer maxBookingsPerDay = 20;
 
+    private Long userId;
+
     public Staff() {}
 
-    public Staff(Long businessId, Long id, String name, String phone, String role) {
+    public Staff(Long businessId, Long id, String name, String phone, String role, Long userId) {
         this.businessId = businessId;
         this.id = id;
         this.name = name;
         this.phone = phone;
         this.role = role;
+        this.userId = userId;
     }
 
     public Long getId() {
@@ -98,7 +101,12 @@ public class Staff {
         this.maxBookingsPerDay = maxBookingsPerDay;
     }
 
-    
+    public Long getUserId() {
+        return userId;
+    }
 
-    
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
 }

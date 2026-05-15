@@ -2,6 +2,8 @@ package uz.encode.fresh.api_gateway.filter;
 
 import java.nio.charset.StandardCharsets;
 
+import javax.crypto.SecretKey;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
@@ -15,8 +17,6 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import reactor.core.publisher.Mono;
-
-import javax.crypto.SecretKey;
 
 
 @Component
@@ -63,6 +63,7 @@ public class JwtAuthenticationFilter implements GlobalFilter {
             ServerHttpRequest mutatedRequest = request.mutate()
                     .header("X-User-Id", claims.getSubject())
                     .header("X-User-Email", claims.get("email", String.class))
+                    .header("X-User-Role", claims.get("role", String.class))
                     .build();
 
             return chain.filter(exchange.mutate()

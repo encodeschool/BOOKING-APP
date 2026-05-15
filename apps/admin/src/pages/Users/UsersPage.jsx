@@ -11,13 +11,20 @@ import {
   FaSpinner,
 } from "react-icons/fa";
 import { useAuth } from "../../app/providers/AuthProvider";
-import { getUsersApi } from "../../lib/api/users.api";
+import { useBusiness } from "../../app/providers/BusinessProvider";
+import { getUsersApi, updateUserRoleApi, updateUserApi, deleteUserApi, createUserApi } from "../../lib/api/users.api";
+import UserModal from "./components/UserModal";
+import { createStaff } from "../../lib/api";
 
 export default function UsersPage() {
   const { token } = useAuth();
+  const { selectedBusinessId } = useBusiness();
 
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [showForm, setShowForm] = useState(false);
+  const [formMode, setFormMode] = useState("create");
+  const [selectedUser, setSelectedUser] = useState(null);
 
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("");
@@ -61,7 +68,7 @@ export default function UsersPage() {
 
   const getRoleBadge = (role) => {
     switch (role) {
-      case "SUPERADMIN":
+      case "ADMIN":
         return {
           icon: <FaUserShield />,
           className:
@@ -75,12 +82,106 @@ export default function UsersPage() {
             "bg-emerald-100 text-emerald-700 border border-emerald-200",
         };
 
-      default:
+      case "CLIENT":
         return {
           icon: <FaUser />,
           className:
             "bg-blue-100 text-blue-700 border border-blue-200",
         };
+    }
+  };
+
+  const handleRoleChange = async (userId, newRole) => {
+    try {
+      setLoading(true);
+      await updateUserRoleApi(token, userId, newRole);
+      await loadUsers();
+    } catch (err) {
+      console.error("Failed to update role:", err);
+      alert("Failed to update role: " + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+  const handleOpenCreate = () => {
+    setFormMode("create");
+    setSelectedUser(null);
+    setShowForm(true);
+  };
+
+  const handleOpenEdit = (user) => {
+    setFormMode("edit");
+    setSelectedUser(user);
+    setShowForm(true);
+  };
+
+  const handleDelete = async (user) => {
+    if (!window.confirm(`Delete user ${user.fullName || user.email || user.id}? This cannot be undone.`)) return;
+    try {
+      setLoading(true);
+      await deleteUserApi(token, user.id);
+      await loadUsers();
+    } catch (err) {
+      console.error("Failed to delete user:", err);
+      alert("Failed to delete user: " + err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmitForm = async (data) => {
+    try {
+      setLoading(true);
+      if (formMode === "create") {
+        // create via auth-service, then set role and profile
+        const resp = await createUserApi({ email: data.email, password: data.password });
+        const createdId = resp.id || resp["id"] || resp.userId || null;
+        const id = createdId || resp.id;
+        if (!id) {
+          await loadUsers();
+          setShowForm(false);
+          return;
+        }
+
+        if (data.role) {
+          await updateUserRoleApi(token, id, data.role);
+        }
+
+        await updateUserApi(token, id, { fullName: data.fullName, phone: data.phone });
+
+        // If staff, create staff record for the selected business and link userId
+        if (data.role === 'STAFF') {
+          try {
+            const businessId = window.__SELECTED_BUSINESS_ID__ || null;
+            // prefer BusinessProvider if available in the app; fallback to global (may be set elsewhere)
+            if (businessId) {
+              await createStaff(token, {
+                businessId: Number(businessId),
+                name: data.fullName || "",
+                phone: data.phone || "",
+                role: data.role,
+                userId: id,
+              });
+            }
+          } catch (e) {
+            console.warn('Failed to create core staff record:', e);
+          }
+        }
+
+        await loadUsers();
+      } else {
+        await updateUserApi(token, selectedUser.id, { fullName: data.fullName, phone: data.phone });
+        if (data.role && data.role !== selectedUser.role) {
+          await updateUserRoleApi(token, selectedUser.id, data.role);
+        }
+        await loadUsers();
+      }
+      setShowForm(false);
+    } catch (err) {
+      console.error("Failed to submit user form:", err);
+      alert("Failed to save user: " + err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -125,11 +226,7 @@ export default function UsersPage() {
 
               <div className="bg-white/10 backdrop-blur-md px-5 py-3 rounded-2xl border border-white/10">
                 <p className="text-2xl font-bold">
-                  {
-                    users.filter(
-                      (u) => u.role === "STAFF"
-                    ).length
-                  }
+                  {users.filter((u) => u.role === "STAFF").length}
                 </p>
 
                 <p className="text-sm text-indigo-100">
@@ -139,12 +236,7 @@ export default function UsersPage() {
 
               <div className="bg-white/10 backdrop-blur-md px-5 py-3 rounded-2xl border border-white/10">
                 <p className="text-2xl font-bold">
-                  {
-                    users.filter(
-                      (u) =>
-                        u.role === "SUPERADMIN"
-                    ).length
-                  }
+                  {users.filter((u) => u.role === "ADMIN").length}
                 </p>
 
                 <p className="text-sm text-indigo-100">
@@ -155,10 +247,10 @@ export default function UsersPage() {
           </div>
 
           {/* BUTTON */}
-          <button className="flex items-center gap-3 bg-white text-indigo-700 px-6 py-4 rounded-2xl font-semibold hover:scale-105 transition-all shadow-xl">
-            <FaPlus />
-            Add User
-          </button>
+          <button onClick={handleOpenCreate} className="flex items-center gap-3 bg-white text-indigo-700 px-6 py-4 rounded-2xl font-semibold hover:scale-105 transition-all shadow-xl">
+              <FaPlus />
+              Add User
+            </button>
         </div>
       </div>
 
@@ -192,17 +284,9 @@ export default function UsersPage() {
               All Roles
             </option>
 
-            <option value="SUPERADMIN">
-              Superadmin
-            </option>
-
-            <option value="USER">
-              User
-            </option>
-
-            <option value="STAFF">
-              Staff
-            </option>
+            <option value="ADMIN">Admin</option>
+            <option value="CLIENT">Client</option>
+            <option value="STAFF">Staff</option>
           </select>
         </div>
       </div>
@@ -296,22 +380,32 @@ export default function UsersPage() {
 
                       {/* ROLE */}
                       <td className="px-8 py-5">
-                        <div
-                          className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold ${badge.className}`}
-                        >
-                          {badge.icon}
-                          {user.role}
+                        <div className="flex flex-col justify-center items-center gap-3">
+                          <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold ${badge.className}`}>
+                            {badge.icon}
+                            {user.role}
+                          </div>
+
+                          <select
+                            value={user.role}
+                            onChange={(e) => handleRoleChange(user.id, e.target.value)}
+                            className="px-3 py-1 rounded-lg border border-gray-200 bg-white text-sm"
+                          >
+                            <option value="CLIENT">CLIENT</option>
+                            <option value="STAFF">STAFF</option>
+                            <option value="ADMIN">ADMIN</option>
+                          </select>
                         </div>
                       </td>
 
                       {/* ACTIONS */}
                       <td className="px-8 py-5">
                         <div className="flex justify-end gap-3">
-                          <button className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-100 transition">
+                          <button onClick={() => handleOpenEdit(user)} className="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center hover:bg-blue-100 transition">
                             <FaEdit />
                           </button>
 
-                          <button className="w-10 h-10 rounded-xl bg-red-50 text-red-600 flex items-center justify-center hover:bg-red-100 transition">
+                          <button onClick={() => handleDelete(user)} className="w-10 h-10 rounded-xl bg-red-50 text-red-600 flex items-center justify-center hover:bg-red-100 transition">
                             <FaTrash />
                           </button>
                         </div>
@@ -360,13 +454,13 @@ export default function UsersPage() {
                     </div>
                   </div>
 
-                  <div className="flex gap-3 mt-4">
-                    <button className="flex-1 bg-blue-50 text-blue-600 py-3 rounded-xl font-medium flex items-center justify-center gap-2">
+                    <div className="flex gap-3 mt-4">
+                    <button onClick={() => handleOpenEdit(user)} className="flex-1 bg-blue-50 text-blue-600 py-3 rounded-xl font-medium flex items-center justify-center gap-2">
                       <FaEdit />
                       Edit
                     </button>
 
-                    <button className="flex-1 bg-red-50 text-red-600 py-3 rounded-xl font-medium flex items-center justify-center gap-2">
+                    <button onClick={() => handleDelete(user)} className="flex-1 bg-red-50 text-red-600 py-3 rounded-xl font-medium flex items-center justify-center gap-2">
                       <FaTrash />
                       Delete
                     </button>
@@ -395,6 +489,14 @@ export default function UsersPage() {
           )}
         </div>
       )}
+      <UserModal
+        open={showForm}
+        onClose={() => setShowForm(false)}
+        onSubmit={handleSubmitForm}
+        initial={formMode === "edit" ? selectedUser : {}}
+        mode={formMode}
+        loading={loading}
+      />
     </div>
   );
 }
