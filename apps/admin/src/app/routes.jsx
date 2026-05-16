@@ -13,9 +13,20 @@ import SettingsPage from "../pages/Settings/WorkingHoursPage";
 import UsersPage from "../pages/Users/UsersPage";
 import CalendarPage from "../pages/Calendar/CalendarPage";
 
-function ProtectedRoute({ children }) {
+// Role-based route protection
+function ProtectedRoute({ children, requiredRoles = [] }) {
   const token = localStorage.getItem("admin-token");
-  return token ? children : <Navigate to="/login" />;
+  const userRole = localStorage.getItem("user-role");
+
+  if (!token) {
+    return <Navigate to="/login" />;
+  }
+
+  if (requiredRoles.length > 0 && !requiredRoles.includes(userRole)) {
+    return <Navigate to="/" />;
+  }
+
+  return children;
 }
 
 function AppRoutes() {
@@ -26,21 +37,19 @@ function AppRoutes() {
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
 
-      {/* Protected */}
+      {/* Protected - STAFF role */}
       <Route
         path="/"
         element={
-          <ProtectedRoute>
-            <AdminLayout>
-              <DashboardPage />
-            </AdminLayout>
-          </ProtectedRoute>
+          <AdminLayout>
+            <DashboardPage />
+          </AdminLayout>
         }
       />
       <Route
         path="/businesses"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute requiredRoles={["STAFF", "ADMIN"]}>
             <AdminLayout>
               <BusinessPage />
             </AdminLayout>
@@ -50,7 +59,7 @@ function AppRoutes() {
       <Route
         path="/services"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute requiredRoles={["STAFF", "ADMIN"]}>
             <AdminLayout>
               <ServicesPage />
             </AdminLayout>
@@ -60,7 +69,7 @@ function AppRoutes() {
       <Route
         path="/staff"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute requiredRoles={["STAFF", "ADMIN"]}>
             <AdminLayout>
               <StaffPage />
             </AdminLayout>
@@ -70,7 +79,7 @@ function AppRoutes() {
       <Route
         path="/bookings"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute requiredRoles={["STAFF", "ADMIN"]}>
             <AdminLayout>
               <BookingsPage />
             </AdminLayout>
@@ -80,17 +89,18 @@ function AppRoutes() {
       <Route
         path="/my-bookings"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute requiredRoles={["STAFF", "ADMIN"]}>
             <AdminLayout>
               <StaffBookingsDashboard />
             </AdminLayout>
           </ProtectedRoute>
         }
       />
+      {/* ADMIN-only routes */}
       <Route
         path="/users"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute requiredRoles={["ADMIN"]}>
             <AdminLayout>
               <UsersPage />
             </AdminLayout>
@@ -100,7 +110,7 @@ function AppRoutes() {
       <Route
         path="/calendar"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute requiredRoles={["ADMIN", "STAFF"]}>
             <AdminLayout>
               <CalendarPage />
             </AdminLayout>
@@ -110,7 +120,7 @@ function AppRoutes() {
       <Route
         path="/settings"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute requiredRoles={["ADMIN"]}>
             <AdminLayout>
               <SettingsPage />
             </AdminLayout>

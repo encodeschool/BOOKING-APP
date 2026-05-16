@@ -9,6 +9,7 @@ import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -52,11 +53,14 @@ public class JwtFilter extends OncePerRequestFilter {
 
                 Long userId = Long.valueOf(claims.getSubject());
                 String email = claims.get("email", String.class);
+                String role = claims.get("role", String.class);
 
                 request.setAttribute("userId", userId);
                 request.setAttribute("email", email);
+                request.setAttribute("role", role);
                 SecurityContextHolder.getContext().setAuthentication(
-                        new UsernamePasswordAuthenticationToken(email, null, Collections.emptyList())
+                        new UsernamePasswordAuthenticationToken(email, null, 
+                            Collections.singletonList(new SimpleGrantedAuthority(role)))
                 );
 
             } catch (JwtException | IllegalArgumentException e) {

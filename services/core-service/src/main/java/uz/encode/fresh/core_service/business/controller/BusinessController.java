@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -30,6 +31,7 @@ public class BusinessController {
     private BusinessService service;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasAuthority('STAFF')")
     public BusinessResponse create(
             HttpServletRequest request,
 
@@ -49,6 +51,7 @@ public class BusinessController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('STAFF')")
     public BusinessResponse update(
             @PathVariable("id") Long id,
 
@@ -67,6 +70,7 @@ public class BusinessController {
             value = "/{id}/images",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
+    @PreAuthorize("hasAuthority('STAFF')")
     public void addImages(
             @PathVariable("id") Long id,
 
@@ -83,6 +87,7 @@ public class BusinessController {
     }
 
     @DeleteMapping("/images/{imageId}")
+    @PreAuthorize("hasAuthority('STAFF')")
     public void deleteImage(
             @PathVariable("imageId") Long imageId,
 
@@ -96,6 +101,7 @@ public class BusinessController {
     }
 
     @GetMapping
+    @PreAuthorize("isAuthenticated()")
     public List<BusinessResponse> myBusinesses(
             HttpServletRequest request
     ) {
@@ -110,6 +116,7 @@ public class BusinessController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('STAFF')")
     public void delete(
             @PathVariable("id") Long id,
 

@@ -13,6 +13,7 @@ import uz.encode.fresh.auth_service.entity.User;
 import uz.encode.fresh.auth_service.integration.NotificationClient;
 import uz.encode.fresh.auth_service.integration.UserServiceClient;
 import uz.encode.fresh.auth_service.integration.dto.CreateUserProfileRequest;
+import uz.encode.fresh.auth_service.integration.dto.UserProfileResponse;
 import uz.encode.fresh.auth_service.repository.UserRepository;
 import uz.encode.fresh.auth_service.security.JwtUtil;
 import uz.encode.fresh.auth_service.service.AuthService;
@@ -40,7 +41,7 @@ public class AuthServiceImpl implements AuthService {
         user.setPassword(passwordEncoder.encode(request.getPassword()));
 
         User saved = repo.save(user);
-        userServiceClient.createUser(new CreateUserProfileRequest(saved.getId(), saved.getEmail()));
+        userServiceClient.createUser(new CreateUserProfileRequest(saved.getId(), saved.getEmail(), "CLIENT", null));
 
         // Send welcome email
         try {
@@ -56,7 +57,8 @@ public class AuthServiceImpl implements AuthService {
             System.err.println("Failed to send welcome email: " + e.getMessage());
         }
 
-        String token = jwtUtil.generateToken(saved.getId(), saved.getEmail());
+        String role = "CLIENT"; // Default role for new users
+        String token = jwtUtil.generateToken(saved.getId(), saved.getEmail(), role);
 
         return new AuthResponse(saved.getId(), saved.getEmail(), token);
     }
@@ -70,9 +72,13 @@ public class AuthServiceImpl implements AuthService {
             throw new RuntimeException("Invalid password");
         }
 
-        userServiceClient.createUser(new CreateUserProfileRequest(user.getId(), user.getEmail()));
+        String defaultRole = "CLIENT";
+        userServiceClient.createUser(new CreateUserProfileRequest(user.getId(), user.getEmail(), defaultRole, null));
 
-        String token = jwtUtil.generateToken(user.getId(), user.getEmail());
+        UserProfileResponse profile = userServiceClient.getUser(user.getId());
+        String role = profile.getRole() != null ? profile.getRole() : defaultRole;
+
+        String token = jwtUtil.generateToken(user.getId(), user.getEmail(), role);
         return new AuthResponse(user.getId(), user.getEmail(), token);
     }
 
@@ -88,7 +94,7 @@ public class AuthServiceImpl implements AuthService {
             Map<String, Object> resetData = Map.of(
                 "email", user.getEmail(),
                 "userName", user.getEmail().split("@")[0],
-                "resetLink", "https://fresha.com/reset-password?token=" + resetToken,
+                "resetLink", "https://localhost:8080/reset-password?token=" + resetToken,
                 "expiryHours", "24",
                 "requestTime", java.time.LocalDateTime.now().toString(),
                 "ipAddress", "127.0.0.1" // In production, get from request
