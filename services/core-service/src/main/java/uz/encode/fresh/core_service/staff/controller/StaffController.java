@@ -28,7 +28,7 @@ public class StaffController {
     private StaffService service;
 
     @PostMapping
-    @PreAuthorize("hasAuthority('STAFF')")
+    @PreAuthorize("hasAnyAuthority('STAFF', 'ADMIN')")
     public StaffResponse create(HttpServletRequest request,
                                 @Valid @RequestBody CreateStaffRequest req) {
         return service.create((Long) request.getAttribute("userId"), req);

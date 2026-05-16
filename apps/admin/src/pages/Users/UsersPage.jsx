@@ -14,7 +14,7 @@ import { useAuth } from "../../app/providers/AuthProvider";
 import { useBusiness } from "../../app/providers/BusinessProvider";
 import { getUsersApi, updateUserRoleApi, updateUserApi, deleteUserApi, createUserApi } from "../../lib/api/users.api";
 import UserModal from "./components/UserModal";
-import { createStaff } from "../../lib/api";
+import { createStaff, getBusinesses } from "../../lib/api";
 
 export default function UsersPage() {
   const { token } = useAuth();
@@ -25,6 +25,7 @@ export default function UsersPage() {
   const [showForm, setShowForm] = useState(false);
   const [formMode, setFormMode] = useState("create");
   const [selectedUser, setSelectedUser] = useState(null);
+  const [businesses, setBusinesses] = useState([]);
 
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("");
@@ -32,8 +33,18 @@ export default function UsersPage() {
   useEffect(() => {
     if (token) {
       loadUsers();
+      loadBusinesses();
     }
   }, [token]);
+
+  async function loadBusinesses() {
+    try {
+      const data = await getBusinesses(token);
+      setBusinesses(data || []);
+    } catch (error) {
+      console.error("Failed to load businesses:", error);
+    }
+  }
 
   async function loadUsers() {
     try {
@@ -152,16 +163,16 @@ export default function UsersPage() {
         // If staff, create staff record for the selected business and link userId
         if (data.role === 'STAFF') {
           try {
-            const businessId = window.__SELECTED_BUSINESS_ID__ || null;
-            // prefer BusinessProvider if available in the app; fallback to global (may be set elsewhere)
-            if (businessId) {
+            if (data.businessId) {
               await createStaff(token, {
-                businessId: Number(businessId),
+                businessId: Number(data.businessId),
                 name: data.fullName || "",
                 phone: data.phone || "",
                 role: data.role,
                 userId: id,
               });
+            } else {
+              console.warn('No business selected for staff assignment');
             }
           } catch (e) {
             console.warn('Failed to create core staff record:', e);
@@ -496,6 +507,7 @@ export default function UsersPage() {
         initial={formMode === "edit" ? selectedUser : {}}
         mode={formMode}
         loading={loading}
+        businesses={businesses}
       />
     </div>
   );

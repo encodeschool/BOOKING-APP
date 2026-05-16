@@ -11,6 +11,8 @@ public interface BusinessService {
 
     List<Business> getByOwner(Long ownerId);
 
+    List<Business> getAccessibleBusinesses(Long userId);
+
     Business getById(Long id);
 
     void delete(Long id, Long ownerId);

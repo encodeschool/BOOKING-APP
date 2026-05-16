@@ -1,13 +1,14 @@
 import { useState, useEffect } from "react";
 import { FiX } from "react-icons/fi";
 
-export default function UserModal({ open, onClose, onSubmit, initial = {}, mode = "create", loading }) {
+export default function UserModal({ open, onClose, onSubmit, initial = {}, mode = "create", loading, businesses = [] }) {
   const [form, setForm] = useState({
     email: "",
     password: "",
     fullName: "",
     phone: "",
     role: "CLIENT",
+    businessId: "",
   });
 
   useEffect(() => {
@@ -63,6 +64,19 @@ export default function UserModal({ open, onClose, onSubmit, initial = {}, mode 
               <option value="ADMIN">Admin</option>
             </select>
           </div>
+
+          {mode === "create" && form.role === "STAFF" && (
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Assign to Business</label>
+              <select value={form.businessId} onChange={(e) => setForm({...form, businessId: e.target.value})} className="w-full px-4 py-3 rounded-2xl border border-gray-200 bg-gray-50 outline-none">
+                <option value="">Select a business...</option>
+                {businesses.map((b) => (
+                  <option key={b.id} value={b.id}>{b.name}</option>
+                ))}
+              </select>
+              <p className="text-xs text-gray-500 mt-1">The staff user will be created with this business assignment.</p>
+            </div>
+          )}
         </div>
 
         <div className="flex items-center justify-end gap-3 mt-6 px-6 py-4 border-t border-gray-100">

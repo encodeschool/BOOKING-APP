@@ -109,7 +109,7 @@ public class BusinessController {
         Long userId =
                 (Long) request.getAttribute("userId");
 
-        return service.getByOwner(userId)
+        return service.getAccessibleBusinesses(userId)
                 .stream()
                 .map(this::map)
                 .toList();

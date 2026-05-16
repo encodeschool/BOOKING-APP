@@ -9,15 +9,25 @@ export default function BusinessProvider({ children }) {
   const [businesses, setBusinesses] = useState([]);
   const [selectedBusinessId, setSelectedBusinessId] = useState(null);
 
+  const selectedBusiness =
+    businesses.find(
+      (business) => String(business.id) === String(selectedBusinessId)
+    ) || null;
+
   const load = async () => {
     if (!token) return;
 
-    const data = await getBusinessesApi(token);
+    try {
+      const data = await getBusinessesApi(token);
+      setBusinesses(data || []);
 
-    setBusinesses(data);
-
-    if (data?.length > 0 && !selectedBusinessId) {
-      setSelectedBusinessId(data[0].id);
+      if (data?.length > 0 && !selectedBusinessId) {
+        setSelectedBusinessId(data[0].id);
+      }
+    } catch (error) {
+      console.error("Failed to load businesses:", error);
+      setBusinesses([]);
+      setSelectedBusinessId(null);
     }
   };
 
@@ -32,6 +42,7 @@ export default function BusinessProvider({ children }) {
         setBusinesses,
         selectedBusinessId,
         setSelectedBusinessId,
+        selectedBusiness,
         load,
       }}
     >
