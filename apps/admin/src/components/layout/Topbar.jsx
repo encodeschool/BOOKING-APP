@@ -15,10 +15,13 @@ export default function Topbar() {
     businesses,
     selectedBusinessId,
     setSelectedBusinessId,
+    selectedBusiness,
   } = useBusiness();
 
   const firstName =
     profile?.name?.split(" ")[0] || "Admin";
+
+  const isStaff = profile?.role === "STAFF";
 
   return (
     <header className="ml-72 sticky top-0 z-40 bg-white/90 backdrop-blur-xl border-b border-gray-200">
@@ -61,36 +64,43 @@ export default function Topbar() {
 
           {/* BUSINESS SELECTOR */}
           <div className="relative">
-
-            <select
-              value={selectedBusinessId || ""}
-              onChange={(e) =>
-                setSelectedBusinessId(Number(e.target.value))
-              }
-              className="appearance-none bg-white border border-gray-200 rounded-2xl h-12 pl-4 pr-10 text-sm font-medium text-gray-700 shadow-sm hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#52b46ecc]"
-            >
-
-              <option value="" disabled>
-                Select Business
-              </option>
-
-              {businesses.map((business) => (
-                <option
-                  key={business.id}
-                  value={business.id}
+            {isStaff ? (
+              <div className="h-12 px-4 rounded-2xl border border-gray-200 bg-white text-sm font-medium text-gray-700 shadow-sm flex items-center gap-2">
+                <span className="text-xs text-gray-500 uppercase tracking-wide">
+                  Business
+                </span>
+                <span>{selectedBusiness?.name || "Loading business..."}</span>
+              </div>
+            ) : (
+              <>
+                <select
+                  value={selectedBusinessId || ""}
+                  onChange={(e) =>
+                    setSelectedBusinessId(Number(e.target.value))
+                  }
+                  className="appearance-none bg-white border border-gray-200 rounded-2xl h-12 pl-4 pr-10 text-sm font-medium text-gray-700 shadow-sm hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#52b46ecc]"
                 >
-                  {business.name}
-                </option>
-              ))}
 
-            </select>
+                  <option value="" disabled>
+                    Select Business
+                  </option>
 
-            <div className="absolute top-1/2 right-4 -translate-y-1/2 pointer-events-none">
+                  {businesses.map((business) => (
+                    <option
+                      key={business.id}
+                      value={business.id}
+                    >
+                      {business.name}
+                    </option>
+                  ))}
 
-              <FaChevronDown className="text-xs text-gray-400" />
+                </select>
 
-            </div>
-
+                <div className="absolute top-1/2 right-4 -translate-y-1/2 pointer-events-none">
+                  <FaChevronDown className="text-xs text-gray-400" />
+                </div>
+              </>
+            )}
           </div>
 
           {/* NOTIFICATION */}

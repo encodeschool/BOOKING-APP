@@ -14,12 +14,17 @@ import uz.encode.fresh.core_service.business.repository.BusinessRepository;
 import uz.encode.fresh.core_service.business.service.BusinessService;
 import uz.encode.fresh.core_service.business.service.FileStorageService;
 import uz.encode.fresh.core_service.business.service.GeocodingService;
+import uz.encode.fresh.core_service.staff.entity.Staff;
+import uz.encode.fresh.core_service.staff.repository.StaffRepository;
 
 @Service
 public class BusinessServiceImpl implements BusinessService {
 
     @Autowired
     private BusinessRepository repo;
+
+    @Autowired
+    private StaffRepository staffRepo;
 
     @Autowired
     private GeocodingService geocodingService;
@@ -143,6 +148,33 @@ public class BusinessServiceImpl implements BusinessService {
     @Override
     public List<Business> getByOwner(Long ownerId) {
         return repo.findByOwnerId(ownerId);
+    }
+
+    @Override
+    public List<Business> getAccessibleBusinesses(Long userId) {
+        if (userId == null) {
+            return List.of();
+        }
+
+        List<Business> owned = getByOwner(userId);
+        if (owned == null) {
+            owned = new java.util.ArrayList<>();
+        }
+
+        List<Staff> staffRecords = staffRepo.findByUserId(userId);
+        if (staffRecords != null) {
+            for (Staff staff : staffRecords) {
+                if (staff != null && staff.getBusinessId() != null) {
+                    Business business = repo.findById(staff.getBusinessId())
+                            .orElse(null);
+                    if (business != null && owned.stream().noneMatch(b -> b.getId().equals(business.getId()))) {
+                        owned.add(business);
+                    }
+                }
+            }
+        }
+
+        return owned;
     }
 
     @Override
