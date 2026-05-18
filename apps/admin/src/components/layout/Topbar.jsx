@@ -1,3 +1,5 @@
+// layouts/Topbar.jsx
+
 import { useAuth } from "../../app/providers/AuthProvider";
 import { useBusiness } from "../../app/providers/BusinessProvider";
 
@@ -6,9 +8,13 @@ import {
   FaChevronDown,
   FaSearch,
   FaSignOutAlt,
+  FaBars,
 } from "react-icons/fa";
 
-export default function Topbar() {
+export default function Topbar({
+  collapsed,
+  setSidebarOpen,
+}) {
   const { profile, logout } = useAuth();
 
   const {
@@ -24,34 +30,34 @@ export default function Topbar() {
   const isStaff = profile?.role === "STAFF";
 
   return (
-    <header className="ml-72 sticky top-0 z-40 bg-white/90 backdrop-blur-xl border-b border-gray-200">
-
-      <div className="h-20 px-8 flex items-center justify-between">
-
+    <header className="sticky top-0 z-30 bg-white/90 backdrop-blur-xl border-b border-gray-200">
+      <div className="h-20 px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-4">
         {/* LEFT */}
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-4 min-w-0">
+          {/* MOBILE MENU */}
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="lg:hidden w-11 h-11 rounded-2xl bg-gray-100 hover:bg-gray-200 transition flex items-center justify-center shrink-0"
+          >
+            <FaBars className="text-gray-700" />
+          </button>
 
           {/* GREETING */}
-          <div>
-
-            <h1 className="text-2xl font-bold text-gray-900">
+          <div className="min-w-0">
+            <h1 className="text-lg sm:text-2xl font-bold text-gray-900 truncate">
               Good morning, {firstName} 👋
             </h1>
 
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="hidden sm:block text-sm text-gray-500 mt-1">
               Welcome back to your dashboard
             </p>
-
           </div>
-
         </div>
 
         {/* RIGHT */}
-        <div className="flex items-center gap-4">
-
+        <div className="flex items-center gap-2 sm:gap-4">
           {/* SEARCH */}
-          <div className="hidden lg:flex items-center bg-gray-100 rounded-2xl px-4 h-12 min-w-[260px]">
-
+          <div className="hidden xl:flex items-center bg-gray-100 rounded-2xl px-4 h-12 min-w-[260px]">
             <FaSearch className="text-gray-400 text-sm" />
 
             <input
@@ -59,28 +65,32 @@ export default function Topbar() {
               placeholder="Search..."
               className="bg-transparent outline-none px-3 text-sm w-full text-gray-700 placeholder:text-gray-400"
             />
-
           </div>
 
-          {/* BUSINESS SELECTOR */}
-          <div className="relative">
+          {/* BUSINESS */}
+          <div className="hidden md:block relative">
             {isStaff ? (
               <div className="h-12 px-4 rounded-2xl border border-gray-200 bg-white text-sm font-medium text-gray-700 shadow-sm flex items-center gap-2">
                 <span className="text-xs text-gray-500 uppercase tracking-wide">
                   Business
                 </span>
-                <span>{selectedBusiness?.name || "Loading business..."}</span>
+
+                <span>
+                  {selectedBusiness?.name ||
+                    "Loading business..."}
+                </span>
               </div>
             ) : (
               <>
                 <select
                   value={selectedBusinessId || ""}
                   onChange={(e) =>
-                    setSelectedBusinessId(Number(e.target.value))
+                    setSelectedBusinessId(
+                      Number(e.target.value)
+                    )
                   }
                   className="appearance-none bg-white border border-gray-200 rounded-2xl h-12 pl-4 pr-10 text-sm font-medium text-gray-700 shadow-sm hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#52b46ecc]"
                 >
-
                   <option value="" disabled>
                     Select Business
                   </option>
@@ -93,7 +103,6 @@ export default function Topbar() {
                       {business.name}
                     </option>
                   ))}
-
                 </select>
 
                 <div className="absolute top-1/2 right-4 -translate-y-1/2 pointer-events-none">
@@ -104,29 +113,22 @@ export default function Topbar() {
           </div>
 
           {/* NOTIFICATION */}
-          <button className="relative w-12 h-12 rounded-2xl bg-gray-100 hover:bg-gray-200 transition flex items-center justify-center">
-
+          <button className="relative w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-gray-100 hover:bg-gray-200 transition flex items-center justify-center">
             <FaBell className="text-gray-600 text-sm" />
 
             <span className="absolute top-3 right-3 w-2 h-2 rounded-full bg-red-500"></span>
-
           </button>
 
           {/* LOGOUT */}
           <button
             onClick={logout}
-            className="w-12 h-12 rounded-2xl bg-red-50 hover:bg-red-100 text-red-500 transition flex items-center justify-center"
+            className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-red-50 hover:bg-red-100 text-red-500 transition flex items-center justify-center"
             title="Logout"
           >
-
             <FaSignOutAlt className="text-sm" />
-
           </button>
-
         </div>
-
       </div>
-
     </header>
   );
 }

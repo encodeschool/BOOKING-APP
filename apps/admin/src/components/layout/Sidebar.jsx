@@ -1,3 +1,5 @@
+// layouts/Sidebar.jsx
+
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../app/providers/AuthProvider";
 
@@ -10,6 +12,10 @@ import {
   FaCog,
   FaCalendarAlt,
   FaChevronRight,
+  FaBars,
+  FaTimes,
+  FaAngleLeft,
+  FaAngleRight,
 } from "react-icons/fa";
 
 const baseLinks = [
@@ -64,10 +70,15 @@ const superadminLinks = [
     label: "Users",
     icon: FaUsers,
   },
-  ...userLinks
+  ...userLinks,
 ];
 
-export default function Sidebar() {
+export default function Sidebar({
+  open,
+  setOpen,
+  collapsed,
+  setCollapsed,
+}) {
   const location = useLocation();
   const { profile } = useAuth();
 
@@ -92,155 +103,180 @@ export default function Sidebar() {
   const links = getLinks();
 
   return (
-    <aside className="fixed left-0 top-0 h-screen w-72 bg-white border-r border-gray-200 z-50 flex flex-col">
+    <>
+      {/* MOBILE OVERLAY */}
+      {open && (
+        <div
+          onClick={() => setOpen(false)}
+          className="fixed inset-0 bg-black/40 z-40 lg:hidden"
+        />
+      )}
 
-      {/* TOP BRAND */}
-      <div className="px-6 py-7 border-b border-gray-100">
+      {/* SIDEBAR */}
+      <aside
+        className={`fixed top-0 left-0 z-50 h-screen bg-white border-r border-gray-200 transition-all duration-300 flex flex-col
+        ${
+          collapsed ? "w-24" : "w-72"
+        }
+        ${
+          open
+            ? "translate-x-0"
+            : "-translate-x-full lg:translate-x-0"
+        }`}
+      >
+        {/* TOP */}
+        <div className="h-20 border-b border-gray-100 px-4 flex items-center justify-between">
+          <div
+            className={`flex items-center gap-3 overflow-hidden ${
+              collapsed ? "justify-center w-full" : ""
+            }`}
+          >
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#52b46ecc] to-[#3b8f59] flex items-center justify-center shadow-lg shrink-0">
+              <span className="text-white font-bold text-xl">
+                B
+              </span>
+            </div>
 
-        <div className="flex items-center gap-3">
+            {!collapsed && (
+              <div>
+                <h1 className="text-lg font-bold text-gray-900 whitespace-nowrap">
+                  Booking Admin
+                </h1>
 
-          {/* LOGO */}
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#52b46ecc] to-[#3b8f59] flex items-center justify-center shadow-lg">
-
-            <span className="text-white font-bold text-xl">
-              B
-            </span>
-
+                <p className="text-sm text-gray-500 whitespace-nowrap">
+                  Management Platform
+                </p>
+              </div>
+            )}
           </div>
 
-          {/* BRAND */}
-          <div>
-
-            <h1 className="text-lg font-bold text-gray-900">
-              Booking Admin
-            </h1>
-
-            <p className="text-sm text-gray-500">
-              Management Platform
-            </p>
-
-          </div>
-
+          {/* MOBILE CLOSE */}
+          <button
+            onClick={() => setOpen(false)}
+            className="lg:hidden w-10 h-10 rounded-xl hover:bg-gray-100 flex items-center justify-center"
+          >
+            <FaTimes />
+          </button>
         </div>
 
-      </div>
+        {/* NAVIGATION */}
+        <nav className="flex-1 overflow-y-auto px-3 py-5">
+          <div className="space-y-2">
+            {links.map((link) => {
+              const isActive =
+                location.pathname === link.to;
 
-      {/* NAVIGATION */}
-      <nav className="flex-1 px-4 py-6 overflow-y-auto">
+              const Icon = link.icon;
 
-        <div className="space-y-2">
-
-          {links.map((link) => {
-            const isActive = location.pathname === link.to;
-            const Icon = link.icon;
-
-            return (
-              <Link
-                key={link.to}
-                to={link.to}
-                className={`group relative flex items-center justify-between px-4 py-3 rounded-2xl transition-all duration-300 ${
-                  isActive
-                    ? "bg-gradient-to-r from-[#52b46ecc] to-[#3b8f59] text-white shadow-lg"
-                    : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                }`}
-              >
-
-                {/* LEFT */}
-                <div className="flex items-center gap-4">
-
-                  {/* ICON */}
-                  <div
-                    className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
-                      isActive
-                        ? "bg-white/20"
-                        : "bg-gray-100 group-hover:bg-white"
-                    }`}
-                  >
-                    <Icon
-                      className={`text-lg ${
+              return (
+                <Link
+                  key={link.to}
+                  to={link.to}
+                  onClick={() => setOpen(false)}
+                  className={`group flex items-center ${
+                    collapsed
+                      ? "justify-center"
+                      : "justify-between"
+                  } px-3 py-3 rounded-2xl transition-all duration-300 ${
+                    isActive
+                      ? "bg-gradient-to-r from-[#52b46ecc] to-[#3b8f59] text-white shadow-lg"
+                      : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                  }`}
+                >
+                  <div className="flex items-center gap-4">
+                    <div
+                      className={`w-11 h-11 rounded-xl flex items-center justify-center transition-all ${
                         isActive
-                          ? "text-white"
-                          : "text-gray-600"
+                          ? "bg-white/20"
+                          : "bg-gray-100 group-hover:bg-white"
+                      }`}
+                    >
+                      <Icon
+                        className={`text-lg ${
+                          isActive
+                            ? "text-white"
+                            : "text-gray-600"
+                        }`}
+                      />
+                    </div>
+
+                    {!collapsed && (
+                      <p className="font-semibold text-sm whitespace-nowrap">
+                        {link.label}
+                      </p>
+                    )}
+                  </div>
+
+                  {!collapsed && (
+                    <FaChevronRight
+                      className={`text-xs transition-transform duration-300 ${
+                        isActive
+                          ? "translate-x-1 text-white"
+                          : "text-gray-400 group-hover:translate-x-1"
                       }`}
                     />
-                  </div>
+                  )}
+                </Link>
+              );
+            })}
+          </div>
+        </nav>
 
-                  {/* LABEL */}
-                  <div>
+        {/* BOTTOM */}
+        <div className="border-t border-gray-100 p-4">
+          <div
+            className={`bg-gray-50 rounded-2xl p-4 ${
+              collapsed ? "flex justify-center" : ""
+            }`}
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#52b46ecc] to-[#3b8f59] flex items-center justify-center shadow shrink-0">
+                <span className="text-white font-bold">
+                  {profile?.name
+                    ?.charAt(0)
+                    ?.toUpperCase() ||
+                    profile?.email
+                      ?.charAt(0)
+                      ?.toUpperCase() ||
+                    "U"}
+                </span>
+              </div>
 
-                    <p className="font-semibold text-sm">
-                      {link.label}
+              {!collapsed && (
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-gray-900 truncate">
+                    {profile?.name || "User"}
+                  </p>
+
+                  <p className="text-xs text-gray-500 truncate">
+                    {profile?.role || "Admin"}
+                  </p>
+
+                  <div className="mt-2 flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+
+                    <p className="text-xs text-gray-500">
+                      System online
                     </p>
-
                   </div>
-
                 </div>
-
-                {/* RIGHT ICON */}
-                <FaChevronRight
-                  className={`text-xs transition-transform duration-300 ${
-                    isActive
-                      ? "translate-x-1 text-white"
-                      : "text-gray-400 group-hover:translate-x-1"
-                  }`}
-                />
-
-              </Link>
-            );
-          })}
-
+              )}
+            </div>
+          </div>
         </div>
 
-      </nav>
-
-      {/* BOTTOM USER */}
-      <div className="p-4 border-t border-gray-100">
-
-        <div className="bg-gray-50 rounded-2xl p-4">
-
-          <div className="flex items-center gap-3">
-
-            {/* AVATAR */}
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#52b46ecc] to-[#3b8f59] flex items-center justify-center shadow">
-
-              <span className="text-white font-bold">
-                {profile?.name?.charAt(0)?.toUpperCase() ||
-                  profile?.email?.charAt(0)?.toUpperCase() ||
-                  "U"}
-              </span>
-
-            </div>
-
-            {/* INFO */}
-            <div className="flex-1 min-w-0">
-
-              <p className="text-sm font-semibold text-gray-900 truncate">
-                {profile?.name || "User"}
-              </p>
-
-              <p className="text-xs text-gray-500 truncate">
-                {profile?.role || "Admin"}
-              </p>
-
-            </div>
-
-          </div>
-
-          {/* STATUS */}
-          <div className="mt-4 flex items-center gap-2">
-
-            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-
-            <p className="text-xs text-gray-500">
-              System online
-            </p>
-
-          </div>
-
-        </div>
-
-      </div>
-
-    </aside>
+        {/* COLLAPSE BUTTON */}
+        <button
+          onClick={() => setCollapsed(!collapsed)}
+          className="hidden lg:flex absolute -right-4 top-24 w-8 h-8 rounded-full bg-white border border-gray-200 shadow items-center justify-center hover:bg-gray-50"
+        >
+          {collapsed ? (
+            <FaAngleRight className="text-sm text-gray-600" />
+          ) : (
+            <FaAngleLeft className="text-sm text-gray-600" />
+          )}
+        </button>
+      </aside>
+    </>
   );
 }

@@ -40,6 +40,15 @@ public class StaffServiceImpl implements StaffService {
     }
 
     @Override
+    public List<StaffResponse> getByUser(Long userId) {
+        if (userId == null) return List.of();
+        return repo.findByUserId(userId)
+                .stream()
+                .map(this::map)
+                .toList();
+    }
+
+    @Override
     public List<StaffResponse> getByBusiness(Long businessId, Long ownerId) {
         businessAuthorizationService.assertOwner(businessId, ownerId);
         return repo.findByBusinessId(businessId)
@@ -94,6 +103,7 @@ public class StaffServiceImpl implements StaffService {
         r.phone = s.getPhone();
         r.active = s.getActive();
         r.userId = s.getUserId();
+        r.businessId = s.getBusinessId();
         return r;
     }
 }

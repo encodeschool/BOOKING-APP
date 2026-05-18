@@ -115,6 +115,12 @@ public class BusinessController {
                 .toList();
     }
 
+    @GetMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
+    public BusinessResponse getById(@PathVariable("id") Long id) {
+        return map(service.getById(id));
+    }
+
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('STAFF')")
     public void delete(

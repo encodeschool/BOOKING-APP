@@ -41,6 +41,13 @@ public class StaffController {
         return service.getByBusiness(businessId, (Long) request.getAttribute("userId"));
     }
 
+    @GetMapping("/me")
+    @PreAuthorize("isAuthenticated()")
+    public List<StaffResponse> getMyStaff(HttpServletRequest request) {
+        Long userId = (Long) request.getAttribute("userId");
+        return service.getByUser(userId);
+    }
+
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('STAFF')")
     public StaffResponse update(@PathVariable Long id,

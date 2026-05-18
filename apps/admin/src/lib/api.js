@@ -69,6 +69,14 @@ export async function createStaff(token, body) {
   return request("/api/staff", { method: "POST", token, body });
 }
 
+export async function getMyStaff(token) {
+  return request(`/api/staff/me`, { token });
+}
+
+export async function getBusinessById(token, id) {
+  return request(`/api/businesses/${id}`, { token });
+}
+
 export async function getWorkingHours(token, businessId) {
   return request(`/api/working-hours/${businessId}`, { token });
 }

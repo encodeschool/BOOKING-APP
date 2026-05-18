@@ -1,11 +1,12 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { getBusinessesApi } from "@/lib/api/business.api";
+import { getMyStaff, getBusinessById } from "@/lib/api";
 import { useAuth } from "./AuthProvider";
 
 const BusinessContext = createContext();
 
 export default function BusinessProvider({ children }) {
-  const { token } = useAuth();
+  const { token, profile } = useAuth();
   const [businesses, setBusinesses] = useState([]);
   const [selectedBusinessId, setSelectedBusinessId] = useState(null);
 
@@ -19,10 +20,29 @@ export default function BusinessProvider({ children }) {
 
     try {
       const data = await getBusinessesApi(token);
-      setBusinesses(data || []);
+      const list = data || [];
 
-      if (data?.length > 0 && !selectedBusinessId) {
-        setSelectedBusinessId(data[0].id);
+      // Fallback for staff users: if no businesses returned, try fetching staff record
+      if (list.length === 0 && profile?.role === "STAFF") {
+        try {
+          const staff = await getMyStaff(token);
+          if (staff && staff.length > 0 && staff[0].businessId) {
+            const business = await getBusinessById(token, staff[0].businessId);
+            if (business) {
+              setBusinesses([business]);
+              if (!selectedBusinessId) setSelectedBusinessId(business.id);
+              return;
+            }
+          }
+        } catch (e) {
+          console.warn("Failed to load staff business fallback:", e);
+        }
+      }
+
+      setBusinesses(list);
+
+      if (list.length > 0 && !selectedBusinessId) {
+        setSelectedBusinessId(list[0].id);
       }
     } catch (error) {
       console.error("Failed to load businesses:", error);
@@ -33,7 +53,7 @@ export default function BusinessProvider({ children }) {
 
   useEffect(() => {
     load();
-  }, [token]);
+  }, [token, profile]);
 
   return (
     <BusinessContext.Provider

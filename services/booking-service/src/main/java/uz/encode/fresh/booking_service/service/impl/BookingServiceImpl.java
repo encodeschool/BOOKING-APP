@@ -91,7 +91,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public List<BookingResponse> getBusinessBookings(Long ownerId, Long businessId) {
-        assertBusinessOwner(ownerId, businessId);
+        assertBusinessAccess(ownerId, businessId);
         return bookingRepository.findByBusinessIdOrderByBookingDateDescStartTimeDesc(businessId)
                 .stream()
                 .map(this::toResponse)
@@ -101,12 +101,11 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public BookingResponse getBooking(Long requesterId, Long bookingId) {
         Booking booking = getBookingEntity(bookingId);
-        BusinessDetailsResponse business = getBusiness(booking.getBusinessId());
-
-        if (!booking.getClientId().equals(requesterId) && !business.ownerId().equals(requesterId)) {
-            throw new IllegalArgumentException("Booking not accessible");
+        if (booking.getClientId().equals(requesterId)) {
+            return toResponse(booking);
         }
 
+        assertBusinessAccess(requesterId, booking.getBusinessId());
         return toResponse(booking);
     }
 
@@ -114,7 +113,7 @@ public class BookingServiceImpl implements BookingService {
     @Transactional
     public BookingResponse updateBusinessStatus(Long ownerId, Long bookingId, UpdateBookingStatusRequest request) {
         Booking booking = getBookingEntity(bookingId);
-        assertBusinessOwner(ownerId, booking.getBusinessId());
+        assertBusinessAccess(ownerId, booking.getBusinessId());
 
         BookingStatus nextStatus = request.status;
         if (nextStatus == BookingStatus.PENDING) {
@@ -528,10 +527,26 @@ public class BookingServiceImpl implements BookingService {
                 .orElseThrow(() -> new IllegalArgumentException("Booking not found"));
     }
 
-    private void assertBusinessOwner(Long ownerId, Long businessId) {
+    private void assertBusinessAccess(Long userId, Long businessId) {
         BusinessDetailsResponse business = getBusiness(businessId);
-        if (!business.ownerId().equals(ownerId)) {
+        if (business.ownerId().equals(userId)) {
+            return;
+        }
+
+        List<StaffDetailsResponse> staffRecords = getStaffByUser(userId);
+        boolean isStaffForBusiness = staffRecords.stream()
+                .anyMatch(staff -> staff.businessId().equals(businessId));
+
+        if (!isStaffForBusiness) {
             throw new IllegalArgumentException("Business not accessible");
+        }
+    }
+
+    private List<StaffDetailsResponse> getStaffByUser(Long userId) {
+        try {
+            return coreServiceClient.getStaffByUser(userId);
+        } catch (FeignException.NotFound ex) {
+            return List.of();
         }
     }
 

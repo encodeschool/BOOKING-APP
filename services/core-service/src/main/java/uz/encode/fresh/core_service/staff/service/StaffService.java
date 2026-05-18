@@ -13,6 +13,8 @@ public interface StaffService {
     
     List<StaffResponse> getByBusiness(Long businessId, Long ownerId);
 
+    List<StaffResponse> getByUser(Long userId);
+
     StaffResponse update(Long id, Long ownerId, UpdateStaffRequest req);
 
     void delete(Long id, Long ownerId);

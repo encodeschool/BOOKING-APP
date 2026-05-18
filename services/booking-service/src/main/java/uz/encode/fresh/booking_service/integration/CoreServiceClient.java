@@ -27,6 +27,9 @@ public interface CoreServiceClient {
     @GetMapping("/api/internal/staff/business/{businessId}")
     List<StaffDetailsResponse> getStaffByBusiness(@PathVariable("businessId") Long businessId);
 
+    @GetMapping("/api/internal/staff/user/{userId}")
+    List<StaffDetailsResponse> getStaffByUser(@PathVariable("userId") Long userId);
+
     @GetMapping("/api/internal/working-hours/{businessId}/{dayOfWeek}")
     WorkingHoursResponse getWorkingHours(@PathVariable("businessId") Long businessId,
                                          @PathVariable("dayOfWeek") DayOfWeek dayOfWeek);

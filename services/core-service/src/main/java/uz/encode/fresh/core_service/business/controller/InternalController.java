@@ -79,6 +79,20 @@ public class InternalController {
                 .toList();
     }
 
+    @GetMapping("/staff/user/{userId}")
+    public List<StaffDetailsResponse> getStaffByUser(@PathVariable("userId") Long userId) {
+        return staffService.getByUser(userId)
+                .stream()
+                .map(staff -> new StaffDetailsResponse(
+                        staff.getId(),
+                        staff.getBusinessId(),
+                        staff.getName(),
+                        null,
+                        staff.getActive()
+                ))
+                .toList();
+    }
+
     @GetMapping("/working-hours/{businessId}/{dayOfWeek}")
     public WorkingHoursResponse getWorkingHours(@PathVariable("businessId") Long businessId,
                                                 @PathVariable("dayOfWeek") String dayOfWeek) {
