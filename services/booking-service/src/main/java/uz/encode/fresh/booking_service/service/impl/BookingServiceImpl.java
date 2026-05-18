@@ -324,17 +324,32 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public BookingResponse getStaffBooking(Long staffId, Long bookingId) {
+    public BookingResponse getStaffBooking(Long userId, Long bookingId) {
         Booking booking = getBookingEntity(bookingId);
-        if (!booking.getStaffId().equals(staffId)) {
+        List<StaffDetailsResponse> staffRecords = getStaffByUser(userId);
+
+        boolean isAccessible = staffRecords.stream()
+                .anyMatch(staff -> staff.id().equals(booking.getStaffId()));
+
+        if (!isAccessible) {
             throw new IllegalArgumentException("Booking not accessible");
         }
+
         return toResponse(booking);
     }
 
     @Override
-    public List<BookingResponse> getStaffBookings(Long staffId) {
-        return bookingRepository.findByStaffIdOrderByBookingDateDescStartTimeDesc(staffId)
+    public List<BookingResponse> getStaffBookings(Long userId) {
+        List<StaffDetailsResponse> staffRecords = getStaffByUser(userId);
+        if (staffRecords.isEmpty()) {
+            return List.of();
+        }
+
+        List<Long> staffIds = staffRecords.stream()
+                .map(StaffDetailsResponse::id)
+                .toList();
+
+        return bookingRepository.findByStaffIdInOrderByBookingDateDescStartTimeDesc(staffIds)
                 .stream()
                 .map(this::toResponse)
                 .toList();

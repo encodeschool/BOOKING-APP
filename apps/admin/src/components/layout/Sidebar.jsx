@@ -46,14 +46,6 @@ const baseLinks = [
   },
 ];
 
-const staffLinks = [
-  {
-    to: "/calendar",
-    label: "Calendar",
-    icon: FaCalendarAlt,
-  },
-];
-
 const userLinks = [
   {
     to: "/my-bookings",
@@ -61,6 +53,16 @@ const userLinks = [
     icon: FaCalendarAlt,
   },
 ];
+
+const staffLinks = [
+  {
+    to: "/calendar",
+    label: "Calendar",
+    icon: FaCalendarAlt,
+  },
+  ...userLinks
+];
+
 
 const superadminLinks = [
   ...baseLinks,
@@ -70,7 +72,6 @@ const superadminLinks = [
     label: "Users",
     icon: FaUsers,
   },
-  ...userLinks,
 ];
 
 export default function Sidebar({

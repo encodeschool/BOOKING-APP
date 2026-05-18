@@ -30,9 +30,9 @@ public interface BookingService {
 
     List<String> getAvailableDates(Long businessId, Long serviceId, Long staffId);
 
-    BookingResponse getStaffBooking(Long staffId, Long bookingId);
+    BookingResponse getStaffBooking(Long userId, Long bookingId);
 
-    List<BookingResponse> getStaffBookings(Long staffId);
+    List<BookingResponse> getStaffBookings(Long userId);
 
     List<BookingResponse> getCalendar(Long businessId, String from, String to);
 

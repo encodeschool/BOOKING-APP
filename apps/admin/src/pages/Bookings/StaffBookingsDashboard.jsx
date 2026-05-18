@@ -109,6 +109,20 @@ export default function StaffBookingsDashboard() {
         return bookings;
     }
   };
+  
+  const getCountFor = (status) => {
+    if (!bookings) return 0;
+    switch (status) {
+      case "pending":
+        return bookings.filter(b => b.status === "PENDING").length;
+      case "approved":
+        return bookings.filter(b => b.status === "CONFIRMED").length;
+      case "rejected":
+        return bookings.filter(b => b.status === "REJECTED").length;
+      default:
+        return bookings.length;
+    }
+  };
 
   const getStatusBadge = (status) => {
     switch (status) {
@@ -156,7 +170,7 @@ export default function StaffBookingsDashboard() {
             >
               {status.charAt(0).toUpperCase() + status.slice(1)}
               <span className="ml-2 text-sm">
-                ({filteredBookings.length})
+                ({getCountFor(status)})
               </span>
             </button>
           ))}

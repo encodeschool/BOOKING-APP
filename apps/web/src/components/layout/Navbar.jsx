@@ -7,6 +7,7 @@ import {
   MapPin,
   ChevronDown,
 } from "lucide-react";
+import { useAuth } from "../../app/providers/AuthProvider";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -20,6 +21,10 @@ const Navbar = () => {
   const [selectedTime, setSelectedTime] = useState("Any time");
   const [location, setLocation] = useState("Riga, Latvia");
   const [treatment, setTreatment] = useState("All treatments");
+
+  const { isAuthenticated, profile, logout } = useAuth();
+  const userName = profile?.fullName || profile?.name || profile?.email || "Guest";
+  const userInitial = userName?.charAt(0).toUpperCase();
 
   const menuRef = useRef();
   const timeRef = useRef();
@@ -371,12 +376,30 @@ const Navbar = () => {
                   Map
                 </Link>
 
-                <Link
-                  to="/login"
-                  className="px-5 h-11 rounded-full bg-black text-white flex items-center justify-center text-sm font-medium hover:opacity-90 transition"
-                >
-                  Sign in
-                </Link>
+                {isAuthenticated ? (
+                  <>
+                    <Link
+                      to="/my-bookings"
+                      className="text-sm font-medium text-gray-700 hover:text-black transition"
+                    >
+                      My Bookings
+                    </Link>
+
+                    <Link
+                      to="/profile"
+                      className="px-5 h-11 rounded-full bg-black text-white flex items-center justify-center text-sm font-medium hover:opacity-90 transition"
+                    >
+                      {userName.split(" ")[0]}
+                    </Link>
+                  </>
+                ) : (
+                  <Link
+                    to="/login"
+                    className="px-5 h-11 rounded-full bg-black text-white flex items-center justify-center text-sm font-medium hover:opacity-90 transition"
+                  >
+                    Sign in
+                  </Link>
+                )}
               </div>
 
               {/* MOBILE MENU BUTTON */}
@@ -393,42 +416,85 @@ const Navbar = () => {
                   onClick={() => setMenuOpen(!menuOpen)}
                   className="w-11 h-11 rounded-full border border-gray-200 flex items-center justify-center hover:bg-gray-100 transition"
                 >
-                  <Menu size={18} />
+                  {isAuthenticated ? (
+                    <span className="text-sm font-semibold text-gray-700">
+                      {userInitial}
+                    </span>
+                  ) : (
+                    <Menu size={18} />
+                  )}
                 </button>
 
                 {menuOpen && (
                   <div className="absolute right-0 top-14 w-72 bg-white border border-gray-200 rounded-3xl shadow-2xl overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                    <div className="p-4 border-b border-gray-100">
+                      {isAuthenticated ? (
+                        <div>
+                          <p className="text-sm font-semibold text-gray-900">
+                            {userName}
+                          </p>
+                          <p className="text-xs text-gray-500">Signed in</p>
+                        </div>
+                      ) : (
+                        <p className="text-sm font-medium text-gray-900">
+                          Explore the app
+                        </p>
+                      )}
+                    </div>
+
                     <div className="p-2">
                       {[
-                        {
-                          label: "All Services",
-                          to: "/services",
-                        },
-                        {
-                          label: "Book Now",
-                          to: "/booking",
-                        },
-                        {
-                          label: "Map",
-                          to: "/map",
-                        },
-                        {
-                          label: "About",
-                          to: "/about",
-                        },
-                        {
-                          label: "Contact",
-                          to: "/contact",
-                        },
+                        { label: "Services", to: "/services" },
+                        { label: "Book Now", to: "/booking" },
+                        { label: "Map", to: "/map" },
+                        { label: "About", to: "/about" },
+                        { label: "Contact", to: "/contact" },
                       ].map((item) => (
                         <Link
                           key={item.label}
                           to={item.to}
+                          onClick={() => setMenuOpen(false)}
                           className="block px-4 py-3 rounded-2xl hover:bg-gray-100 transition text-sm font-medium"
                         >
                           {item.label}
                         </Link>
                       ))}
+
+                      {isAuthenticated ? (
+                        <>
+                          <Link
+                            to="/my-bookings"
+                            onClick={() => setMenuOpen(false)}
+                            className="block px-4 py-3 rounded-2xl hover:bg-gray-100 transition text-sm font-medium"
+                          >
+                            My Bookings
+                          </Link>
+                          <Link
+                            to="/profile"
+                            onClick={() => setMenuOpen(false)}
+                            className="block px-4 py-3 rounded-2xl hover:bg-gray-100 transition text-sm font-medium"
+                          >
+                            Profile
+                          </Link>
+                          <button
+                            onClick={() => {
+                              logout();
+                              setMenuOpen(false);
+                            }}
+                            className="w-full text-left px-4 py-3 rounded-2xl hover:bg-gray-100 transition text-sm font-medium text-red-600"
+                          >
+                            Sign out
+                          </button>
+                        </>
+                      ) : (
+                        <Link
+                          to="/login"
+                          onClick={() => setMenuOpen(false)}
+                          className="block mt-2 px-4 py-3 rounded-2xl bg-black text-white text-sm font-medium text-center hover:opacity-90 transition"
+                        >
+                          Sign in
+                        </Link>
+                      )}
                     </div>
                   </div>
                 )}
@@ -531,14 +597,43 @@ const Navbar = () => {
               </Link>
             ))}
 
-            <div className="pt-6">
-              <Link
-                to="/login"
-                className="w-full h-12 rounded-2xl bg-black text-white flex items-center justify-center font-medium"
-              >
-                Sign in
-              </Link>
-            </div>
+            {isAuthenticated ? (
+              <>
+                <Link
+                  to="/my-bookings"
+                  onClick={() => setIsOpen(false)}
+                  className="block px-4 py-4 rounded-2xl hover:bg-gray-100 transition text-sm font-medium"
+                >
+                  My Bookings
+                </Link>
+                <Link
+                  to="/profile"
+                  onClick={() => setIsOpen(false)}
+                  className="block px-4 py-4 rounded-2xl hover:bg-gray-100 transition text-sm font-medium"
+                >
+                  Profile
+                </Link>
+                <button
+                  onClick={() => {
+                    logout();
+                    setIsOpen(false);
+                  }}
+                  className="w-full text-left px-4 py-4 rounded-2xl hover:bg-gray-100 transition text-sm font-medium text-red-600"
+                >
+                  Sign out
+                </button>
+              </>
+            ) : (
+              <div className="pt-6">
+                <Link
+                  to="/login"
+                  onClick={() => setIsOpen(false)}
+                  className="w-full h-12 rounded-2xl bg-black text-white flex items-center justify-center font-medium"
+                >
+                  Sign in
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       </div>
