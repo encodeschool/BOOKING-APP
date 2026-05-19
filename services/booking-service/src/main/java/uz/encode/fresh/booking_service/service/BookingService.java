@@ -34,6 +34,8 @@ public interface BookingService {
 
     List<BookingResponse> getStaffBookings(Long userId);
 
+    List<BookingResponse> getBookingsByEmail(String email);
+
     List<BookingResponse> getCalendar(Long businessId, String from, String to);
 
     DashboardMetricsResponse getDashboardMetrics(Long businessId);

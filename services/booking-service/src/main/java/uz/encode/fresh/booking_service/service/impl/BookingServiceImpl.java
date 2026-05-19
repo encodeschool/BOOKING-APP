@@ -69,7 +69,7 @@ public class BookingServiceImpl implements BookingService {
         booking.setEndTime(endTime);
         booking.setStatus(BookingStatus.PENDING);
         booking.setNotes(request.notes);
-        booking.setCustomerEmail(request.customerEmail);
+        booking.setCustomerEmail(request.customerEmail != null ? request.customerEmail.toLowerCase() : null);
         booking.setCustomerName(request.customerName);
         booking.setCustomerPhone(request.customerPhone);
 
@@ -350,6 +350,17 @@ public class BookingServiceImpl implements BookingService {
                 .toList();
 
         return bookingRepository.findByStaffIdInOrderByBookingDateDescStartTimeDesc(staffIds)
+                .stream()
+                .map(this::toResponse)
+                .toList();
+    }
+
+    @Override
+    public List<BookingResponse> getBookingsByEmail(String email) {
+        if (email == null || email.isBlank()) {
+            return List.of();
+        }
+        return bookingRepository.findByCustomerEmailIgnoreCaseOrderByBookingDateDescStartTimeDesc(email)
                 .stream()
                 .map(this::toResponse)
                 .toList();
