@@ -53,4 +53,12 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     );
 
     List<Booking> findByStaffIdAndBookingDate(Long staffId, LocalDate date);
+
+    @Query("""
+            select b from Booking b
+            where b.customerEmail is not null 
+              and lower(trim(b.customerEmail)) = lower(trim(:email))
+            order by b.bookingDate desc, b.startTime desc
+            """)
+    List<Booking> findByCustomerEmailIgnoreCaseOrderByBookingDateDescStartTimeDesc(@Param("email") String email);
 }

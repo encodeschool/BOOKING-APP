@@ -83,6 +83,15 @@ public class BookingController {
         return bookingService.getStaffBooking((Long) request.getAttribute("userId"), bookingId);
     }
 
+    @GetMapping("/by-email")
+    @PreAuthorize("isAuthenticated()")
+    public List<BookingResponse> getBookingsByEmail(@RequestParam(name = "email", required = false) String email) {
+        if (email == null || email.trim().isEmpty()) {
+            return List.of();
+        }
+        return bookingService.getBookingsByEmail(email.trim());
+    }
+
     @GetMapping("/calendar")
     public List<BookingResponse> getCalendar(
             @RequestParam("businessId") Long businessId,
