@@ -81,25 +81,25 @@ public class UserController {
     }
 
     @GetMapping("/internal/{id}")
-    public User getUserInternal(@PathVariable Long id) {
+    public User getUserInternal(@PathVariable("id") Long id) {
         return service.getById(id);
     }
 
     @PutMapping("/{id}/role")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public User updateRole(@PathVariable Long id, @RequestBody UpdateUserRoleRequest req) {
+    public User updateRole(@PathVariable("id") Long id, @Valid @RequestBody UpdateUserRoleRequest req) {
         return service.setRole(id, req.role());
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public User updateById(@PathVariable Long id, @Valid @RequestBody UpdateUserRequest req) {
+    public User updateById(@PathVariable("id") Long id, @Valid @RequestBody UpdateUserRequest req) {
         return service.updateById(id, req);
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('ADMIN')")
-    public void deleteById(@PathVariable Long id) {
+    public void deleteById(@PathVariable("id") Long id) {
         service.delete(id);
     }
 }

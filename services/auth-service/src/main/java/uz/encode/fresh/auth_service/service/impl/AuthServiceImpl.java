@@ -31,13 +31,14 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public AuthResponse register(AuthRequest request) {
+        String normalizedEmail = request.getEmail().trim().toLowerCase();
 
-        if (repo.findByEmail(request.getEmail()).isPresent()) {
+        if (repo.findByEmailIgnoreCase(normalizedEmail).isPresent()) {
             throw new RuntimeException("User already exists");
         }
 
         User user = new User();
-        user.setEmail(request.getEmail());
+        user.setEmail(normalizedEmail);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
 
         User saved = repo.save(user);
@@ -65,7 +66,8 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthResponse login(AuthRequest request) {
-        User user = repo.findByEmail(request.getEmail())
+        String normalizedEmail = request.getEmail().trim().toLowerCase();
+        User user = repo.findByEmailIgnoreCase(normalizedEmail)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
@@ -84,7 +86,8 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public String forgotPassword(String email) {
-        User user = repo.findByEmail(email)
+        String normalizedEmail = email.trim().toLowerCase();
+        User user = repo.findByEmailIgnoreCase(normalizedEmail)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         // Generate a simple reset token (in production, use proper token generation)

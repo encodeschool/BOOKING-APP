@@ -16,5 +16,5 @@ public interface UserServiceClient {
     void createUser(@RequestBody CreateUserProfileRequest request);
 
     @GetMapping("/api/users/internal/{id}")
-    UserProfileResponse getUser(@PathVariable Long id);
+    UserProfileResponse getUser(@PathVariable("id") Long id);
 }
