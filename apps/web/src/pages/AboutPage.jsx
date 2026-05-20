@@ -1,202 +1,96 @@
-import { Users, Target, Award, Heart } from "lucide-react";
+﻿import { Link } from "react-router-dom";
+import { ShieldCheck, HeartHandshake, Sparkles, Globe } from "lucide-react";
+
+const stats = [
+  { label: "Businesses", value: "1.2k" },
+  { label: "Bookings", value: "75k+" },
+  { label: "Reviews", value: "18k" },
+  { label: "Locations", value: "230" },
+];
+
+const values = [
+  {
+    icon: ShieldCheck,
+    title: "Trusted partners",
+    description: "Only verified salons and wellness providers join our platform.",
+  },
+  {
+    icon: HeartHandshake,
+    title: "Customer-first",
+    description: "Designed to make every booking feel effortless and reliable.",
+  },
+  {
+    icon: Sparkles,
+    title: "Modern design",
+    description: "A polished, responsive experience on mobile and desktop.",
+  },
+  {
+    icon: Globe,
+    title: "Global reach",
+    description: "Supporting bookings across multiple cities and regions.",
+  },
+];
 
 const AboutPage = () => {
-  const stats = [
-    { number: "10,000+", label: "Happy Customers" },
-    { number: "500+", label: "Partner Businesses" },
-    { number: "50+", label: "Cities Covered" },
-    { number: "99%", label: "Satisfaction Rate" },
-  ];
-
-  const values = [
-    {
-      icon: Users,
-      title: "Customer First",
-      description: "We put our customers at the heart of everything we do, ensuring the best possible experience.",
-    },
-    {
-      icon: Target,
-      title: "Innovation",
-      description: "We continuously improve our platform to make booking easier and more convenient.",
-    },
-    {
-      icon: Award,
-      title: "Quality",
-      description: "We partner only with verified, high-quality businesses that meet our standards.",
-    },
-    {
-      icon: Heart,
-      title: "Community",
-      description: "We build strong relationships with our partners and customers to create lasting value.",
-    },
-  ];
-
-  const team = [
-    {
-      name: "Sarah Johnson",
-      role: "CEO & Founder",
-      image: "/api/placeholder/150/150",
-    },
-    {
-      name: "Michael Chen",
-      role: "CTO",
-      image: "/api/placeholder/150/150",
-    },
-    {
-      name: "Emily Davis",
-      role: "Head of Operations",
-      image: "/api/placeholder/150/150",
-    },
-    {
-      name: "David Wilson",
-      role: "Customer Success Manager",
-      image: "/api/placeholder/150/150",
-    },
-  ];
-
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Hero Section */}
-      <section className="bg-gradient-to-r from-primary-600 to-primary-800 text-white py-20">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl md:text-6xl font-bold mb-6">
-            About BookEase
-          </h1>
-          <p className="text-xl md:text-2xl text-primary-100">
-            Revolutionizing the way people book appointments with local businesses.
-          </p>
-        </div>
-      </section>
-
-      {/* Mission Section */}
-      <section className="py-16 bg-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold text-gray-900 mb-6">Our Mission</h2>
-          <p className="text-lg text-gray-600 leading-relaxed">
-            At BookEase, we believe that booking appointments should be simple, fast, and stress-free.
-            We're on a mission to connect customers with the best local businesses while empowering
-            businesses to grow their customer base through our innovative platform.
-          </p>
-        </div>
-      </section>
-
-      {/* Stats Section */}
-      <section className="py-16 bg-primary-600 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {stats.map((stat, index) => (
-              <div key={index} className="text-center">
-                <div className="text-3xl md:text-4xl font-bold mb-2">{stat.number}</div>
-                <div className="text-primary-100">{stat.label}</div>
-              </div>
-            ))}
+    <div className="min-h-screen bg-slate-50 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid gap-12 lg:grid-cols-[1.1fr_0.9fr] items-center mb-16">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.3em] text-primary-600">About Enroll</p>
+            <h1 className="mt-4 text-4xl font-bold text-slate-900 sm:text-5xl">A smarter way to discover beauty and wellness.</h1>
+            <p className="mt-6 text-lg leading-8 text-slate-600">Our platform helps customers find the right service, provider, and schedule with a clean interface built for modern browsing and booking.</p>
+            <div className="mt-8 grid gap-4 sm:grid-cols-2">
+              <Link to="/booking" className="btn-primary text-center">
+                Book Now
+              </Link>
+              <Link to="/contact" className="btn-secondary text-center">
+                Contact support
+              </Link>
+            </div>
           </div>
-        </div>
-      </section>
-
-      {/* Values Section */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Our Values</h2>
-            <p className="text-lg text-gray-600">
-              The principles that guide everything we do.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {values.map((value, index) => (
-              <div key={index} className="text-center">
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-100 rounded-full mb-4">
-                  <value.icon className="w-8 h-8 text-primary-600" />
+          <div className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-sm">
+            <div className="grid gap-4">
+              {stats.map((stat) => (
+                <div key={stat.label} className="rounded-3xl bg-slate-50 p-6 text-center">
+                  <p className="text-3xl font-semibold text-slate-900">{stat.value}</p>
+                  <p className="mt-2 text-sm uppercase tracking-[0.3em] text-slate-500">{stat.label}</p>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                  {value.title}
-                </h3>
-                <p className="text-gray-600">{value.description}</p>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <section className="mb-16">
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {values.map((value) => (
+              <div key={value.title} className="card">
+                <value.icon className="h-10 w-10 text-primary-600 mb-4" />
+                <h2 className="text-xl font-semibold text-slate-900 mb-2">{value.title}</h2>
+                <p className="text-slate-600">{value.description}</p>
               </div>
             ))}
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Story Section */}
-      <section className="py-16 bg-gray-50">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Our Story</h2>
-          </div>
-
-          <div className="prose prose-lg mx-auto text-gray-600">
-            <p>
-              BookEase was born from a simple frustration: booking appointments with local businesses
-              was unnecessarily complicated. Long phone calls, confusing websites, and missed appointments
-              were the norm. Our founders experienced this firsthand and decided to create a better way.
-            </p>
-
-            <p>
-              In 2020, we launched BookEase with a vision to make appointment booking as simple as ordering
-              food online. Today, we're proud to serve thousands of customers and hundreds of businesses
-              across multiple cities, making the booking experience seamless for everyone involved.
-            </p>
-
-            <p>
-              We're just getting started. Our commitment to innovation and customer satisfaction drives
-              us to continuously improve our platform and expand our services to meet the evolving needs
-              of our community.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Team Section */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Meet Our Team</h2>
-            <p className="text-lg text-gray-600">
-              The passionate people behind BookEase.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {team.map((member, index) => (
-              <div key={index} className="text-center">
-                <div className="w-32 h-32 bg-gray-200 rounded-full mx-auto mb-4 flex items-center justify-center">
-                  <span className="text-2xl font-bold text-gray-600">
-                    {member.name.split(' ').map(n => n[0]).join('')}
-                  </span>
+        <section className="rounded-[2rem] bg-gradient-to-r from-indigo-600 to-violet-600 p-10 text-white shadow-2xl">
+          <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] items-center">
+            <div>
+              <p className="text-sm uppercase tracking-[0.3em] text-primary-200">Our mission</p>
+              <h2 className="mt-4 text-3xl font-bold">Create a booking experience people love.</h2>
+              <p className="mt-4 text-slate-100 leading-7">We focus on accessibility, speed, and continuing to evolve the product for both customers and business partners alike.</p>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              {stats.slice(0, 4).map((stat) => (
+                <div key={stat.label} className="rounded-3xl bg-white/10 p-6">
+                  <p className="text-3xl font-semibold">{stat.value}</p>
+                  <p className="mt-2 text-sm text-slate-200">{stat.label}</p>
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-1">
-                  {member.name}
-                </h3>
-                <p className="text-gray-600">{member.role}</p>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-16 bg-primary-600 text-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold mb-4">
-            Join Our Community
-          </h2>
-          <p className="text-xl mb-8 text-primary-100">
-            Whether you're a customer looking for great services or a business ready to grow,
-            BookEase is here to help you succeed.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="/booking" className="btn-secondary">
-              Book Now
-            </a>
-            <a href="/contact" className="btn-secondary">
-              Partner With Us
-            </a>
-          </div>
-        </div>
-      </section>
+        </section>
+      </div>
     </div>
   );
 };

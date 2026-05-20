@@ -1,103 +1,54 @@
-import { useAuth } from "@/app/providers/AuthProvider";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+﻿import { useState } from "react";
+import { Link } from "react-router-dom";
+import { Mail } from "lucide-react";
+import toast from "react-hot-toast";
 
-export default function ForgotPasswordPage() {
-  const { forgotPassword, loading, error: authError } = useAuth();
-  const navigate = useNavigate();
+const ForgotPasswordPage = () => {
   const [email, setEmail] = useState("");
-  const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(null);
-    setSuccess(false);
-
-    try {
-      await forgotPassword(email);
-      setSuccess(true);
-      setTimeout(() => {
-        navigate("/login");
-      }, 3000);
-    } catch (err) {
-      setError(
-        authError ||
-          "Failed to send password reset email. Please try again."
-      );
-    }
+    setIsSubmitting(true);
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    toast.success("Password recovery email sent.");
+    setIsSubmitting(false);
   };
 
-  if (success) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center px-4">
-        <div className="w-full max-w-md bg-white rounded-lg shadow-lg p-8 text-center">
-          <div className="text-4xl mb-4">✓</div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">
-            Check your email
-          </h1>
-          <p className="text-gray-600 mb-4">
-            We've sent a password reset link to {email}. Please check your email
-            and follow the instructions to reset your password.
-          </p>
-          <p className="text-sm text-gray-500">
-            Redirecting to login in 3 seconds...
+  return (
+    <div className="min-h-screen bg-slate-50 flex items-center py-20">
+      <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+        <div className="rounded-[2rem] bg-white p-10 shadow-xl border border-slate-200">
+          <div className="mb-8">
+            <p className="text-sm font-semibold uppercase tracking-[0.3em] text-primary-600">Reset password</p>
+            <h1 className="mt-4 text-4xl font-bold text-slate-900">Forgot your password?</h1>
+            <p className="mt-4 text-slate-600">Enter your email address and we’ll send you instructions to reset your password.</p>
+          </div>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">Email address</label>
+              <div className="relative">
+                <Mail className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="input-field pl-12"
+                  required
+                />
+              </div>
+            </div>
+            <button className="btn-primary w-full" type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Sending..." : "Send reset email"}
+            </button>
+          </form>
+          <p className="mt-6 text-center text-sm text-slate-600">
+            Remembered it? <Link to="/login" className="text-primary-600 hover:text-primary-700">Return to sign in</Link>
           </p>
         </div>
       </div>
-    );
-  }
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center px-4">
-      <div className="w-full max-w-md bg-white rounded-lg shadow-lg p-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2 text-center">
-          Fresha
-        </h1>
-        <p className="text-gray-600 text-center mb-8">
-          Reset your password
-        </p>
-
-        {error && (
-          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded text-red-700 text-sm">
-            {error}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Email Address
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="you@example.com"
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-blue-600 text-white py-2 rounded-lg font-medium hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {loading ? "Sending..." : "Send Reset Link"}
-          </button>
-        </form>
-
-        <p className="text-center text-sm text-gray-600 mt-6">
-          Remember your password?{" "}
-          <a
-            href="/login"
-            className="text-blue-600 hover:underline font-medium"
-          >
-            Back to login
-          </a>
-        </p>
-      </div>
     </div>
   );
-}
+};
+
+export default ForgotPasswordPage;

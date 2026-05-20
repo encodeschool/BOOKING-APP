@@ -1,87 +1,111 @@
-import { Link } from "react-router-dom";
+﻿import { Link } from "react-router-dom";
 import { Phone, Mail, MapPin, Facebook, Twitter, Instagram } from "lucide-react";
 
 const Footer = () => {
   return (
-    <footer className="bg-gray-900 text-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          {/* Company Info */}
-          <div className="col-span-1 md:col-span-2">
-            <h3 className="text-2xl font-bold text-primary-400 mb-4">BookEase</h3>
-            <p className="text-gray-300 mb-4">
-              Your trusted partner for easy and convenient booking services.
-              We make it simple to book appointments with your favorite businesses.
+    <footer className="bg-slate-950 text-slate-100">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+          <div className="space-y-4">
+            <div className="inline-flex items-center gap-3 rounded-3xl bg-primary-600/10 px-4 py-3">
+              <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-primary-600 text-white font-bold">
+                B
+              </span>
+              <div>
+                <p className="text-xl font-semibold text-white">BookEase</p>
+                <p className="text-sm text-slate-400">A modern booking experience for beauty and wellness.</p>
+              </div>
+            </div>
+            <p className="text-sm text-slate-400 leading-relaxed">
+              Simplify your scheduling with an intuitive experience designed for customers and businesses on every device.
             </p>
-            <div className="flex space-x-4">
-              <a href="#" className="text-gray-400 hover:text-primary-400 transition-colors">
+            <div className="flex items-center gap-3">
+              <a href="#" className="text-slate-400 hover:text-white transition">
                 <Facebook size={20} />
               </a>
-              <a href="#" className="text-gray-400 hover:text-primary-400 transition-colors">
+              <a href="#" className="text-slate-400 hover:text-white transition">
                 <Twitter size={20} />
               </a>
-              <a href="#" className="text-gray-400 hover:text-primary-400 transition-colors">
+              <a href="#" className="text-slate-400 hover:text-white transition">
                 <Instagram size={20} />
               </a>
             </div>
           </div>
 
-          {/* Quick Links */}
-          <div>
-            <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
-            <ul className="space-y-2">
-              <li>
-                <Link to="/" className="text-gray-300 hover:text-primary-400 transition-colors">
-                  Home
-                </Link>
-              </li>
-              <li>
-                <Link to="/services" className="text-gray-300 hover:text-primary-400 transition-colors">
-                  Services
-                </Link>
-              </li>
-              <li>
-                <Link to="/booking" className="text-gray-300 hover:text-primary-400 transition-colors">
-                  Book Now
-                </Link>
-              </li>
-              <li>
-                <Link to="/about" className="text-gray-300 hover:text-primary-400 transition-colors">
-                  About Us
-                </Link>
-              </li>
-              <li>
-                <Link to="/contact" className="text-gray-300 hover:text-primary-400 transition-colors">
-                  Contact
-                </Link>
-              </li>
-            </ul>
+          <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-2">
+            <div>
+              <h4 className="text-sm font-semibold text-slate-200 uppercase tracking-[0.12em] mb-4">Quick Links</h4>
+              <ul className="space-y-3 text-sm text-slate-400">
+                <li>
+                  <Link to="/" className="hover:text-white transition">
+                    Home
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/services" className="hover:text-white transition">
+                    Services
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/booking" className="hover:text-white transition">
+                    Book Now
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/about" className="hover:text-white transition">
+                    About
+                  </Link>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-sm font-semibold text-slate-200 uppercase tracking-[0.12em] mb-4">Support</h4>
+              <ul className="space-y-3 text-sm text-slate-400">
+                <li>
+                  <Link to="/contact" className="hover:text-white transition">
+                    Contact
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/login" className="hover:text-white transition">
+                    Sign in
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/register" className="hover:text-white transition">
+                    Register
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/map" className="hover:text-white transition">
+                    Map
+                  </Link>
+                </li>
+              </ul>
+            </div>
           </div>
 
-          {/* Contact Info */}
           <div>
-            <h4 className="text-lg font-semibold mb-4">Contact Info</h4>
-            <div className="space-y-3">
-              <div className="flex items-center">
-                <Phone size={16} className="text-primary-400 mr-2" />
-                <span className="text-gray-300">+1 (555) 123-4567</span>
+            <h4 className="text-sm font-semibold text-slate-200 uppercase tracking-[0.12em] mb-4">Contact Info</h4>
+            <div className="space-y-4 text-sm text-slate-400">
+              <div className="flex items-center gap-3">
+                <Phone size={18} className="text-primary-400" />
+                <span>+1 (555) 123-4567</span>
               </div>
-              <div className="flex items-center">
-                <Mail size={16} className="text-primary-400 mr-2" />
-                <span className="text-gray-300">info@bookease.com</span>
+              <div className="flex items-center gap-3">
+                <Mail size={18} className="text-primary-400" />
+                <span>info@bookease.com</span>
               </div>
-              <div className="flex items-center">
-                <MapPin size={16} className="text-primary-400 mr-2" />
-                <span className="text-gray-300">123 Business St, City, ST 12345</span>
+              <div className="flex items-center gap-3">
+                <MapPin size={18} className="text-primary-400" />
+                <span>123 Business St, City, ST 12345</span>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="border-t border-gray-800 mt-8 pt-8 text-center">
-          <p className="text-gray-400">
-            © {new Date().getFullYear()} BookEase. All rights reserved.
-          </p>
+        <div className="mt-12 border-t border-slate-800 pt-6 text-center text-slate-500 text-sm">
+          © {new Date().getFullYear()} BookEase. All rights reserved.
         </div>
       </div>
     </footer>

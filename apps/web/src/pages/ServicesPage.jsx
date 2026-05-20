@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+﻿import { useState, useEffect } from "react";
+import { useSearchParams, Link } from "react-router-dom";
 import { Search, MapPin, Clock, Star } from "lucide-react";
 import { useBusinesses, useServices } from "../hooks/useApi";
+import ImageCarousel from "../components/ImageCarousel";
 
 const ServicesPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -14,12 +15,12 @@ const ServicesPage = () => {
   useEffect(() => {
     const businessId = searchParams.get("business");
     if (businessId && businesses.length > 0) {
-      const business = businesses.find(b => b.id === parseInt(businessId));
-      setSelectedBusiness(business);
+      const business = businesses.find((b) => b.id === parseInt(businessId));
+      setSelectedBusiness(business || null);
     }
   }, [searchParams, businesses]);
 
-  const filteredServices = services.filter(service =>
+  const filteredServices = services.filter((service) =>
     service.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     service.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -30,132 +31,120 @@ const ServicesPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Our Services</h1>
-          <p className="text-lg text-gray-600">
-            Discover and book from a wide range of services offered by our partner businesses.
-          </p>
+    <div className="min-h-screen bg-slate-50 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mb-10 text-center">
+          <p className="text-sm font-semibold uppercase tracking-[0.3em] text-primary-600">Our Services</p>
+          <h1 className="mt-4 text-4xl font-bold text-slate-900 sm:text-5xl">Discover services made for you</h1>
+          <p className="mt-4 text-slate-600 max-w-2xl mx-auto">Browse by business, search by service name, and book with confidence across our partner network.</p>
         </div>
 
-        {/* Business Selector */}
-        <div className="mb-8">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Select a Business
-          </label>
-          {businessesLoading ? (
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
-          ) : (
-            <select
-              value={selectedBusiness?.id || ""}
-              onChange={(e) => {
-                const business = businesses.find(b => b.id === parseInt(e.target.value));
-                handleBusinessChange(business);
-              }}
-              className="input-field max-w-md"
-            >
-              <option value="">All Businesses</option>
-              {businesses.map((business) => (
-                <option key={business.id} value={business.id}>
-                  {business.name}
-                </option>
-              ))}
-            </select>
-          )}
-        </div>
-
-        {/* Search Bar */}
-        <div className="mb-8">
-          <div className="relative max-w-md">
-            <Search className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search services..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="input-field pl-10"
-            />
-          </div>
-        </div>
-
-        {/* Services Grid */}
-        {selectedBusiness ? (
-          <div>
-            {/* Business Info */}
-            <div className="card mb-8">
-              <div className="flex items-start justify-between">
-                <div>
-                  <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                    {selectedBusiness.name}
-                  </h2>
-                  <p className="text-gray-600 mb-4">{selectedBusiness.description}</p>
-                  <div className="flex items-center space-x-4 text-sm text-gray-500">
-                    <div className="flex items-center">
-                      <MapPin className="w-4 h-4 mr-1" />
-                      {selectedBusiness.address}
-                    </div>
-                    <div className="flex items-center">
-                      <Clock className="w-4 h-4 mr-1" />
-                      {selectedBusiness.workingHours}
-                    </div>
-                  </div>
+        <div className="grid gap-6 lg:grid-cols-[1fr_2fr] items-start">
+          <aside className="space-y-6 rounded-3xl bg-white p-6 shadow-sm">
+            <div>
+              <h2 className="text-lg font-semibold text-slate-900">Choose a business</h2>
+              <p className="mt-2 text-sm text-slate-500">Filter services by partner business.</p>
+            </div>
+            <div>
+              {businessesLoading ? (
+                <div className="flex items-center justify-center py-12 text-slate-500">
+                  <div className="h-10 w-10 rounded-full border-4 border-primary-500 border-t-transparent animate-spin" />
                 </div>
-                <div className="text-right">
-                  <div className="flex items-center mb-2">
-                    <Star className="w-5 h-5 text-yellow-400 fill-current" />
-                    <span className="ml-1 text-gray-600">4.5</span>
-                  </div>
-                  <span className="text-sm text-gray-500">{selectedBusiness.category}</span>
-                </div>
+              ) : (
+                <select
+                  value={selectedBusiness?.id || ""}
+                  onChange={(e) => {
+                    const business = businesses.find((b) => b.id === parseInt(e.target.value));
+                    handleBusinessChange(business);
+                  }}
+                  className="input-field"
+                >
+                  <option value="">All Businesses</option>
+                  {businesses.map((business) => (
+                    <option key={business.id} value={business.id}>
+                      {business.name}
+                    </option>
+                  ))}
+                </select>
+              )}
+            </div>
+
+            <div className="rounded-3xl bg-slate-50 p-4">
+              <h3 className="text-sm font-semibold text-slate-900">Why book here?</h3>
+              <ul className="mt-4 space-y-3 text-slate-600 text-sm">
+                <li className="flex items-start gap-3">
+                  <span className="mt-1 h-2.5 w-2.5 rounded-full bg-primary-600" />
+                  Real-time availability for your convenience.
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="mt-1 h-2.5 w-2.5 rounded-full bg-primary-600" />
+                  Verified partners for trusted service quality.
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="mt-1 h-2.5 w-2.5 rounded-full bg-primary-600" />
+                  Secure booking with easy confirmation.
+                </li>
+              </ul>
+            </div>
+          </aside>
+
+          <div className="space-y-6">
+            <div className="rounded-3xl bg-white p-6 shadow-sm">
+              <div className="relative">
+                <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+                <input
+                  type="text"
+                  placeholder="Search services..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="input-field pl-12"
+                />
               </div>
             </div>
 
-            {/* Services */}
+            {selectedBusiness && (
+              <div className="rounded-3xl bg-white p-6 shadow-sm border border-slate-200">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <h2 className="text-2xl font-semibold text-slate-900">{selectedBusiness.name}</h2>
+                    <p className="mt-2 text-slate-600">{selectedBusiness.description}</p>
+                  </div>
+                  <div className="inline-flex items-center gap-3 rounded-full bg-slate-50 px-4 py-3 text-sm text-slate-700">
+                    <MapPin className="h-4 w-4" />
+                    {selectedBusiness.address || "Address unavailable"}
+                  </div>
+                </div>
+              </div>
+            )}
+
             {servicesLoading ? (
-              <div className="text-center py-8">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
-                <p className="mt-4 text-gray-600">Loading services...</p>
+              <div className="rounded-3xl bg-white p-10 text-center text-slate-500 shadow-sm">
+                <div className="mx-auto mb-4 h-10 w-10 rounded-full border-4 border-primary-500 border-t-transparent animate-spin" />
+                Loading services...
               </div>
             ) : filteredServices.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {filteredServices.map((service) => (
                   <div key={service.id} className="card">
-                    <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                      {service.name}
-                    </h3>
-                    <p className="text-gray-600 mb-4">{service.description}</p>
-                    <div className="flex items-center justify-between">
-                      <span className="text-2xl font-bold text-primary-600">
-                        ${service.price}
-                      </span>
-                      <span className="text-sm text-gray-500">
-                        {service.duration} min
-                      </span>
+                    <h3 className="text-xl font-semibold text-slate-900 mb-3">{service.name}</h3>
+                    <p className="text-slate-600 mb-5">{service.description}</p>
+                    <div className="flex items-center justify-between text-slate-900 font-semibold">
+                      <span>${service.price}</span>
+                      <span className="text-sm text-slate-500">{service.duration} min</span>
                     </div>
-                    <button className="w-full btn-primary mt-4">
-                      Book Now
-                    </button>
+                    <Link to="/booking" className="btn-secondary mt-5 inline-flex w-full justify-center">
+                      Book now
+                    </Link>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="text-center py-8">
-                <p className="text-gray-600">No services found matching your search.</p>
+              <div className="rounded-3xl bg-white p-10 text-center text-slate-600 shadow-sm">
+                No services found matching your search.
               </div>
             )}
           </div>
-        ) : (
-          <div className="text-center py-16">
-            <h3 className="text-2xl font-semibold text-gray-900 mb-4">
-              Select a Business
-            </h3>
-            <p className="text-gray-600">
-              Choose a business from the dropdown above to view their available services.
-            </p>
-          </div>
-        )}
+        </div>
       </div>
     </div>
   );
