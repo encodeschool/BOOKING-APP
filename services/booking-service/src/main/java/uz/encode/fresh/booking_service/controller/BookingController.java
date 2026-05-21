@@ -93,11 +93,18 @@ public class BookingController {
     }
 
     @GetMapping("/calendar")
-    public List<BookingResponse> getCalendar(
+    public List<BookingResponse> getCalendar(HttpServletRequest request,
             @RequestParam("businessId") Long businessId,
             @RequestParam("from") String from,
             @RequestParam("to") String to
     ) {
+        Long userId = (Long) request.getAttribute("userId");
+        String role = (String) request.getAttribute("role");
+
+        if (userId != null && "STAFF".equals(role)) {
+            return bookingService.getCalendar(userId, role, businessId, from, to);
+        }
+
         return bookingService.getCalendar(businessId, from, to);
     }
 

@@ -38,6 +38,8 @@ public interface BookingService {
 
     List<BookingResponse> getCalendar(Long businessId, String from, String to);
 
+    List<BookingResponse> getCalendar(Long userId, String role, Long businessId, String from, String to);
+
     DashboardMetricsResponse getDashboardMetrics(Long businessId);
 
     List<BookedSlotResponse> getBookedSlots(Long staffId, LocalDate date);
