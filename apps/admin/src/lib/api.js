@@ -69,6 +69,33 @@ export async function createStaff(token, body) {
   return request("/api/staff", { method: "POST", token, body });
 }
 
+export async function updateStaff(token, id, body) {
+  return request(`/api/staff/${id}`, { method: "PUT", token, body });
+}
+
+export async function deleteStaff(token, id) {
+  return request(`/api/staff/${id}`, { method: "DELETE", token });
+}
+
+export async function uploadStaffImage(token, staffId, file) {
+  const form = new FormData();
+  form.append("file", file);
+
+  const res = await fetch(`${API_BASE_URL}/api/staff/${staffId}/image`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: form,
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to upload image");
+  }
+
+  return res.json();
+}
+
 export async function getMyStaff(token) {
   return request(`/api/staff/me`, { token });
 }

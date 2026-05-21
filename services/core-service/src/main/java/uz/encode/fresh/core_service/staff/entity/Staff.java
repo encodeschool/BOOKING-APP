@@ -28,6 +28,8 @@ public class Staff {
 
     private String phone;
 
+    private String imageUrl;
+
     private Boolean active = true;
 
     private Integer maxBookingsPerDay = 20;
@@ -83,6 +85,14 @@ public class Staff {
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
     public Boolean getActive() {

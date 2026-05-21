@@ -1,10 +1,8 @@
-﻿import { useState, useEffect } from "react";
+﻿import { useState, useEffect, useMemo } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
 import toast from "react-hot-toast";
 import { Calendar, Clock, User, Scissors, ChevronRight, ChevronLeft, Check } from "lucide-react";
-import { useBusinesses, useServices, useStaff, useAvailableSlots } from "../hooks/useApi";
+import { useBusinesses, useServices, useStaff, useAvailableSlots, useStaffWorkingHours } from "../hooks/useApi";
 import { apiClient } from "../lib/api";
 
 const STEPS = [
@@ -18,6 +16,7 @@ const BookingPage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [currentStep, setCurrentStep] = useState(1);
+  const API_URL = "http://localhost:8080";
   const [formData, setFormData] = useState({
     businessId: searchParams.get("businessId") || "",
     serviceId: searchParams.get("serviceId") || "",
@@ -39,11 +38,94 @@ const BookingPage = () => {
     formData.date?.toISOString().split("T")[0]
   );
 
+  const next14Days = Array.from({ length: 14 }).map((_, i) => {
+    const d = new Date();
+    d.setDate(d.getDate() + i);
+    d.setHours(0, 0, 0, 0);
+    return d;
+  });
+
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const selectedBusiness = businesses.find((b) => b.id === parseInt(formData.businessId));
   const selectedService = services.find((s) => s.id === parseInt(formData.serviceId));
   const selectedStaff = staff.find((m) => m.id === parseInt(formData.staffId));
+  const { hours: staffHours, loading: staffHoursLoading } = useStaffWorkingHours(
+    formData.staffId ? parseInt(formData.staffId) : null
+  );
+
+  const selectedDateString = formData.date?.toISOString().split("T")[0] || null;
+  const selectedDayName = formData.date
+    ? formData.date
+        .toLocaleDateString("en-US", {
+          weekday: "long",
+        })
+        .toUpperCase()
+    : null;
+
+  const selectedStaffWorkingDay = selectedDayName
+    ? staffHours.find((h) => h.dayOfWeek === selectedDayName)
+    : null;
+
+  const staffTimeSlots = useMemo(() => {
+    if (!selectedStaff || !selectedService || !formData.date || !selectedStaffWorkingDay) {
+      return [];
+    }
+
+    if (selectedStaffWorkingDay.isOff || !selectedStaffWorkingDay.startTime || !selectedStaffWorkingDay.endTime) {
+      return [];
+    }
+
+    const duration = Number(selectedService.duration) || 30;
+    const slots = [];
+
+    const [startHour, startMinute] = selectedStaffWorkingDay.startTime
+      .slice(0, 5)
+      .split(":")
+      .map(Number);
+    const [endHour, endMinute] = selectedStaffWorkingDay.endTime
+      .slice(0, 5)
+      .split(":")
+      .map(Number);
+
+    const current = new Date(formData.date);
+    current.setHours(startHour, startMinute, 0, 0);
+
+    const endDate = new Date(formData.date);
+    endDate.setHours(endHour, endMinute, 0, 0);
+
+    const today = new Date();
+    const isToday = current.toDateString() === today.toDateString();
+    const currentHour = today.getHours();
+    const currentMinute = today.getMinutes();
+
+    while (current.getTime() + duration * 60000 <= endDate.getTime()) {
+      const hour = current.getHours().toString().padStart(2, "0");
+      const minute = current.getMinutes().toString().padStart(2, "0");
+      const formatted = `${hour}:${minute}`;
+
+      if (isToday) {
+        const slotHour = current.getHours();
+        const slotMinute = current.getMinutes();
+        const isPast =
+          slotHour < currentHour ||
+          (slotHour === currentHour && slotMinute <= currentMinute);
+
+        if (!isPast) {
+          slots.push(formatted);
+        }
+      } else {
+        slots.push(formatted);
+      }
+
+      current.setMinutes(current.getMinutes() + 30);
+    }
+
+    return slots;
+  }, [selectedStaff, selectedService, formData.date, selectedStaffWorkingDay]);
+
+  const effectiveSlots = selectedStaff ? staffTimeSlots : slots;
+  const isLoadingSlots = selectedStaff ? staffHoursLoading : slotsLoading;
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -99,7 +181,7 @@ const BookingPage = () => {
         serviceId: parseInt(formData.serviceId),
         staffId: parseInt(formData.staffId) || null,
         bookingDate: formData.date.toISOString().split("T")[0],
-        bookingTime: formData.time,
+        startTime: formData.time,
         customerName: formData.customerName,
         customerEmail: formData.customerEmail,
         customerPhone: formData.customerPhone,
@@ -246,43 +328,89 @@ const BookingPage = () => {
                           <div className="h-10 w-10 rounded-full border-4 border-primary-500 border-t-transparent animate-spin" />
                         </div>
                       ) : (
-                        <select
-                          value={formData.staffId}
-                          onChange={(e) => handleInputChange("staffId", e.target.value)}
-                          className="input-field"
-                        >
-                          <option value="">Any staff member</option>
-                          {staff.map((member) => (
-                            <option key={member.id} value={member.id}>
-                              {member.name} - {member.specialization}
-                            </option>
-                          ))}
-                        </select>
+                        <>
+                          <select
+                            value={formData.staffId}
+                            onChange={(e) => handleInputChange("staffId", e.target.value)}
+                            className="input-field"
+                          >
+                            <option value="">Any staff member</option>
+                            {staff.map((member) => (
+                              <option key={member.id} value={member.id}>
+                                {member.name} - {member.specialization}
+                              </option>
+                            ))}
+                          </select>
+
+                          <div className="mt-3 flex items-center gap-3 overflow-x-auto">
+                            {staff.map((member) => (
+                              <button
+                                key={member.id}
+                                type="button"
+                                onClick={() => handleInputChange("staffId", String(member.id))}
+                                className={`flex-shrink-0 flex items-center gap-3 p-2 rounded-2xl border ${String(formData.staffId) === String(member.id) ? 'border-primary-600 bg-primary-50' : 'border-slate-200'}`}
+                              >
+                                <div className="w-10 h-10 rounded-full overflow-hidden bg-slate-100">
+                                  {member.imageUrl ? (
+                                    <img src={`${API_URL}${member.imageUrl}`} alt={member.name} className="w-full h-full object-cover" />
+                                  ) : (
+                                    <div className="w-full h-full flex items-center justify-center text-white bg-primary-600">{member.name?.charAt(0)}</div>
+                                  )}
+                                </div>
+
+                                <div className="text-left">
+                                  <div className="text-sm font-semibold">{member.name}</div>
+                                  <div className="text-xs text-slate-500">{member.specialization}</div>
+                                </div>
+                              </button>
+                            ))}
+                          </div>
+                        </>
                       )}
                     </div>
 
                     <div>
                       <label className="block text-sm font-semibold text-slate-700 mb-3">Select date *</label>
-                      <DatePicker
-                        selected={formData.date}
-                        onChange={(date) => handleInputChange("date", date)}
-                        minDate={new Date()}
-                        className="input-field"
-                        placeholderText="Choose a date"
-                        dateFormat="MMM dd, yyyy"
-                      />
+                      <div className="grid grid-cols-7 gap-2">
+                        {next14Days.map((d) => {
+                          const iso = d.toISOString().split("T")[0];
+                          const isSelected =
+                            formData.date && formData.date.toISOString().split("T")[0] === iso;
+
+                          return (
+                            <button
+                              key={iso}
+                              type="button"
+                              onClick={() => handleInputChange("date", new Date(d))}
+                              className={`p-2 rounded-2xl text-sm flex flex-col items-center justify-center transition ${
+                                isSelected
+                                  ? "bg-primary-600 text-white"
+                                  : "bg-slate-50 hover:bg-slate-100"
+                              }`}
+                              aria-pressed={isSelected}
+                            >
+                              <div className="text-xs">
+                                {d.toLocaleDateString("en-US", { weekday: "short" })}
+                              </div>
+                              <div className="text-lg font-semibold">{d.getDate()}</div>
+                            </button>
+                          );
+                        })}
+                      </div>
                     </div>
                   </div>
 
                   <div className="mt-6">
                     <label className="block text-sm font-semibold text-slate-700 mb-3">Select time *</label>
-                    {slotsLoading ? (
+                    {isLoadingSlots ? (
                       <div className="flex items-center justify-center py-4">
                         <div className="h-10 w-10 rounded-full border-4 border-primary-500 border-t-transparent animate-spin" />
                       </div>
-                    ) : (
+                    ) : selectedStaff && selectedStaffWorkingDay?.isOff ? (
+                      <div className="text-red-500 text-sm">Selected staff is not working on this day</div>
+                    ) : effectiveSlots.length > 0 ? (
                       <div className="grid gap-2 sm:grid-cols-4">
-                        {slots.map((slot) => (
+                        {effectiveSlots.map((slot) => (
                           <button
                             key={slot}
                             type="button"
@@ -297,6 +425,8 @@ const BookingPage = () => {
                           </button>
                         ))}
                       </div>
+                    ) : (
+                      <div className="text-gray-500 text-sm">No available slots for the selected date.</div>
                     )}
                   </div>
                 </div>
@@ -395,10 +525,19 @@ const BookingPage = () => {
                       </div>
 
                       {selectedStaff && (
-                        <div className="rounded-3xl bg-slate-50 p-6">
-                          <p className="text-sm uppercase tracking-[0.2em] text-slate-500 mb-2">Staff</p>
-                          <p className="text-lg font-semibold text-slate-900">{selectedStaff.name}</p>
-                          <p className="text-sm text-slate-600 mt-2">{selectedStaff.specialization}</p>
+                        <div className="rounded-3xl bg-slate-50 p-6 flex items-center gap-4">
+                          <div className="w-16 h-16 rounded-xl overflow-hidden bg-slate-100">
+                            {selectedStaff.imageUrl ? (
+                              <img src={`${API_URL}${selectedStaff.imageUrl}`} alt={selectedStaff.name} className="w-full h-full object-cover" />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center text-white bg-primary-600">{selectedStaff.name?.charAt(0)}</div>
+                            )}
+                          </div>
+                          <div>
+                            <p className="text-sm uppercase tracking-[0.2em] text-slate-500 mb-2">Staff</p>
+                            <p className="text-lg font-semibold text-slate-900">{selectedStaff.name}</p>
+                            <p className="text-sm text-slate-600 mt-2">{selectedStaff.specialization}</p>
+                          </div>
                         </div>
                       )}
                     </div>

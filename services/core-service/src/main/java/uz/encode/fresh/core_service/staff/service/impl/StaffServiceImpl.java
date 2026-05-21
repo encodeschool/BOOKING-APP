@@ -4,9 +4,11 @@ import java.util.List;
 import java.util.Objects;
 
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import lombok.RequiredArgsConstructor;
 import uz.encode.fresh.core_service.business.service.BusinessAuthorizationService;
+import uz.encode.fresh.core_service.business.service.FileStorageService;
 import uz.encode.fresh.core_service.staff.dto.CreateStaffRequest;
 import uz.encode.fresh.core_service.staff.dto.StaffResponse;
 import uz.encode.fresh.core_service.staff.dto.UpdateStaffRequest;
@@ -20,6 +22,7 @@ public class StaffServiceImpl implements StaffService {
 
     private final StaffRepository repo;
     private final BusinessAuthorizationService businessAuthorizationService;
+    private final FileStorageService fileStorageService;
 
     @Override
     public StaffResponse create(Long ownerId, CreateStaffRequest req) {
@@ -74,6 +77,27 @@ public class StaffServiceImpl implements StaffService {
     }
 
     @Override
+    public StaffResponse addImage(Long staffId, Long ownerId, MultipartFile file) {
+        Objects.requireNonNull(staffId, "Staff id is required");
+
+        Staff s = repo.findById(staffId)
+                .orElseThrow(() -> new RuntimeException("Staff not found"));
+
+        businessAuthorizationService.assertOwner(s.getBusinessId(), ownerId);
+
+        String url = fileStorageService.save(file, "staff");
+
+        // delete previous image if exists
+        if (s.getImageUrl() != null) {
+            fileStorageService.delete(s.getImageUrl(), "staff");
+        }
+
+        s.setImageUrl(url);
+
+        return map(repo.save(s));
+    }
+
+    @Override
     public void delete(Long id, Long ownerId) {
         Objects.requireNonNull(id, "Staff id is required");
         Staff s = repo.findById(id)
@@ -101,6 +125,7 @@ public class StaffServiceImpl implements StaffService {
         r.specialization = s.getSpecialization();
         r.role = s.getRole();
         r.phone = s.getPhone();
+        r.imageUrl = s.getImageUrl();
         r.active = s.getActive();
         r.userId = s.getUserId();
         r.businessId = s.getBusinessId();

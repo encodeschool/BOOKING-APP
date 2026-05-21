@@ -32,17 +32,17 @@ public class PublicBookingController {
 
     @GetMapping("/available-slots")
     public List<String> getAvailableSlots(
-            @RequestParam Long businessId,
-            @RequestParam Long serviceId,
-            @RequestParam String date) {
+            @RequestParam("businessId") Long businessId,
+            @RequestParam("serviceId") Long serviceId,
+            @RequestParam("date") String date) {
         return bookingService.getAvailableSlots(businessId, serviceId, date);
     }
 
     @GetMapping("/available-dates")
     public List<String> getAvailableDates(
-            @RequestParam Long businessId,
-            @RequestParam Long serviceId,
-            @RequestParam(required = false) Long staffId) {
+            @RequestParam("businessId") Long businessId,
+            @RequestParam("serviceId") Long serviceId,
+            @RequestParam(value = "staffId", required = false) Long staffId) {
         return bookingService.getAvailableDates(businessId, serviceId, staffId);
     }
 

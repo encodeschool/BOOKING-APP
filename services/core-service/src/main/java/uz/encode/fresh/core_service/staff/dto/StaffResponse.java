@@ -18,6 +18,7 @@ public class StaffResponse {
     public String specialization;
     public String role;
     public String phone;
+    public String imageUrl;
     public Boolean active;
     public Long userId;
     public Long businessId;

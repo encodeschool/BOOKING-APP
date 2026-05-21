@@ -11,7 +11,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -50,7 +52,7 @@ public class StaffController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('STAFF')")
-    public StaffResponse update(@PathVariable Long id,
+    public StaffResponse update(@PathVariable("id") Long id,
                                 HttpServletRequest request,
                                 @RequestBody UpdateStaffRequest req) {
         return service.update(id, (Long) request.getAttribute("userId"), req);
@@ -58,8 +60,16 @@ public class StaffController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('STAFF')")
-    public void delete(@PathVariable Long id,
+    public void delete(@PathVariable("id") Long id,
                        HttpServletRequest request) {
         service.delete(id, (Long) request.getAttribute("userId"));
+    }
+
+    @PostMapping("/{id}/image")
+    @PreAuthorize("hasAuthority('STAFF')")
+    public StaffResponse uploadImage(@PathVariable("id") Long id,
+                                     HttpServletRequest request,
+                                     @RequestParam("file") MultipartFile file) {
+        return service.addImage(id, (Long) request.getAttribute("userId"), file);
     }
 }

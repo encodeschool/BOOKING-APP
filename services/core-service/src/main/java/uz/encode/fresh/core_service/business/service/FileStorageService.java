@@ -12,26 +12,29 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 public class FileStorageService {
 
-    private final String uploadDir =
-            System.getProperty("user.dir") + "/uploads/business/";
+    private final String baseUploadDir = System.getProperty("user.dir") + "/uploads/";
 
     public String save(MultipartFile file) {
+        return save(file, "business");
+    }
 
+    public String save(MultipartFile file, String subFolder) {
         try {
+            String uploadDir = baseUploadDir + subFolder + "/";
+
             Path dirPath = Paths.get(uploadDir);
 
             if (!Files.exists(dirPath)) {
                 Files.createDirectories(dirPath);
             }
 
-            String filename =
-                    UUID.randomUUID() + "_" + file.getOriginalFilename();
+            String filename = UUID.randomUUID() + "_" + file.getOriginalFilename();
 
             Path filePath = dirPath.resolve(filename);
 
             file.transferTo(filePath.toFile());
 
-            return "/uploads/business/" + filename;
+            return "/uploads/" + subFolder + "/" + filename;
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -40,14 +43,20 @@ public class FileStorageService {
     }
 
     public void delete(String path) {
+        delete(path, "business");
+    }
 
+    public void delete(String path, String subFolder) {
         try {
             if (path == null) return;
 
-            String filename = path.replace("/uploads/business/", "");
+            String prefix = "/uploads/" + subFolder + "/";
 
-            Path filePath =
-                    Paths.get(uploadDir).resolve(filename);
+            String filename = path.replace(prefix, "");
+
+            String uploadDir = baseUploadDir + subFolder + "/";
+
+            Path filePath = Paths.get(uploadDir).resolve(filename);
 
             Files.deleteIfExists(filePath);
 

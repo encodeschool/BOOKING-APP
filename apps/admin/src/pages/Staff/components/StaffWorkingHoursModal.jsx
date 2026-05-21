@@ -49,15 +49,17 @@ export default function StaffWorkingHoursModal({
 
   async function handleSave(day) {
     try {
-      const item = hours[day];
+      const item = hours[day] || { startTime: "09:00", endTime: "18:00", isOff: false };
 
-      await saveStaffWorkingHours(token, {
+      const saved = await saveStaffWorkingHours(token, {
         staffId: staff.id,
         dayOfWeek: day,
         startTime: item.startTime,
         endTime: item.endTime,
         isOff: item.isOff,
       });
+
+      setHours((prev) => ({ ...prev, [day]: saved }));
 
       alert("Saved");
     } catch (err) {

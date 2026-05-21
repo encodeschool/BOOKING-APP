@@ -7,6 +7,8 @@ import {
 import { useBooking } from "../../../context/BookingContext";
 import { useStaff } from "../../../hooks/useApi";
 
+const API_URL =  "http://localhost:8080";
+
 const Step3StaffSelection = () => {
   const {
     booking,
@@ -132,11 +134,17 @@ const Step3StaffSelection = () => {
                   <div className="flex items-center gap-4">
 
                     {/* AVATAR */}
-                    <div className="w-14 h-14 rounded-full bg-black text-white flex items-center justify-center text-lg font-semibold">
-                      {(member.name || "?")
-                        .charAt(0)
-                        .toUpperCase()}
-                    </div>
+                    {member.imageUrl ? (
+                      <img
+                        src={`${API_URL}${member.imageUrl}`}
+                        alt={member.name}
+                        className="w-14 h-14 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-14 h-14 rounded-full bg-black text-white flex items-center justify-center text-lg font-semibold">
+                        {(member.name || "?").charAt(0).toUpperCase()}
+                      </div>
+                    )}
 
                     {/* INFO */}
                     <div>

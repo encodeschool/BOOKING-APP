@@ -13,12 +13,13 @@ import {
 
 import { useAuth } from "../../app/providers/AuthProvider";
 import { useBusiness } from "../../app/providers/BusinessProvider";
-import { createStaff, getStaff } from "../../lib/api";
+import { createStaff, getStaff, updateStaff, deleteStaff, uploadStaffImage } from "../../lib/api";
 import StaffWorkingHoursModal from './components/StaffWorkingHoursModal';
 
 export default function StaffPage() {
   const { token } = useAuth();
   const { selectedBusinessId } = useBusiness();
+  const API_URL = "http://localhost:8080";
 
   const [staff, setStaff] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -27,9 +28,14 @@ export default function StaffPage() {
   const [selectedStaff, setSelectedStaff] = useState(null);
 
   const [form, setForm] = useState({
+    id: null,
     name: "",
     role: "",
+    specialization: "",
     phone: "",
+    active: true,
+    imageUrl: "",
+    file: null,
   });
 
   const [search, setSearch] = useState("");
@@ -66,16 +72,33 @@ export default function StaffPage() {
   async function handleCreate() {
     try {
       const created = await createStaff(token, {
-        ...form,
         businessId: Number(selectedBusinessId),
+        name: form.name,
+        role: form.role,
+        phone: form.phone,
+        specialization: form.specialization,
       });
+
+      if (form.file) {
+        try {
+          const updated = await uploadStaffImage(token, created.id, form.file);
+          created.imageUrl = updated.imageUrl || updated.image;
+        } catch (e) {
+          console.warn('Failed to upload staff image', e);
+        }
+      }
 
       setStaff((prev) => [...prev, created]);
 
       setForm({
+        id: null,
         name: "",
         role: "",
+        specialization: "",
         phone: "",
+        active: true,
+        imageUrl: "",
+        file: null,
       });
 
       setShowForm(false);
@@ -99,6 +122,65 @@ export default function StaffPage() {
             roleFilter.toLowerCase()
           ))
   );
+
+  async function handleUpdate() {
+    try {
+      const updated = await updateStaff(token, form.id, {
+        name: form.name,
+        role: form.role,
+        phone: form.phone,
+        active: form.active,
+      });
+
+      if (form.file) {
+        try {
+          const res = await uploadStaffImage(token, updated.id, form.file);
+          updated.imageUrl = res.imageUrl || res.image;
+        } catch (e) {
+          console.warn('Failed to upload staff image', e);
+        }
+      }
+
+      setStaff((prev) => prev.map((s) => (s.id === updated.id ? { ...s, ...updated } : s)));
+      setShowForm(false);
+      setForm({
+        id: null,
+        name: "",
+        role: "",
+        specialization: "",
+        phone: "",
+        active: true,
+        imageUrl: "",
+        file: null,
+      });
+    } catch (e) {
+      console.error('Failed to update staff', e);
+    }
+  }
+
+  function openEdit(member) {
+    setForm({
+      id: member.id,
+      name: member.name || "",
+      role: member.role || "",
+      specialization: member.specialization || "",
+      phone: member.phone || "",
+      active: member.active ?? true,
+      imageUrl: member.imageUrl || "",
+      file: null,
+    });
+    setShowForm(true);
+  }
+
+  async function handleDelete(member) {
+    if (!confirm(`Delete ${member.name}?`)) return;
+    try {
+      await deleteStaff(token, member.id);
+      setStaff((prev) => prev.filter((s) => s.id !== member.id));
+    } catch (e) {
+      console.error('Failed to delete staff', e);
+    }
+  }
 
   return (
     <div className="space-y-6">
@@ -205,11 +287,11 @@ export default function StaffPage() {
             <div className="flex items-center justify-between p-6 border-b border-gray-100">
               <div>
                 <h2 className="text-2xl font-bold text-gray-900">
-                  Add New Staff
+                  {form.id ? 'Edit Staff' : 'Add New Staff'}
                 </h2>
 
                 <p className="text-sm text-gray-500 mt-1">
-                  Create a new team member
+                  {form.id ? 'Update team member' : 'Create a new team member'}
                 </p>
               </div>
 
@@ -243,6 +325,30 @@ export default function StaffPage() {
                 />
               </div>
 
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Photo
+                </label>
+
+                {form.imageUrl && !form.file && (
+                  <div className="mb-3 w-full max-w-[160px] overflow-hidden rounded-3xl border border-gray-200">
+                    <img src={form.imageUrl} alt="Staff profile" className="w-full h-full object-cover" />
+                  </div>
+                )}
+
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      file: e.target.files?.[0] || null,
+                    })
+                  }
+                  className="w-full"
+                />
+              </div>
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Role
@@ -260,6 +366,49 @@ export default function StaffPage() {
                   }
                   className="w-full px-4 py-3 rounded-2xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-green-500 outline-none transition-all"
                 />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Specialization
+                </label>
+
+                <input
+                  type="text"
+                  placeholder="Hair Styling, Colour, Nails"
+                  value={form.specialization}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      specialization: e.target.value,
+                    })
+                  }
+                  className="w-full px-4 py-3 rounded-2xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-green-500 outline-none transition-all"
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Active
+                </label>
+
+                <label className="inline-flex items-center gap-3 rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3 w-full cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={form.active}
+                    onChange={(e) =>
+                      setForm({
+                        ...form,
+                        active: e.target.checked,
+                      })
+                    }
+                    className="h-5 w-5 rounded border-gray-300 text-green-600 focus:ring-green-500"
+                  />
+
+                  <span className="text-sm text-gray-600">
+                    {form.active ? "Active" : "Inactive"}
+                  </span>
+                </label>
               </div>
 
               <div className="md:col-span-2">
@@ -293,10 +442,10 @@ export default function StaffPage() {
               </button>
 
               <button
-                onClick={handleCreate}
+                onClick={form.id ? handleUpdate : handleCreate}
                 className="px-6 py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-green-600 text-white font-medium shadow-lg shadow-green-100 hover:opacity-90 transition-all"
               >
-                Create Staff
+                {form.id ? 'Save Changes' : 'Create Staff'}
               </button>
 
             </div>
@@ -415,10 +564,14 @@ export default function StaffPage() {
 
                       <div className="flex items-center gap-4">
 
-                        <div className="w-12 h-12 rounded-2xl bg-gradient-to-r from-green-500 to-emerald-500 flex items-center justify-center text-white font-bold">
-                          {member.name
-                            ?.charAt(0)
-                            ?.toUpperCase()}
+                        <div className="w-12 h-12 rounded-2xl overflow-hidden flex items-center justify-center">
+                          {member.imageUrl ? (
+                            <img src={`${API_URL}${member.imageUrl}`} alt={member.name} className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="w-full h-full bg-gradient-to-r from-green-500 to-emerald-500 flex items-center justify-center text-white font-bold">
+                              {member.name?.charAt(0)?.toUpperCase()}
+                            </div>
+                          )}
                         </div>
 
                         <div>
@@ -427,7 +580,7 @@ export default function StaffPage() {
                           </h3>
 
                           <p className="text-sm text-gray-500">
-                            Staff Member
+                            {member.specialization || "Staff Member"}
                           </p>
                         </div>
 
@@ -456,11 +609,11 @@ export default function StaffPage() {
 
                       <div className="flex items-center justify-end gap-2">
 
-                        <button className="w-10 h-10 rounded-xl border border-gray-200 hover:bg-blue-50 hover:text-blue-600 flex items-center justify-center transition-all">
+                        <button onClick={() => openEdit(member)} className="w-10 h-10 rounded-xl border border-gray-200 hover:bg-blue-50 hover:text-blue-600 flex items-center justify-center transition-all">
                           <FiEdit2 />
                         </button>
 
-                        <button className="w-10 h-10 rounded-xl border border-gray-200 hover:bg-red-50 hover:text-red-600 flex items-center justify-center transition-all">
+                        <button onClick={() => handleDelete(member)} className="w-10 h-10 rounded-xl border border-gray-200 hover:bg-red-50 hover:text-red-600 flex items-center justify-center transition-all">
                           <FiTrash2 />
                         </button>
 

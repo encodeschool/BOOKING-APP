@@ -50,7 +50,13 @@ class ApiClient {
   }
 
   async getAvailableSlots(businessId, serviceId, date) {
-    return this.request(`/api/bookings/available-slots?businessId=${businessId}&serviceId=${serviceId}&date=${date}`);
+    const params = new URLSearchParams({
+      businessId: String(businessId),
+      serviceId: String(serviceId),
+      date: String(date),
+    });
+
+    return this.request(`/api/bookings/available-slots?${params.toString()}`);
   }
 
   async getAvailableDates(businessId, serviceId, staffId) {

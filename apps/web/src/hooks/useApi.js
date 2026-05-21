@@ -84,13 +84,20 @@ export function useAvailableSlots(businessId, serviceId, date) {
   useEffect(() => {
     if (!businessId || !serviceId || !date) return;
 
+    const bId = Number(businessId);
+    const sId = Number(serviceId);
+    if (Number.isNaN(bId) || Number.isNaN(sId)) return;
+
     const fetchSlots = async () => {
       setLoading(true);
       try {
-        const data = await apiClient.getAvailableSlots(businessId, serviceId, date);
+        const dateStr = typeof date === "string" ? date : date?.toString();
+        console.debug("Fetching available slots:", { businessId: bId, serviceId: sId, date: dateStr });
+        const data = await apiClient.getAvailableSlots(bId, sId, dateStr);
         setSlots(data);
       } catch (err) {
-        setError(err.message);
+        console.error("Failed to fetch available slots", { businessId, serviceId, date, err });
+        setError(err.message || String(err));
       } finally {
         setLoading(false);
       }

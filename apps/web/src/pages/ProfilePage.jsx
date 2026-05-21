@@ -16,7 +16,7 @@ const ProfilePage = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 py-12">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-10 text-center">
           <p className="text-sm font-semibold uppercase tracking-[0.3em] text-primary-600">Your profile</p>
           <h1 className="mt-4 text-4xl font-bold text-slate-900">Manage your account</h1>

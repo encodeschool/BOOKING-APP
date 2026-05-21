@@ -28,7 +28,7 @@ const RegisterPage = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 flex items-center py-12">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
         <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] items-center rounded-[2rem] bg-white p-8 shadow-xl border border-slate-200">
           <div className="space-y-6">
             <div>
