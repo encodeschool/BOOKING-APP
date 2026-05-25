@@ -6,7 +6,7 @@ services:
       args:
         SERVICE_NAME: service-registry
     ports:
-      - "8761:8761"
+      - "9001:8761"
     restart: unless-stopped
 
   config-server:
@@ -16,7 +16,7 @@ services:
       args:
         SERVICE_NAME: config-server
     ports:
-      - "8888:8888"
+      - "9002:8888"
     depends_on:
       - service-registry
     restart: unless-stopped
@@ -28,7 +28,7 @@ services:
       args:
         SERVICE_NAME: api-gateway
     ports:
-      - "9080:8080"
+      - "9003:8080"
     depends_on:
       - service-registry
       - config-server
@@ -41,7 +41,7 @@ services:
       args:
         SERVICE_NAME: auth-service
     ports:
-      - "8081:8081"
+      - "9004:8081"
     depends_on:
       - service-registry
       - config-server
@@ -54,7 +54,7 @@ services:
       args:
         SERVICE_NAME: user-service
     ports:
-      - "8082:8082"
+      - "9005:8082"
     depends_on:
       - service-registry
       - config-server
@@ -67,7 +67,7 @@ services:
       args:
         SERVICE_NAME: core-service
     ports:
-      - "8083:8083"
+      - "9006:8083"
     depends_on:
       - service-registry
       - config-server
@@ -80,7 +80,7 @@ services:
       args:
         SERVICE_NAME: booking-service
     ports:
-      - "8084:8084"
+      - "9007:8084"
     depends_on:
       - service-registry
       - config-server
@@ -93,7 +93,7 @@ services:
       args:
         SERVICE_NAME: notification-service
     ports:
-      - "8085:8085"
+      - "9008:8085"
     depends_on:
       - service-registry
       - config-server
@@ -104,7 +104,7 @@ services:
       context: ../../apps/admin
       dockerfile: Dockerfile
     ports:
-      - "3000:80"
+      - "9009:80"
     restart: unless-stopped
 
   web-frontend:
@@ -112,5 +112,5 @@ services:
       context: ../../apps/web
       dockerfile: Dockerfile
     ports:
-      - "3001:80"
+      - "9010:80"
     restart: unless-stopped
