@@ -39,13 +39,13 @@ jobs:
       - name: Install admin front-end dependencies
         working-directory: apps/admin
         run: |
-          npm ci
+          npm ci --legacy-peer-deps
           npm run build
 
       - name: Install web front-end dependencies
         working-directory: apps/web
         run: |
-          npm ci
+          npm ci --legacy-peer-deps
           npm run build
 
       - name: Verify backend Docker containers can build
