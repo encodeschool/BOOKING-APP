@@ -22,7 +22,7 @@ export default function StaffPage() {
   const API_URL =
     import.meta.env.VITE_API_BASE_URL ||
     import.meta.env.VITE_API_URL ||
-    (import.meta.env.DEV ? "http://localhost:8080" : "");
+    (import.meta.env.DEV ? "http://localhost:8080" : "https://api-enroll.encode.uz");
 
   const [staff, setStaff] = useState([]);
   const [loading, setLoading] = useState(false);
