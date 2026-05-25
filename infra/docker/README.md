@@ -4,14 +4,14 @@ This folder contains the Compose definition for the React frontends and Spring B
 
 ## Deployment folder
 
-On your VDS, place the repository under `/home/enroll` so the GitHub Actions deploy workflow can use that path.
+On your VDS, place the repository under `/home/encode/enroll` so the GitHub Actions deploy workflow can use that path.
 
 ## Start services
 
 From the repository root:
 
 ```bash
-cd /home/enroll
+cd /home/encode/enroll
 docker compose -f infra/docker/docker-compose.yml up -d --build
 ```
 
