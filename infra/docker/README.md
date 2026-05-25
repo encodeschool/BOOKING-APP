@@ -25,7 +25,7 @@ docker compose -f infra/docker/docker-compose.yml down
 
 - Frontend web app is exposed on port `3001`
 - Admin frontend is exposed on port `3000`
-- API gateway is exposed on port `8080`
+- API gateway is exposed on port `9080`
 - Service registry is exposed on port `8761`
 - Config server is exposed on port `8888`
 
