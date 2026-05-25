@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   FaChevronLeft,
   FaChevronRight,
@@ -14,6 +14,8 @@ import {
   FaCut,
   FaUserTie,
   FaBan,
+  FaExpand,
+  FaCompress,
 } from "react-icons/fa";
 
 import { useAuth } from "../../app/providers/AuthProvider";
@@ -320,13 +322,10 @@ export default function CalendarPage() {
   const [calendarBookings, setCalendarBookings] = useState([]);
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [view, setView] = useState("month");
+  const [isFullScreen, setIsFullScreen] = useState(false);
 
-  useEffect(() => {
-    if (!selectedBusinessId) return;
-    fetchBookings();
-  }, [selectedBusinessId, currentDate]);
-
-  const fetchBookings = async () => {
+  const fetchBookings = useCallback(async () => {
+    if (!selectedBusinessId || !token) return;
     const from = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
     const to = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
 
@@ -343,6 +342,50 @@ export default function CalendarPage() {
       setCalendarBookings(await res.json());
     } catch (err) {
       console.error("Failed to fetch bookings:", err);
+    }
+  }, [selectedBusinessId, currentDate, token]);
+
+  useEffect(() => {
+    if (!selectedBusinessId) return;
+    fetchBookings();
+  }, [selectedBusinessId, currentDate, fetchBookings]);
+
+  useEffect(() => {
+    if (!selectedBusinessId || !token) return undefined;
+    const interval = setInterval(() => {
+      if (!document.hidden) fetchBookings();
+    }, 10000);
+
+    return () => clearInterval(interval);
+  }, [selectedBusinessId, token, fetchBookings]);
+
+  useEffect(() => {
+    const handleFullscreenChange = () => setIsFullScreen(Boolean(document.fullscreenElement));
+    const handleVisibility = () => {
+      if (!document.hidden) fetchBookings();
+    };
+
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    document.addEventListener("visibilitychange", handleVisibility);
+    window.addEventListener("focus", handleVisibility);
+
+    return () => {
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
+      document.removeEventListener("visibilitychange", handleVisibility);
+      window.removeEventListener("focus", handleVisibility);
+    };
+  }, [fetchBookings]);
+
+  const toggleFullScreen = async () => {
+    if (!document.fullscreenElement) {
+      try {
+        await document.documentElement.requestFullscreen();
+        setIsFullScreen(true);
+      } catch (err) {
+        console.error("Failed to enter full screen", err);
+      }
+    } else {
+      await document.exitFullscreen();
     }
   };
 
@@ -599,7 +642,7 @@ export default function CalendarPage() {
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen">
+    <div className={`${isFullScreen ? "overflow-hidden" : "min-h-screen"}`}>
       {selectedBooking && (
         <BookingModal
           booking={selectedBooking}
@@ -616,9 +659,18 @@ export default function CalendarPage() {
           <h1 className="text-4xl font-bold text-gray-900">Calendar Overview</h1>
           <p className="text-gray-500 mt-2">Manage appointments, bookings and schedules.</p>
         </div>
-        <button className="flex items-center gap-3 bg-gradient-to-r from-emerald-500 to-green-500 hover:scale-[1.02] transition-all text-white px-6 py-3 rounded-2xl shadow-lg shadow-emerald-200 font-medium">
-          <FaPlus /> Add Booking
-        </button>
+        <div className="flex flex-wrap items-center gap-3">
+          <button className="flex items-center gap-3 bg-gradient-to-r from-emerald-500 to-green-500 hover:scale-[1.02] transition-all text-white px-6 py-3 rounded-2xl shadow-lg shadow-emerald-200 font-medium">
+            <FaPlus /> Add Booking
+          </button>
+          <button
+            onClick={toggleFullScreen}
+            className="flex items-center gap-2 border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all text-gray-700 px-4 py-3 rounded-2xl"
+          >
+            {isFullScreen ? <FaCompress /> : <FaExpand />}
+            <span className="text-sm font-medium">{isFullScreen ? "Exit full screen" : "Full screen"}</span>
+          </button>
+        </div>
       </div>
 
       {/* STATS */}
@@ -663,7 +715,7 @@ export default function CalendarPage() {
       </div>
 
       {/* CALENDAR CARD */}
-      <div className="bg-white rounded-[32px] border border-gray-100 shadow-sm overflow-hidden">
+      <div className={`bg-white rounded-[32px] border border-gray-100 shadow-sm overflow-hidden ${isFullScreen ? "h-full flex flex-col" : ""}`}>
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 p-6 border-b border-gray-100">
           <div>
             <h2 className="text-2xl font-bold text-gray-900">{headerTitle()}</h2>
@@ -695,9 +747,11 @@ export default function CalendarPage() {
           </div>
         </div>
 
-        {view === "month" && <MonthView />}
-        {view === "day" && <DayView />}
-        {view === "year" && <YearView />}
+        <div className="flex-1 overflow-auto">
+          {view === "month" && <MonthView />}
+          {view === "day" && <DayView />}
+          {view === "year" && <YearView />}
+        </div>
       </div>
 
       {!calendarBookings.length && (

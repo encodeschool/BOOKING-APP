@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Cache Maven repository
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('services/pom.xml', 'services/**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Build backend services
+        working-directory: services
+        run: mvn clean package -DskipTests
+
+      - name: Install admin front-end dependencies
+        working-directory: apps/admin
+        run: |
+          npm ci
+          npm run build
+
+      - name: Install web front-end dependencies
+        working-directory: apps/web
+        run: |
+          npm ci
+          npm run build
+
+      - name: Verify backend Docker containers can build
+        run: |
+          docker build --pull --no-cache --file services/Dockerfile --build-arg SERVICE_NAME=api-gateway --tag ci-api-gateway ./services
+          docker build --pull --no-cache --file services/Dockerfile --build-arg SERVICE_NAME=auth-service --tag ci-auth-service ./services
+
+      - name: Verify frontend Docker build
+        run: |
+          docker build --pull --file apps/admin/Dockerfile --tag ci-admin-frontend ./apps/admin
+          docker build --pull --file apps/web/Dockerfile --tag ci-web-frontend ./apps/web

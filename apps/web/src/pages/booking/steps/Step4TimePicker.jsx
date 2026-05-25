@@ -53,62 +53,53 @@ const Step4TimePicker = () => {
 
   const timeSlots = useMemo(() => {
     if (!workingDay) return [];
-
     if (workingDay.isOff) return [];
+    if (!workingDay.startTime || !workingDay.endTime) return [];
+
+    const parseTimeString = (timeString) => {
+      const [hour = 0, minute = 0] = String(timeString)
+        .slice(0, 5)
+        .split(":")
+        .map(Number);
+      return { hour, minute };
+    };
+
+    const formatTimeSlot = (totalMinutes) => {
+      const hour = Math.floor(totalMinutes / 60)
+        .toString()
+        .padStart(2, "0");
+      const minute = (totalMinutes % 60)
+        .toString()
+        .padStart(2, "0");
+      return `${hour}:${minute}`;
+    };
+
+    const { hour: startHour, minute: startMinute } = parseTimeString(
+      workingDay.startTime
+    );
+    const { hour: endHour, minute: endMinute } = parseTimeString(
+      workingDay.endTime
+    );
+
+    const startTotal = startHour * 60 + startMinute;
+    const endTotal = endHour * 60 + endMinute;
+    let currentTotal = startTotal;
+    const nowTotal = currentHour * 60 + currentMinute;
 
     const slots = [];
 
-    if (!workingDay.startTime || !workingDay.endTime) return [];
+    while (currentTotal < endTotal) {
+      const formatted = formatTimeSlot(currentTotal);
 
-    const start = workingDay.startTime.slice(0, 5);
-    const end = workingDay.endTime.slice(0, 5);
-
-    let [startHour, startMinute] =
-      start.split(":").map(Number);
-
-    let [endHour, endMinute] =
-      end.split(":").map(Number);
-
-    let current = new Date();
-    current.setHours(startHour, startMinute, 0);
-
-    const endDate = new Date();
-    endDate.setHours(endHour, endMinute, 0);
-
-    while (current < endDate) {
-      const hour = current
-        .getHours()
-        .toString()
-        .padStart(2, "0");
-
-      const minute = current
-        .getMinutes()
-        .toString()
-        .padStart(2, "0");
-
-      const formatted = `${hour}:${minute}`;
-
-      // HIDE PAST TIME TODAY
       if (isToday) {
-        const slotHour = current.getHours();
-        const slotMinute = current.getMinutes();
-
-        const isPast =
-          slotHour < currentHour ||
-          (slotHour === currentHour &&
-            slotMinute <= currentMinute);
-
-        if (!isPast) {
+        if (currentTotal > nowTotal) {
           slots.push(formatted);
         }
       } else {
         slots.push(formatted);
       }
 
-      // NEXT 30 MIN
-      current.setMinutes(
-        current.getMinutes() + 30
-      );
+      currentTotal += 30;
     }
 
     return slots;
