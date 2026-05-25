@@ -1,6 +1,11 @@
 import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL ||
+  import.meta.env.VITE_API_URL ||
+  (import.meta.env.DEV ? "http://localhost:8080" : "");
+
 const ImageCarousel = ({ images, title = "", autoPlay = true, interval = 5000 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isHovering, setIsHovering] = useState(false);
@@ -49,7 +54,7 @@ const ImageCarousel = ({ images, title = "", autoPlay = true, interval = 5000 })
           src={
             image.startsWith("http")
               ? image
-              : `http://localhost:8080${image}`
+              : `${API_BASE_URL}${image}`
           }
           alt={`${title} - Slide ${index + 1}`}
           className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${

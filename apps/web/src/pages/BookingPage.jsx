@@ -16,7 +16,10 @@ const BookingPage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [currentStep, setCurrentStep] = useState(1);
-  const API_URL = "http://localhost:8080";
+  const API_URL =
+    import.meta.env.VITE_API_BASE_URL ||
+    import.meta.env.VITE_API_URL ||
+    (import.meta.env.DEV ? "http://localhost:8080" : "");
   const [formData, setFormData] = useState({
     businessId: searchParams.get("businessId") || "",
     serviceId: searchParams.get("serviceId") || "",
