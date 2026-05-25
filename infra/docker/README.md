@@ -34,4 +34,16 @@ docker compose -f infra/docker/docker-compose.yml down
 - Admin frontend is exposed on port `9009`
 - Web frontend is exposed on port `9010`
 
+## Nginx domain routing
+
+If you run Nginx on the VDS host, use the config in `infra/nginx/default.conf`.
+
+Domain mapping:
+
+- `enroll.encode.uz` and `www.enroll.encode.uz` → `http://127.0.0.1:9010`
+- `admin-enroll.encode.uz` and `www.admin-enroll.encode.uz` → `http://127.0.0.1:9009`
+- `api-enroll.encode.uz` and `www.api-enroll.encode.uz` → `http://127.0.0.1:9003`
+
+Place the config on the host at `/etc/nginx/sites-available/enroll` and enable it with a symlink to `/etc/nginx/sites-enabled/`.
+
 If you need to use a different folder on the VDS, update the path in `.github/workflows/deploy.yml` accordingly.
