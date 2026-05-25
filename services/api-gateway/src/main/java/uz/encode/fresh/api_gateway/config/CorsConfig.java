@@ -17,25 +17,23 @@ public class CorsConfig {
         CorsConfiguration config = new CorsConfiguration();
 
         // Frontend origins
-        config.setAllowedOrigins(List.of(
+        config.setAllowedOriginPatterns(List.of(
             "http://localhost:3000",
             "http://localhost:5173",
-            "https://enroll.encode.uz",
-            "https://www.enroll.encode.uz",
-            "https://admin-enroll.encode.uz",
-            "https://www.admin-enroll.encode.uz",
-            "https://api-enroll.encode.uz",
-            "https://www.api-enroll.encode.uz"
+            "https://*.encode.uz"
         ));
 
         // Allow all headers
         config.setAllowedHeaders(List.of("*"));
 
         // Allow all methods
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+        config.setAllowedMethods(List.of("*"));
 
         // Allow credentials (JWT)
         config.setAllowCredentials(true);
+
+        config.setExposedHeaders(List.of("Authorization", "Content-Disposition"));
+        config.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
