@@ -660,6 +660,29 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    public List<BookingResponse> getCalendar(Long userId, String role, Long businessId, String from, String to) {
+        if (!"STAFF".equals(role)) {
+            return getCalendar(businessId, from, to);
+        }
+
+        List<StaffDetailsResponse> staffRecords = getStaffByUser(userId);
+        if (staffRecords.isEmpty()) {
+            return List.of();
+        }
+
+        List<Long> staffIds = staffRecords.stream()
+                .map(StaffDetailsResponse::id)
+                .toList();
+
+        LocalDate start = LocalDate.parse(from);
+        LocalDate end = LocalDate.parse(to);
+
+        return bookingRepository.findByBusinessIdAndBookingDateBetweenAndStaffIdIn(
+                businessId, start, end, staffIds
+        ).stream().map(this::toResponse).toList();
+    }
+
+    @Override
     public DashboardMetricsResponse getDashboardMetrics(Long businessId) {
 
         long totalBookings =

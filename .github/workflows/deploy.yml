@@ -6,30 +6,42 @@ on:
       - main
 
 jobs:
-  build-deploy:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up JDK
+      - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
 
-      - name: Build services
-        run: |
-          mvn clean package -DskipTests
+      - name: Cache Maven repository
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('services/pom.xml', 'services/**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
 
-      - name: Build Docker images
+      - name: Build backend services
+        working-directory: services
+        run: mvn clean package -DskipTests
+
+      - name: Install admin front-end dependencies
+        working-directory: apps/admin
         run: |
-          docker build -t api-gateway ./api-gateway
-          docker build -t auth-service ./auth-service
-          docker build -t user-service ./user-service
-          docker build -t core-service ./core-service
-          docker build -t booking-service ./booking-service
+          npm ci --legacy-peer-deps
+          npm run build
+
+      - name: Install web front-end dependencies
+        working-directory: apps/web
+        run: |
+          npm ci --legacy-peer-deps
+          npm run build
 
       - name: Save SSH key
         run: |
@@ -37,13 +49,11 @@ jobs:
           echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
 
-      - name: Deploy to VPS
+      - name: Deploy to VPS using rsync
         run: |
-          ssh -o StrictHostKeyChecking=no root@${{ secrets.VPS_IP }} << 'EOF'
-            cd /opt/app
-
-            git pull origin main
-
-            docker compose -f infra/docker/docker-compose.yml down
-            docker compose -f infra/docker/docker-compose.yml up -d --build
+          rsync -az --delete --exclude='.git' -e "ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa" . ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_IP }}:/home/${{ secrets.VPS_USERNAME }}/enroll
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_IP }} << 'EOF'
+            cd /home/${{ secrets.VPS_USERNAME }}/enroll
+            sudo docker compose -f infra/docker/docker-compose.yml down
+            sudo docker compose -f infra/docker/docker-compose.yml up -d --build
           EOF

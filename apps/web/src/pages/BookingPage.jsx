@@ -1,7 +1,7 @@
 ﻿import { useState, useEffect, useMemo } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import toast from "react-hot-toast";
-import { Calendar, Clock, User, Scissors, ChevronRight, ChevronLeft, Check } from "lucide-react";
+import { Calendar, Clock, User, Scissors, ChevronRight, ChevronLeft, Check, X } from "lucide-react";
 import { useBusinesses, useServices, useStaff, useAvailableSlots, useStaffWorkingHours } from "../hooks/useApi";
 import { apiClient } from "../lib/api";
 
@@ -16,7 +16,10 @@ const BookingPage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [currentStep, setCurrentStep] = useState(1);
-  const API_URL = "http://localhost:8080";
+  const API_URL =
+    import.meta.env.VITE_API_BASE_URL ||
+    import.meta.env.VITE_API_URL ||
+    (import.meta.env.DEV ? "http://localhost:8080" : "https://api-enroll.encode.uz");
   const [formData, setFormData] = useState({
     businessId: searchParams.get("businessId") || "",
     serviceId: searchParams.get("serviceId") || "",
@@ -46,6 +49,8 @@ const BookingPage = () => {
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+  const [confirmedBooking, setConfirmedBooking] = useState(null);
 
   const selectedBusiness = businesses.find((b) => b.id === parseInt(formData.businessId));
   const selectedService = services.find((s) => s.id === parseInt(formData.serviceId));
@@ -63,6 +68,86 @@ const BookingPage = () => {
         .toUpperCase()
     : null;
 
+  const parseTimeString = (timeString) => {
+    const [hour = 0, minute = 0] = String(timeString)
+      .slice(0, 5)
+      .split(":")
+      .map(Number);
+    return { hour, minute };
+  };
+
+  const formatTimeSlot = (totalMinutes) => {
+    const hour = Math.floor(totalMinutes / 60)
+      .toString()
+      .padStart(2, "0");
+    const minute = (totalMinutes % 60)
+      .toString()
+      .padStart(2, "0");
+    return `${hour}:${minute}`;
+  };
+
+  const closeConfirmationModal = () => {
+    setShowConfirmationModal(false);
+  };
+
+  const ConfirmationModal = ({ booking, onClose }) => {
+    if (!booking) return null;
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40">
+        <div className="relative w-full max-w-xl rounded-3xl bg-white p-6 shadow-2xl">
+          <button
+            type="button"
+            onClick={onClose}
+            className="absolute right-4 top-4 inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-slate-200 text-slate-500 hover:bg-slate-100"
+          >
+            <X size={20} />
+          </button>
+          <div className="text-center pt-4">
+            <div className="mx-auto mb-4 inline-flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
+              <Check size={32} />
+            </div>
+            <h2 className="text-3xl font-semibold text-slate-900 mb-2">Booking Confirmed</h2>
+            <p className="text-sm text-slate-500 mb-6">Your appointment has been successfully booked.</p>
+          </div>
+          <div className="grid gap-4 rounded-3xl border border-slate-200 bg-slate-50 p-5 text-sm text-slate-700 mb-6">
+            <div>
+              <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Business</p>
+              <p className="font-semibold text-slate-900">{booking.businessName}</p>
+            </div>
+            <div>
+              <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Service</p>
+              <p className="font-semibold text-slate-900">{booking.serviceName}</p>
+            </div>
+            <div>
+              <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Date & Time</p>
+              <p className="font-semibold text-slate-900">{formData.date?.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })} at {booking.startTime}</p>
+            </div>
+            <div>
+              <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Staff</p>
+              <p className="font-semibold text-slate-900">{booking.staffName}</p>
+            </div>
+          </div>
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <button
+              type="button"
+              onClick={() => navigate("/my-bookings")}
+              className="btn-primary w-full"
+            >
+              View my bookings
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="w-full rounded-3xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const selectedStaffWorkingDay = selectedDayName
     ? staffHours.find((h) => h.dayOfWeek === selectedDayName)
     : null;
@@ -79,46 +164,33 @@ const BookingPage = () => {
     const duration = Number(selectedService.duration) || 30;
     const slots = [];
 
-    const [startHour, startMinute] = selectedStaffWorkingDay.startTime
-      .slice(0, 5)
-      .split(":")
-      .map(Number);
-    const [endHour, endMinute] = selectedStaffWorkingDay.endTime
-      .slice(0, 5)
-      .split(":")
-      .map(Number);
+    const { hour: startHour, minute: startMinute } = parseTimeString(
+      selectedStaffWorkingDay.startTime
+    );
+    const { hour: endHour, minute: endMinute } = parseTimeString(
+      selectedStaffWorkingDay.endTime
+    );
 
-    const current = new Date(formData.date);
-    current.setHours(startHour, startMinute, 0, 0);
-
-    const endDate = new Date(formData.date);
-    endDate.setHours(endHour, endMinute, 0, 0);
+    const startTotal = startHour * 60 + startMinute;
+    const endTotal = endHour * 60 + endMinute;
+    let currentTotal = startTotal;
 
     const today = new Date();
-    const isToday = current.toDateString() === today.toDateString();
-    const currentHour = today.getHours();
-    const currentMinute = today.getMinutes();
+    const isToday = formData.date.toDateString() === today.toDateString();
+    const nowTotal = today.getHours() * 60 + today.getMinutes();
 
-    while (current.getTime() + duration * 60000 <= endDate.getTime()) {
-      const hour = current.getHours().toString().padStart(2, "0");
-      const minute = current.getMinutes().toString().padStart(2, "0");
-      const formatted = `${hour}:${minute}`;
+    while (currentTotal + duration <= endTotal) {
+      const formatted = formatTimeSlot(currentTotal);
 
       if (isToday) {
-        const slotHour = current.getHours();
-        const slotMinute = current.getMinutes();
-        const isPast =
-          slotHour < currentHour ||
-          (slotHour === currentHour && slotMinute <= currentMinute);
-
-        if (!isPast) {
+        if (currentTotal > nowTotal) {
           slots.push(formatted);
         }
       } else {
         slots.push(formatted);
       }
 
-      current.setMinutes(current.getMinutes() + 30);
+      currentTotal += 30;
     }
 
     return slots;
@@ -188,10 +260,16 @@ const BookingPage = () => {
         notes: formData.notes,
       };
 
-      await apiClient.createBooking(bookingData);
-
+      const createdBooking = await apiClient.createBooking(bookingData);
+      setConfirmedBooking({
+        ...bookingData,
+        id: createdBooking?.id,
+        businessName: selectedBusiness?.name,
+        serviceName: selectedService?.name,
+        staffName: selectedStaff?.name || "Any available staff",
+      });
+      setShowConfirmationModal(true);
       toast.success("Booking confirmed successfully!");
-      navigate("/my-bookings");
     } catch (error) {
       toast.error(error.message || "Failed to create booking");
     } finally {
@@ -242,6 +320,9 @@ const BookingPage = () => {
 
         {/* Step Content */}
         <div className="rounded-3xl bg-white p-8 shadow-lg border border-slate-200">
+          {showConfirmationModal && (
+            <ConfirmationModal booking={confirmedBooking} onClose={closeConfirmationModal} />
+          )}
           <form onSubmit={handleSubmit}>
             {/* Step 1: Business & Service */}
             {currentStep === 1 && (

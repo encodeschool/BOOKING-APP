@@ -3,13 +3,6 @@
   "configurations": [
     {
       "type": "java",
-      "name": "NotificationServiceApplication",
-      "request": "launch",
-      "mainClass": "uz.encode.fresh.notification_service.NotificationServiceApplication",
-      "projectName": "notification-service"
-    },
-    {
-      "type": "java",
       "name": "Auth Service (DEV)",
       "request": "launch",
       "mainClass": "uz.encode.fresh.auth_service.AuthServiceApplication",

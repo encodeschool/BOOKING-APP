@@ -16,17 +16,24 @@ public class CorsConfig {
 
         CorsConfiguration config = new CorsConfiguration();
 
-        // Frontend origin
-        config.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:5173"));
+        // Frontend origins
+        config.setAllowedOriginPatterns(List.of(
+            "http://localhost:3000",
+            "http://localhost:5173",
+            "https://*.encode.uz"
+        ));
 
         // Allow all headers
         config.setAllowedHeaders(List.of("*"));
 
         // Allow all methods
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+        config.setAllowedMethods(List.of("*"));
 
         // Allow credentials (JWT)
         config.setAllowCredentials(true);
+
+        config.setExposedHeaders(List.of("Authorization", "Content-Disposition"));
+        config.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);

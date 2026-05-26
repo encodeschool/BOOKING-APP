@@ -105,7 +105,7 @@ export const MultiStepBookingForm = () => {
         serviceId: parseInt(formData.serviceId),
         staffId: parseInt(formData.staffId),
         bookingDate: formData.date,
-        bookingTime: formData.time,
+        startTime: formData.time,
         customerName: formData.customerName,
         customerEmail: formData.customerEmail,
         customerPhone: formData.customerPhone,

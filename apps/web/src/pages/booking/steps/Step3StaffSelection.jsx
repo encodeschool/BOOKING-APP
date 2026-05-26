@@ -7,7 +7,10 @@ import {
 import { useBooking } from "../../../context/BookingContext";
 import { useStaff } from "../../../hooks/useApi";
 
-const API_URL =  "http://localhost:8080";
+const API_URL =
+  import.meta.env.VITE_API_BASE_URL ||
+  import.meta.env.VITE_API_URL ||
+  (import.meta.env.DEV ? "http://localhost:8080" : "https://api-enroll.encode.uz");
 
 const Step3StaffSelection = () => {
   const {
