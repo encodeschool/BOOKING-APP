@@ -11,7 +11,7 @@ logging:
 
 eureka:
   instance:
-    hostname: localhost
+    hostname: service-registry
   client:
     registry-with-eureka: false
     fetch-registry: false
