@@ -7,6 +7,8 @@ services:
         SERVICE_NAME: service-registry
     ports:
       - "9001:8761"
+    volumes:
+      - ./logs/service-registry:/app/logs
     restart: unless-stopped
 
   config-server:
@@ -19,6 +21,8 @@ services:
       - "9002:8888"
     depends_on:
       - service-registry
+    volumes:
+      - ./logs/config-server:/app/logs
     restart: unless-stopped
 
   api-gateway:
@@ -32,6 +36,8 @@ services:
     depends_on:
       - service-registry
       - config-server
+    volumes:
+      - ./logs/api-gateway:/app/logs
     restart: unless-stopped
 
   auth-service:
@@ -45,6 +51,8 @@ services:
     depends_on:
       - service-registry
       - config-server
+    volumes:
+      - ./logs/auth-service:/app/logs
     restart: unless-stopped
 
   user-service:
@@ -58,6 +66,8 @@ services:
     depends_on:
       - service-registry
       - config-server
+    volumes:
+      - ./logs/user-service:/app/logs
     restart: unless-stopped
 
   core-service:
@@ -71,6 +81,8 @@ services:
     depends_on:
       - service-registry
       - config-server
+    volumes:
+      - ./logs/core-service:/app/logs
     restart: unless-stopped
 
   booking-service:
@@ -84,6 +96,8 @@ services:
     depends_on:
       - service-registry
       - config-server
+    volumes:
+      - ./logs/booking-service:/app/logs
     restart: unless-stopped
 
   notification-service:
@@ -97,6 +111,8 @@ services:
     depends_on:
       - service-registry
       - config-server
+    volumes:
+      - ./logs/notification-service:/app/logs
     restart: unless-stopped
 
   admin-frontend:
