@@ -20,8 +20,10 @@ RUN mvn -q -pl ${SERVICE_NAME} -am clean package -DskipTests
 
 FROM eclipse-temurin:17-jre-jammy
 ARG SERVICE_NAME
+WORKDIR /app
 COPY ${SERVICE_NAME}/target/${SERVICE_NAME}-*.jar /app/app.jar
+RUN mkdir -p /app/logs
 
 EXPOSE 8080
 ENV JAVA_OPTS="-Xms256m -Xmx512m"
-ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar /app/app.jar"]
+ENTRYPOINT ["sh", "-c", "exec java $JAVA_OPTS -jar /app/app.jar"]

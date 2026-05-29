@@ -21,6 +21,16 @@ docker compose -f infra/docker/docker-compose.yml up -d --build
 docker compose -f infra/docker/docker-compose.yml down
 ```
 
+## Service logs
+
+When services are started with Docker Compose, container runtime output is persisted to host log files under `infra/docker/logs/<service>/log.txt`.
+
+Example:
+
+- `infra/docker/logs/api-gateway/log.txt`
+- `infra/docker/logs/auth-service/log.txt`
+- `infra/docker/logs/service-registry/log.txt`
+
 ## Notes
 
 - Service registry is exposed on port `9001`

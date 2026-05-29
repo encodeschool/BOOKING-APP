@@ -5,6 +5,10 @@ spring:
   application:
     name: service-registry
 
+logging:
+  file:
+    name: logs/log.txt
+
 eureka:
   instance:
     hostname: localhost
