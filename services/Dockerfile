@@ -16,7 +16,7 @@ COPY notification-service/pom.xml notification-service/pom.xml
 COPY . .
 
 ARG SERVICE_NAME
-RUN mvn -q -pl ${SERVICE_NAME} -am clean package -DskipTests
+RUN mvn -q -pl ${SERVICE_NAME} -am clean package spring-boot:repackage -DskipTests
 
 FROM eclipse-temurin:17-jre-jammy
 ARG SERVICE_NAME
