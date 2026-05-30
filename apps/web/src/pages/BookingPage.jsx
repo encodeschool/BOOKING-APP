@@ -19,7 +19,7 @@ const BookingPage = () => {
   const API_URL =
     import.meta.env.VITE_API_BASE_URL ||
     import.meta.env.VITE_API_URL ||
-    (import.meta.env.DEV ? "http://localhost:8080" : "https://api-enroll.encode.uz");
+    (import.meta.env.DEV ? "http://localhost:8087" : "https://api-enroll.encode.uz");
   const [formData, setFormData] = useState({
     businessId: searchParams.get("businessId") || "",
     serviceId: searchParams.get("serviceId") || "",

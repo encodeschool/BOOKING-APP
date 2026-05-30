@@ -24,6 +24,6 @@ WORKDIR /app
 COPY ${SERVICE_NAME}/target/${SERVICE_NAME}-*.jar /app/app.jar
 RUN mkdir -p /app/logs
 
-EXPOSE 8080
+EXPOSE 8080 8087
 ENV JAVA_OPTS="-Xms256m -Xmx512m"
 ENTRYPOINT ["sh", "-c", "exec java $JAVA_OPTS -jar /app/app.jar"]

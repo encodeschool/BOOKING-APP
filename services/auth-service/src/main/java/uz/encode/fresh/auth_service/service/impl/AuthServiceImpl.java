@@ -97,7 +97,7 @@ public class AuthServiceImpl implements AuthService {
             Map<String, Object> resetData = Map.of(
                 "email", user.getEmail(),
                 "userName", user.getEmail().split("@")[0],
-                "resetLink", "https://localhost:8080/reset-password?token=" + resetToken,
+                "resetLink", "https://localhost:8087/reset-password?token=" + resetToken,
                 "expiryHours", "24",
                 "requestTime", java.time.LocalDateTime.now().toString(),
                 "ipAddress", "127.0.0.1" // In production, get from request
