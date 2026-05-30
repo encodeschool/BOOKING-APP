@@ -23,6 +23,8 @@ services:
       - service-registry
     volumes:
       - ./logs/config-server:/app/logs
+    environment:
+      - EUREKA_DEFAULT_ZONE=http://service-registry:8761/eureka/
     restart: unless-stopped
 
   api-gateway:
@@ -38,6 +40,8 @@ services:
       - config-server
     volumes:
       - ./logs/api-gateway:/app/logs
+    environment:
+      - EUREKA_DEFAULT_ZONE=http://service-registry:8761/eureka/
     restart: unless-stopped
 
   auth-service:
@@ -53,6 +57,8 @@ services:
       - config-server
     volumes:
       - ./logs/auth-service:/app/logs
+    environment:
+      - EUREKA_DEFAULT_ZONE=http://service-registry:8761/eureka/
     restart: unless-stopped
 
   user-service:
@@ -68,6 +74,8 @@ services:
       - config-server
     volumes:
       - ./logs/user-service:/app/logs
+    environment:
+      - EUREKA_DEFAULT_ZONE=http://service-registry:8761/eureka/
     restart: unless-stopped
 
   core-service:
@@ -83,6 +91,8 @@ services:
       - config-server
     volumes:
       - ./logs/core-service:/app/logs
+    environment:
+      - EUREKA_DEFAULT_ZONE=http://service-registry:8761/eureka/
     restart: unless-stopped
 
   booking-service:
@@ -98,6 +108,8 @@ services:
       - config-server
     volumes:
       - ./logs/booking-service:/app/logs
+    environment:
+      - EUREKA_DEFAULT_ZONE=http://service-registry:8761/eureka/
     restart: unless-stopped
 
   notification-service:
@@ -113,6 +125,8 @@ services:
       - config-server
     volumes:
       - ./logs/notification-service:/app/logs
+    environment:
+      - EUREKA_DEFAULT_ZONE=http://service-registry:8761/eureka/
     restart: unless-stopped
 
   admin-frontend:
