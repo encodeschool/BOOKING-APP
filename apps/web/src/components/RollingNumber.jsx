@@ -23,7 +23,7 @@ const RollingNumber = ({ value }) => {
   const digits = value.toString().split("");
 
   return (
-    <div className="flex items-center text-2xl font-bold">
+    <span className="inline-flex items-center text-2xl font-bold">
       {digits.map((d, i) =>
         d === "," ? (
           <span key={i}>,</span>
@@ -31,7 +31,7 @@ const RollingNumber = ({ value }) => {
           <RollingDigit key={i} digit={Number(d)} />
         )
       )}
-    </div>
+    </span>
   );
 };
 
