@@ -17,11 +17,17 @@ COPY . .
 
 ARG SERVICE_NAME
 RUN mvn -q -pl ${SERVICE_NAME} -am clean package spring-boot:repackage -DskipTests
+RUN mkdir -p /workspace/out && \
+    bash -lc 'for f in ${SERVICE_NAME}/target/${SERVICE_NAME}-*.jar; do \
+        case "$f" in *.original) continue;; esac; \
+        cp "$f" /workspace/out/app.jar; \
+        break; \
+    done'
 
 FROM eclipse-temurin:17-jre-jammy
 ARG SERVICE_NAME
 WORKDIR /app
-COPY ${SERVICE_NAME}/target/${SERVICE_NAME}-*.jar /app/app.jar
+COPY --from=0 /workspace/out/app.jar /app/app.jar
 RUN mkdir -p /app/logs
 
 EXPOSE 8080 8087
