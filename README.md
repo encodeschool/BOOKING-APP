@@ -288,3 +288,17 @@ docker compose -f infra/docker/docker-compose.yml restart
 # View logs
 docker compose -f infra/docker/docker-compose.yml logs -f
 ```
+
+
+If you need safe cleanup
+If you want to preserve current containers but remove stopped/unused data:
+```bash
+sudo docker container prune
+sudo docker image prune -af
+sudo docker volume prune
+sudo docker network prune
+```
+
+Important
+This is a host disk/daemon issue, not a code issue. Freeing space on the Docker host will resolve this build failure.
+
