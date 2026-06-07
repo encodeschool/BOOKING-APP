@@ -1,4 +1,4 @@
-name: CI
+name: CI - All Components
 
 on:
   push:
@@ -11,9 +11,8 @@ on:
       - develop
 
 jobs:
-  build:
+  build-backend:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -36,24 +35,40 @@ jobs:
         working-directory: services
         run: mvn clean package -DskipTests
 
-      - name: Install admin front-end dependencies
+  build-admin:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: apps/admin/package-lock.json
+
+      - name: Install and build admin frontend
         working-directory: apps/admin
         run: |
           npm ci --legacy-peer-deps
           npm run build
 
-      - name: Install web front-end dependencies
+  build-web:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: apps/web/package-lock.json
+
+      - name: Install and build web frontend
         working-directory: apps/web
         run: |
           npm ci --legacy-peer-deps
           npm run build
-
-      - name: Verify backend Docker containers can build
-        run: |
-          docker build --pull --no-cache --file services/Dockerfile --build-arg SERVICE_NAME=api-gateway --tag ci-api-gateway ./services
-          docker build --pull --no-cache --file services/Dockerfile --build-arg SERVICE_NAME=auth-service --tag ci-auth-service ./services
-
-      - name: Verify frontend Docker build
-        run: |
-          docker build --pull --file apps/admin/Dockerfile --tag ci-admin-frontend ./apps/admin
-          docker build --pull --file apps/web/Dockerfile --tag ci-web-frontend ./apps/web

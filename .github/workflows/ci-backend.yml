@@ -1,0 +1,49 @@
+name: CI - Backend Services
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'services/**'
+      - '.github/workflows/ci-backend.yml'
+  pull_request:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'services/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Cache Maven repository
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('services/pom.xml', 'services/**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Build backend services
+        working-directory: services
+        run: mvn clean package -DskipTests
+
+      - name: Upload JAR artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-jars
+          path: services/**/target/*.jar
+          retention-days: 7

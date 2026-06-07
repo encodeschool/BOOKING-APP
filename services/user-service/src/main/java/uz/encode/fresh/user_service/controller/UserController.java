@@ -51,7 +51,7 @@ public class UserController {
 
     @GetMapping
     @PreAuthorize("hasAuthority('ADMIN')")
-    public List<User> getUsers(@RequestParam(required = false) String email) {
+    public List<User> getUsers(@RequestParam(name = "email", required = false) String email) {
         return service.getAll();
     }
 

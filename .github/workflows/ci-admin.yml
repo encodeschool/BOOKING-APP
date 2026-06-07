@@ -1,0 +1,46 @@
+name: CI - Admin Frontend
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'apps/admin/**'
+      - '.github/workflows/ci-admin.yml'
+  pull_request:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'apps/admin/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: apps/admin/package-lock.json
+
+      - name: Install dependencies
+        working-directory: apps/admin
+        run: npm ci --legacy-peer-deps
+
+      - name: Build admin frontend
+        working-directory: apps/admin
+        run: npm run build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: admin-build
+          path: apps/admin/dist
+          retention-days: 7

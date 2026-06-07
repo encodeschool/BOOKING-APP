@@ -16,4 +16,4 @@ spring:
           searchLocations: classpath:/config
 
 server:
-  port: 8888
+  port: 9888

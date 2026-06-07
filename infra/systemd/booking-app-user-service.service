@@ -1,0 +1,22 @@
+[Unit]
+Description=Booking App - User Service
+After=network.target booking-app-config-server.service booking-app-postgres.service
+Wants=booking-app-config-server.service booking-app-postgres.service
+
+[Service]
+Type=simple
+User=encode
+WorkingDirectory=/home/encode/enroll
+Environment="JAR_FILE=/home/encode/enroll/jars/user-service.jar"
+Environment="JAVA_OPTS=-Xmx512m -Xms512m"
+Environment="EUREKA_DEFAULT_ZONE=http://localhost:9761/eureka/"
+Environment="POSTGRES_HOST=localhost"
+ExecStart=/usr/bin/java ${JAVA_OPTS} -jar ${JAR_FILE}
+Restart=on-failure
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=user-service
+
+[Install]
+WantedBy=multi-user.target
