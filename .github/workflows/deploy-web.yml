@@ -16,6 +16,22 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Validate required secrets
+        run: |
+          if [ -z "${{ secrets.SSH_KEY }}" ]; then
+            echo "❌ ERROR: SSH_KEY secret not configured"
+            exit 1
+          fi
+          if [ -z "${{ secrets.VDS_IP }}" ]; then
+            echo "❌ ERROR: VDS_IP secret not configured"
+            exit 1
+          fi
+          if [ -z "${{ secrets.VDS_USERNAME }}" ]; then
+            echo "❌ ERROR: VDS_USERNAME secret not configured"
+            exit 1
+          fi
+          echo "✅ All required secrets are configured"
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
