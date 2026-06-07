@@ -28,15 +28,22 @@ echo -e "${YELLOW}Starting Booking App Backend Services...${NC}"
 # Create directories if they don't exist
 mkdir -p "$JAR_DIR" "$LOG_DIR"
 
-# Check if all required JARs exist
+# Check if all required JARs exist (handle versioned names like service-registry-0.0.1-SNAPSHOT.jar)
 echo -e "${YELLOW}Checking for required JAR files...${NC}"
 for service in "${SERVICES[@]}"; do
   service_name=$(echo "$service" | sed 's/booking-app-//' | sed 's/-service$//')
-  jar_file="$JAR_DIR/${service_name}.jar"
-  if [ ! -f "$jar_file" ]; then
-    echo -e "${RED}ERROR: JAR file not found: $jar_file${NC}"
+
+  # Find JAR file (handle versioned names)
+  jar_file=$(find "$JAR_DIR" -maxdepth 1 -name "${service_name}*.jar" 2>/dev/null | head -1)
+
+  if [ -z "$jar_file" ]; then
+    echo -e "${RED}ERROR: JAR file not found for: $service_name${NC}"
+    echo -e "${RED}Searched in: $JAR_DIR/${service_name}*.jar${NC}"
+    echo -e "${YELLOW}Available JARs:${NC}"
+    ls -1 "$JAR_DIR"/*.jar 2>/dev/null || echo "  (no JARs found)"
     exit 1
   fi
+  echo -e "${GREEN}✓ Found: $(basename $jar_file)${NC}"
 done
 
 echo -e "${GREEN}All JAR files found.${NC}"
