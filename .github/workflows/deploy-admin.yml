@@ -19,7 +19,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '22'
           cache: 'npm'
           cache-dependency-path: apps/admin/package-lock.json
 
@@ -36,7 +36,7 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.VDS_IP }} >> ~/.ssh/known_hosts
+          ssh-keyscan -H ${{ secrets.VDS_IP }} >> ~/.ssh/known_hosts 2>/dev/null || true
 
       - name: Deploy to VDS
         run: |
