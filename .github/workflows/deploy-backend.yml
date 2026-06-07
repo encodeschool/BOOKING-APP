@@ -32,38 +32,40 @@ jobs:
           fi
           echo "✅ All required secrets are configured"
 
+      - name: Free up disk space
+        run: |
+          echo "🗑️ Freeing up disk space..."
+          sudo apt-get clean
+          sudo apt-get autoclean
+          sudo apt-get autoremove -y
+          sudo rm -rf /usr/local/graalvm-ce-17* /usr/local/.ghcup /usr/local/lib/android
+          df -h
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
 
-      - name: Cache Maven repository
-        uses: actions/cache@v4
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('services/pom.xml', 'services/**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
-
       - name: Build backend services
         working-directory: services
-        run: mvn clean package -DskipTests
-
-      - name: Save SSH key
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.VDS_IP }} >> ~/.ssh/known_hosts 2>/dev/null || true
+        run: mvn clean package -DskipTests -T1C
 
       - name: Create JAR deployment package
         run: |
           mkdir -p backend-deploy/systemd
           mkdir -p backend-deploy/scripts
 
-          # Copy JARs
-          find services -name "*.jar" -path "*/target/*" -exec cp {} backend-deploy/ \;
+          echo "🔍 Searching for JAR files..."
+          # Find all JAR files in target directories
+          find services -type f -name "*.jar" -path "*/target/*" | while read jar; do
+            echo "  Found: $jar"
+            cp "$jar" backend-deploy/
+          done
+
+          echo ""
+          echo "📦 JAR files in backend-deploy:"
+          ls -lh backend-deploy/*.jar || echo "  ⚠️  No JAR files found!"
 
           # Copy systemd files
           cp infra/systemd/booking-app-*.service backend-deploy/systemd/
@@ -72,18 +74,30 @@ jobs:
           cp infra/scripts/*.sh backend-deploy/scripts/
           chmod +x backend-deploy/scripts/*.sh
 
+          echo ""
+          echo "✅ Deployment package ready:"
           ls -la backend-deploy/
+
+      - name: Save SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.VDS_IP }} >> ~/.ssh/known_hosts 2>/dev/null || true
 
       - name: Deploy to VDS
         run: |
-          rsync -az --delete \
+          echo "📤 Uploading to VDS..."
+          rsync -avz --delete \
             -e "ssh -i ~/.ssh/id_rsa" \
             backend-deploy/ \
             ${{ secrets.VDS_USERNAME }}@${{ secrets.VDS_IP }}:/tmp/backend-deploy/
 
+          echo "✅ Upload complete"
+
       - name: Setup and start services
         run: |
-          ssh -i ~/.ssh/id_rsa ${{ secrets.VDS_USERNAME }}@${{ secrets.VDS_IP }} << 'DEPLOY_EOF'
+          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ secrets.VDS_USERNAME }}@${{ secrets.VDS_IP }} << 'DEPLOY_EOF'
             set -e
 
             echo "=== Booking App Backend Deployment ==="
@@ -91,60 +105,94 @@ jobs:
             # Create directories
             mkdir -p /home/encode/enroll/jars /home/encode/enroll/logs /home/encode/enroll/scripts
 
+            # Check what we received
+            echo "📦 Files received in /tmp/backend-deploy:"
+            ls -la /tmp/backend-deploy/
+
+            echo ""
+            echo "🔍 JAR files in /tmp/backend-deploy:"
+            ls -lh /tmp/backend-deploy/*.jar 2>/dev/null || echo "⚠️ No JAR files found!"
+
             # Copy systemd files
-            echo "Installing systemd units..."
-            sudo cp /tmp/backend-deploy/systemd/*.service /etc/systemd/system/
-
-            # Copy scripts
-            echo "Installing deployment scripts..."
-            sudo cp /tmp/backend-deploy/scripts/*.sh /home/encode/enroll/scripts/
-            sudo chmod +x /home/encode/enroll/scripts/*.sh
-
-            # Backup old JARs if they exist
-            if [ -n "$(ls /home/encode/enroll/jars/*.jar 2>/dev/null)" ]; then
-              echo "Backing up existing JARs..."
-              sudo mkdir -p /home/encode/enroll/backup/$(date +%Y%m%d_%H%M%S)
-              sudo cp /home/encode/enroll/jars/*.jar /home/encode/enroll/backup/$(date +%Y%m%d_%H%M%S)/ || true
+            echo "📋 Installing systemd units..."
+            if [ -d "/tmp/backend-deploy/systemd" ]; then
+              sudo cp /tmp/backend-deploy/systemd/*.service /etc/systemd/system/
+              echo "✅ Systemd units installed"
+            else
+              echo "⚠️ No systemd directory found"
             fi
 
-            # Copy new JARs
-            echo "Deploying JAR files..."
-            sudo cp /tmp/backend-deploy/*.jar /home/encode/enroll/jars/ 2>/dev/null || true
+            # Copy scripts
+            echo "🔧 Installing deployment scripts..."
+            if [ -d "/tmp/backend-deploy/scripts" ]; then
+              sudo cp /tmp/backend-deploy/scripts/*.sh /home/encode/enroll/scripts/
+              sudo chmod +x /home/encode/enroll/scripts/*.sh
+              echo "✅ Scripts installed"
+            else
+              echo "⚠️ No scripts directory found"
+            fi
 
-            # Set permissions to encode user
-            echo "Setting permissions..."
+            # Copy JAR files
+            echo "📦 Deploying JAR files..."
+            jar_count=$(find /tmp/backend-deploy -maxdepth 1 -name "*.jar" -type f | wc -l)
+            if [ "$jar_count" -gt 0 ]; then
+              # Backup old JARs if they exist
+              if [ -n "$(ls /home/encode/enroll/jars/*.jar 2>/dev/null)" ]; then
+                echo "💾 Backing up existing JARs..."
+                sudo mkdir -p /home/encode/enroll/backup/$(date +%Y%m%d_%H%M%S)
+                sudo cp /home/encode/enroll/jars/*.jar /home/encode/enroll/backup/$(date +%Y%m%d_%H%M%S)/ || true
+              fi
+
+              # Copy new JARs
+              sudo cp /tmp/backend-deploy/*.jar /home/encode/enroll/jars/
+              echo "✅ Copied $jar_count JAR files"
+
+              # Verify
+              echo ""
+              echo "📋 JARs now in /home/encode/enroll/jars:"
+              ls -lh /home/encode/enroll/jars/
+            else
+              echo "❌ ERROR: No JAR files found to deploy!"
+              exit 1
+            fi
+
+            # Set permissions
+            echo ""
+            echo "🔐 Setting permissions..."
             sudo chown -R encode:encode /home/encode/enroll
 
             # Reload systemd
-            echo "Reloading systemd..."
+            echo "🔄 Reloading systemd..."
             sudo systemctl daemon-reload
 
             # Stop old services if running
-            echo "Stopping services if running..."
-            sudo /home/encode/enroll/scripts/stop-backend.sh 2>/dev/null || true
+            echo "⛔ Stopping services if running..."
+            sudo /home/encode/enroll/scripts/stop-backend.sh 2>/dev/null || echo "ℹ️ No services running"
 
             # Start services
-            echo "Starting services..."
+            echo ""
+            echo "🚀 Starting services..."
             sudo /home/encode/enroll/scripts/start-backend.sh
 
-            echo "Deployment complete!"
+            echo ""
+            echo "✅ Deployment complete!"
           DEPLOY_EOF
 
       - name: Verify deployment
         run: |
-          ssh -i ~/.ssh/id_rsa ${{ secrets.VDS_USERNAME }}@${{ secrets.VDS_IP }} << 'VERIFY_EOF'
+          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no ${{ secrets.VDS_USERNAME }}@${{ secrets.VDS_IP }} << 'VERIFY_EOF'
             echo "=== Verifying Backend Services ==="
+            echo ""
 
             # Check service status
             sudo /home/encode/enroll/scripts/status-backend.sh
 
-            # Try API Gateway health
             echo ""
-            echo "Testing API Gateway..."
-            curl -s http://localhost:9087/actuator/health || echo "API Gateway not ready yet"
+            echo "🧪 Testing API Gateway..."
+            curl -s http://localhost:9087/actuator/health || echo "⚠️ API Gateway not ready yet"
 
             echo ""
-            echo "Deployment verification complete!"
+            echo "✅ Deployment verification complete!"
           VERIFY_EOF
 
 

@@ -23,23 +23,24 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Free up disk space
+        run: |
+          echo "🗑️ Freeing up disk space..."
+          sudo apt-get clean
+          sudo apt-get autoclean
+          sudo apt-get autoremove -y
+          sudo rm -rf /usr/local/graalvm-ce-17* /usr/local/.ghcup /usr/local/lib/android
+          df -h
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
 
-      - name: Cache Maven repository
-        uses: actions/cache@v4
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('services/pom.xml', 'services/**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
-
       - name: Build backend services
         working-directory: services
-        run: mvn clean package -DskipTests
+        run: mvn clean package -DskipTests -T1C
 
       - name: Upload JAR artifacts
         uses: actions/upload-artifact@v4
