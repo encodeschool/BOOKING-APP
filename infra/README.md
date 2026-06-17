@@ -59,7 +59,7 @@ services:
   api-gateway:
     image: api-gateway:latest
     ports:
-      - "8080:8080"
+      - "8087:8087"
 
   auth-service:
     image: auth-service:latest
@@ -182,7 +182,7 @@ server {
     server_name your-domain.com;
 
     location / {
-        proxy_pass http://localhost:8080;
+        proxy_pass http://localhost:8087;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
     }

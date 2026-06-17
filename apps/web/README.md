@@ -100,7 +100,7 @@ The client website integrates with the BookEase backend API. The API client is c
 Create a `.env` file in the root directory:
 
 ```env
-VITE_API_BASE_URL=http://localhost:8080
+VITE_API_BASE_URL=http://localhost:8087
 ```
 
 ## Key Components

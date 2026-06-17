@@ -7,6 +7,8 @@ services:
         SERVICE_NAME: service-registry
     ports:
       - "9001:8761"
+    volumes:
+      - ./logs/service-registry:/app/logs
     restart: unless-stopped
 
   config-server:
@@ -19,6 +21,11 @@ services:
       - "9002:8888"
     depends_on:
       - service-registry
+    volumes:
+      - ./logs/config-server:/app/logs
+    environment:
+      - EUREKA_DEFAULT_ZONE=http://service-registry:8761/eureka/
+      - POSTGRES_HOST=postgres
     restart: unless-stopped
 
   api-gateway:
@@ -28,10 +35,14 @@ services:
       args:
         SERVICE_NAME: api-gateway
     ports:
-      - "9003:8080"
+      - "9003:8087"
     depends_on:
       - service-registry
       - config-server
+    volumes:
+      - ./logs/api-gateway:/app/logs
+    environment:
+      - EUREKA_DEFAULT_ZONE=http://service-registry:8761/eureka/
     restart: unless-stopped
 
   auth-service:
@@ -45,6 +56,12 @@ services:
     depends_on:
       - service-registry
       - config-server
+      - postgres
+    volumes:
+      - ./logs/auth-service:/app/logs
+    environment:
+      - EUREKA_DEFAULT_ZONE=http://service-registry:8761/eureka/
+      - POSTGRES_HOST=postgres
     restart: unless-stopped
 
   user-service:
@@ -58,6 +75,12 @@ services:
     depends_on:
       - service-registry
       - config-server
+      - postgres
+    volumes:
+      - ./logs/user-service:/app/logs
+    environment:
+      - EUREKA_DEFAULT_ZONE=http://service-registry:8761/eureka/
+      - POSTGRES_HOST=postgres
     restart: unless-stopped
 
   core-service:
@@ -71,6 +94,12 @@ services:
     depends_on:
       - service-registry
       - config-server
+      - postgres
+    volumes:
+      - ./logs/core-service:/app/logs
+    environment:
+      - EUREKA_DEFAULT_ZONE=http://service-registry:8761/eureka/
+      - POSTGRES_HOST=postgres
     restart: unless-stopped
 
   booking-service:
@@ -84,6 +113,12 @@ services:
     depends_on:
       - service-registry
       - config-server
+      - postgres
+    volumes:
+      - ./logs/booking-service:/app/logs
+    environment:
+      - EUREKA_DEFAULT_ZONE=http://service-registry:8761/eureka/
+      - POSTGRES_HOST=postgres
     restart: unless-stopped
 
   notification-service:
@@ -97,7 +132,28 @@ services:
     depends_on:
       - service-registry
       - config-server
+    volumes:
+      - ./logs/notification-service:/app/logs
+    environment:
+      - EUREKA_DEFAULT_ZONE=http://service-registry:8761/eureka/
     restart: unless-stopped
+
+  postgres:
+    image: postgres:15
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+      - ./init-db:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   admin-frontend:
     build:

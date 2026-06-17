@@ -1,15 +1,19 @@
 server:
-  port: 8761
+  port: 9761
 
 spring:
   application:
     name: service-registry
 
+logging:
+  file:
+    name: logs/log.txt
+
 eureka:
   instance:
-    hostname: localhost
+    hostname: service-registry
   client:
-    registry-with-eureka: false
+    register-with-eureka: false
     fetch-registry: false
     service-url:
       defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/

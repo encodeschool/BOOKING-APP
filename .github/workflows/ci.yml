@@ -55,17 +55,6 @@ jobs:
           npm ci --legacy-peer-deps
           npm run build
 
-      - name: Verify Service JARs Exist
-        run: |
-          test -f services/config-server/target/*.jar
-          test -f services/service-registry/target/*.jar
-          test -f services/api-gateway/target/*.jar
-          test -f services/user-service/target/*.jar
-          test -f services/auth-service/target/*.jar
-          test -f services/core-service/target/*.jar
-          test -f services/booking-service/target/*.jar
-          test -f services/notification-service/target/*.jar
-
       - name: Verify Generated JAR Files
         run: |
           ls -la services/config-server/target

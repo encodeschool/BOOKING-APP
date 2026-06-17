@@ -12,7 +12,7 @@ Responsive React + Tailwind admin UI for the booking platform.
 
 Default:
 
-`http://localhost:8080`
+`http://localhost:8087`
 
 Override with:
 

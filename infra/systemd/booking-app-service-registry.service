@@ -1,0 +1,20 @@
+[Unit]
+Description=Booking App - Service Registry (Eureka)
+After=network.target
+Wants=booking-app-postgres.service
+
+[Service]
+Type=simple
+User=encode
+WorkingDirectory=/home/encode/enroll
+Environment="JAVA_OPTS=-Xmx256m -Xms256m"
+Environment="EUREKA_DEFAULT_ZONE=http://localhost:9761/eureka/"
+ExecStart=/bin/sh -c 'java ${JAVA_OPTS} -jar /home/encode/enroll/jars/service-registry*.jar'
+Restart=on-failure
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=service-registry
+
+[Install]
+WantedBy=multi-user.target
