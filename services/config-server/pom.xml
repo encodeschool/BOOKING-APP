@@ -60,6 +60,7 @@
     </dependencies>
 
     <build>
+        <finalName>config-server</finalName>
         <plugins>
 
             <!-- Spring Boot plugin -->

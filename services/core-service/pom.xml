@@ -93,6 +93,7 @@
     </dependencies>
 
     <build>
+        <finalName>core-service</finalName>
         <plugins>
 
             <!-- SPRING BOOT MAVEN PLUGIN -->
