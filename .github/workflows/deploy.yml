@@ -59,6 +59,8 @@ jobs:
           rsync -az --delete \
             --exclude='.git' \
             --exclude='node_modules' \
+            --exclude='infra/docker/logs' \
+            --exclude='logs' \
             -e "ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa" \
             ./ \
             ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_IP }}:/home/${{ secrets.VPS_USERNAME }}/enroll
