@@ -31,3 +31,9 @@ eureka:
 
 jwt:
   secret: mysupersecuresecretkeythatisatleast32characterslong123
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
