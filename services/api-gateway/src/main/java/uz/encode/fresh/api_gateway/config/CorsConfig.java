@@ -18,8 +18,8 @@ public class CorsConfig {
 
         // Frontend origins
         config.setAllowedOriginPatterns(List.of(
-            "http://localhost:3000",
-            "http://localhost:5173",
+            "http://localhost:3010",
+            "http://localhost:3011",
             "https://*.encode.uz"
         ));
 

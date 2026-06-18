@@ -23,7 +23,7 @@ export default function BusinessesPage() {
   const API_URL =
     import.meta.env.VITE_API_BASE_URL ||
     import.meta.env.VITE_API_URL ||
-    (import.meta.env.DEV ? "http://localhost:8087" : "https://api-enroll.encode.uz");
+    (import.meta.env.DEV ? "http://localhost:9087" : "https://api-enroll.encode.uz");
 
   const [showForm, setShowForm] = useState(false);
 

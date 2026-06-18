@@ -41,9 +41,11 @@ function AppRoutes() {
       <Route
         path="/"
         element={
-          <AdminLayout>
-            <DashboardPage />
-          </AdminLayout>
+          <ProtectedRoute>
+            <AdminLayout>
+              <DashboardPage />
+            </AdminLayout>
+          </ProtectedRoute>
         }
       />
       <Route
@@ -129,7 +131,14 @@ function AppRoutes() {
       />
 
       {/* fallback */}
-      <Route path="*" element={<Navigate to="/" />} />
+      <Route
+        path="*"
+        element={
+          localStorage.getItem("admin-token")
+            ? <Navigate to="/" replace />
+            : <Navigate to="/login" replace />
+        }
+      />
     </Routes>
   );
 }

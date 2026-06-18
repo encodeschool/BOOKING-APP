@@ -13,7 +13,7 @@ export default defineConfig({
     port: 3011,
     proxy: {
       "/api": {
-        target: "http://localhost:8087", // your Spring Boot port
+        target: "http://localhost:9087", // your Spring Boot port
         changeOrigin: true,
       },
     },
