@@ -1,0 +1,49 @@
+2026-06-20T00:46:10.130+03:00  INFO 56714 --- [notification-service] [AsyncResolver-bootstrap-executor-%d] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-06-20T01:53:07.509+03:00  INFO 56714 --- [notification-service] [AsyncResolver-bootstrap-executor-%d] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-06-20T01:58:07.514+03:00  INFO 56714 --- [notification-service] [AsyncResolver-bootstrap-executor-%d] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-06-20T02:03:07.429+03:00  INFO 56714 --- [notification-service] [AsyncResolver-bootstrap-executor-%d] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-06-20T02:08:07.435+03:00  INFO 56714 --- [notification-service] [AsyncResolver-bootstrap-executor-%d] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-06-20T02:13:07.443+03:00  INFO 56714 --- [notification-service] [AsyncResolver-bootstrap-executor-%d] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-06-20T02:18:07.446+03:00  INFO 56714 --- [notification-service] [AsyncResolver-bootstrap-executor-%d] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-06-20T02:23:07.417+03:00  INFO 56714 --- [notification-service] [AsyncResolver-bootstrap-executor-%d] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-06-20T02:28:07.426+03:00  INFO 56714 --- [notification-service] [AsyncResolver-bootstrap-executor-%d] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-06-20T02:33:07.430+03:00  INFO 56714 --- [notification-service] [AsyncResolver-bootstrap-executor-%d] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-06-20T02:38:07.434+03:00  INFO 56714 --- [notification-service] [AsyncResolver-bootstrap-executor-%d] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-06-20T02:43:07.440+03:00  INFO 56714 --- [notification-service] [AsyncResolver-bootstrap-executor-%d] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-06-20T02:48:07.446+03:00  INFO 56714 --- [notification-service] [AsyncResolver-bootstrap-executor-%d] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-06-20T02:53:07.447+03:00  INFO 56714 --- [notification-service] [AsyncResolver-bootstrap-executor-%d] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-06-20T02:58:07.447+03:00  INFO 56714 --- [notification-service] [AsyncResolver-bootstrap-executor-%d] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-06-20T03:03:07.456+03:00  INFO 56714 --- [notification-service] [AsyncResolver-bootstrap-executor-%d] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-06-20T03:08:07.780+03:00  INFO 56714 --- [notification-service] [AsyncResolver-bootstrap-executor-%d] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-06-20T03:13:07.800+03:00  INFO 56714 --- [notification-service] [AsyncResolver-bootstrap-executor-%d] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-06-20T03:18:07.821+03:00  INFO 56714 --- [notification-service] [AsyncResolver-bootstrap-executor-%d] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-06-20T03:23:07.891+03:00  INFO 56714 --- [notification-service] [AsyncResolver-bootstrap-executor-%d] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-06-20T03:28:07.913+03:00  INFO 56714 --- [notification-service] [AsyncResolver-bootstrap-executor-%d] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-06-20T03:33:07.925+03:00  INFO 56714 --- [notification-service] [AsyncResolver-bootstrap-executor-%d] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-06-20T03:38:07.944+03:00  INFO 56714 --- [notification-service] [AsyncResolver-bootstrap-executor-%d] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-06-20T03:43:07.930+03:00  INFO 56714 --- [notification-service] [AsyncResolver-bootstrap-executor-%d] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-06-20T03:48:07.944+03:00  INFO 56714 --- [notification-service] [AsyncResolver-bootstrap-executor-%d] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-06-20T03:53:07.954+03:00  INFO 56714 --- [notification-service] [AsyncResolver-bootstrap-executor-%d] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-06-20T03:58:08.014+03:00  INFO 56714 --- [notification-service] [AsyncResolver-bootstrap-executor-%d] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-06-20T04:03:08.032+03:00  INFO 56714 --- [notification-service] [AsyncResolver-bootstrap-executor-%d] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-06-20T04:08:08.045+03:00  INFO 56714 --- [notification-service] [AsyncResolver-bootstrap-executor-%d] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-06-20T04:13:07.983+03:00  INFO 56714 --- [notification-service] [AsyncResolver-bootstrap-executor-%d] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-06-20T04:18:07.993+03:00  INFO 56714 --- [notification-service] [AsyncResolver-bootstrap-executor-%d] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-06-20T04:23:08.006+03:00  INFO 56714 --- [notification-service] [AsyncResolver-bootstrap-executor-%d] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-06-20T04:28:08.016+03:00  INFO 56714 --- [notification-service] [AsyncResolver-bootstrap-executor-%d] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-06-20T04:33:08.016+03:00  INFO 56714 --- [notification-service] [AsyncResolver-bootstrap-executor-%d] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-06-20T04:38:08.027+03:00  INFO 56714 --- [notification-service] [AsyncResolver-bootstrap-executor-%d] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-06-20T04:43:08.031+03:00  INFO 56714 --- [notification-service] [AsyncResolver-bootstrap-executor-%d] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-06-20T04:48:08.027+03:00  INFO 56714 --- [notification-service] [AsyncResolver-bootstrap-executor-%d] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-06-20T04:53:08.036+03:00  INFO 56714 --- [notification-service] [AsyncResolver-bootstrap-executor-%d] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-06-20T04:58:08.048+03:00  INFO 56714 --- [notification-service] [AsyncResolver-bootstrap-executor-%d] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-06-20T06:09:24.198+03:00  INFO 56714 --- [notification-service] [AsyncResolver-bootstrap-executor-%d] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-06-20T10:41:35.359+03:00  INFO 56714 --- [notification-service] [AsyncResolver-bootstrap-executor-%d] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-06-20T15:12:28.275+03:00  INFO 56714 --- [notification-service] [AsyncResolver-bootstrap-executor-%d] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-06-20T19:16:19.536+03:00  INFO 56714 --- [notification-service] [DiscoveryClient-HeartbeatExecutor-%d] com.netflix.discovery.DiscoveryClient    : DiscoveryClient_NOTIFICATION-SERVICE/172.20.10.4:notification-service:8085 - Re-registering apps/NOTIFICATION-SERVICE
+2026-06-20T19:16:19.540+03:00  INFO 56714 --- [notification-service] [DiscoveryClient-HeartbeatExecutor-%d] com.netflix.discovery.DiscoveryClient    : DiscoveryClient_NOTIFICATION-SERVICE/172.20.10.4:notification-service:8085: registering service...
+2026-06-20T19:16:19.545+03:00  INFO 56714 --- [notification-service] [DiscoveryClient-HeartbeatExecutor-%d] com.netflix.discovery.DiscoveryClient    : DiscoveryClient_NOTIFICATION-SERVICE/172.20.10.4:notification-service:8085 - registration status: 204
+2026-06-20T19:33:12.014+03:00  INFO 56714 --- [notification-service] [AsyncResolver-bootstrap-executor-%d] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-06-20T23:20:13.917+03:00  INFO 56714 --- [notification-service] [DiscoveryClient-HeartbeatExecutor-%d] com.netflix.discovery.DiscoveryClient    : DiscoveryClient_NOTIFICATION-SERVICE/172.20.10.4:notification-service:8085 - Re-registering apps/NOTIFICATION-SERVICE
+2026-06-20T23:20:13.917+03:00  INFO 56714 --- [notification-service] [DiscoveryClient-HeartbeatExecutor-%d] com.netflix.discovery.DiscoveryClient    : DiscoveryClient_NOTIFICATION-SERVICE/172.20.10.4:notification-service:8085: registering service...
+2026-06-20T23:20:13.921+03:00  INFO 56714 --- [notification-service] [DiscoveryClient-HeartbeatExecutor-%d] com.netflix.discovery.DiscoveryClient    : DiscoveryClient_NOTIFICATION-SERVICE/172.20.10.4:notification-service:8085 - registration status: 204

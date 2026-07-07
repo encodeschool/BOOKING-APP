@@ -9,3 +9,10 @@ export const createServiceApi = (token, body) =>
     token,
     body,
   });
+
+export const updateServicesApi = (token, id, body) =>
+  request(`/api/services/${id}`, {
+    method: "PUT",
+    token,
+    body
+  });

@@ -1,0 +1,74 @@
+2026-06-25T00:00:05.414+03:00  INFO 52472 --- [service-registry] [Eureka-EvictionTimer] c.n.e.registry.AbstractInstanceRegistry  : Running the evict task with compensationTime 10ms
+2026-06-25T00:45:11.956+03:00  INFO 52472 --- [service-registry] [Eureka-EvictionTimer] c.n.e.registry.AbstractInstanceRegistry  : Running the evict task with compensationTime 10ms
+2026-06-25T00:45:11.959+03:00  INFO 52472 --- [service-registry] [Eureka-EvictionTimer] c.n.e.registry.AbstractInstanceRegistry  : Evicting 1 items (expired=3, evictionLimit=1)
+2026-06-25T00:45:11.959+03:00  WARN 52472 --- [service-registry] [Eureka-EvictionTimer] c.n.e.registry.AbstractInstanceRegistry  : DS: Registry: expired lease for API-GATEWAY/172.20.10.4:api-gateway:9087
+2026-06-25T00:45:11.959+03:00  INFO 52472 --- [service-registry] [Eureka-EvictionTimer] c.n.e.registry.AbstractInstanceRegistry  : Cancelled instance API-GATEWAY/172.20.10.4:api-gateway:9087 (replication=false)
+2026-06-25T00:45:12.740+03:00  WARN 52472 --- [service-registry] [http-nio-9761-exec-35] c.n.e.registry.AbstractInstanceRegistry  : DS: Registry: lease doesn't exist, registering resource: API-GATEWAY - 172.20.10.4:api-gateway:9087
+2026-06-25T00:45:12.740+03:00  WARN 52472 --- [service-registry] [http-nio-9761-exec-35] c.n.eureka.resources.InstanceResource    : Not Found (Renew): API-GATEWAY - 172.20.10.4:api-gateway:9087
+2026-06-25T00:45:12.746+03:00  INFO 52472 --- [service-registry] [http-nio-9761-exec-40] c.n.e.registry.AbstractInstanceRegistry  : Registered instance API-GATEWAY/172.20.10.4:api-gateway:9087 with status UP (replication=false)
+2026-06-25T01:29:32.558+03:00  WARN 52472 --- [service-registry] [Eureka-PeerNodesUpdater] c.n.eureka.cluster.PeerEurekaNodes       : The replica size seems to be empty. Check the route 53 DNS Registry
+2026-06-25T01:29:32.667+03:00  INFO 52472 --- [service-registry] [ReplicaAwareInstanceRegistry - RenewalThresholdUpdater] c.n.e.r.PeerAwareInstanceRegistryImpl    : Current renewal threshold is : 11
+2026-06-25T01:46:37.257+03:00  INFO 52472 --- [service-registry] [Eureka-EvictionTimer] c.n.e.registry.AbstractInstanceRegistry  : Running the evict task with compensationTime 10ms
+2026-06-25T02:30:30.558+03:00  INFO 52472 --- [service-registry] [Eureka-EvictionTimer] c.n.e.registry.AbstractInstanceRegistry  : Running the evict task with compensationTime 10ms
+2026-06-25T03:31:23.859+03:00  INFO 52472 --- [service-registry] [Eureka-EvictionTimer] c.n.e.registry.AbstractInstanceRegistry  : Running the evict task with compensationTime 9ms
+2026-06-25T04:21:00.333+03:00  INFO 52472 --- [service-registry] [Eureka-EvictionTimer] c.n.e.registry.AbstractInstanceRegistry  : Running the evict task with compensationTime 10ms
+2026-06-25T05:21:00.836+03:00  INFO 52472 --- [service-registry] [Eureka-EvictionTimer] c.n.e.registry.AbstractInstanceRegistry  : Running the evict task with compensationTime 9ms
+2026-06-25T05:21:00.837+03:00  INFO 52472 --- [service-registry] [Eureka-EvictionTimer] c.n.e.registry.AbstractInstanceRegistry  : Evicting 1 items (expired=6, evictionLimit=1)
+2026-06-25T05:21:00.837+03:00  WARN 52472 --- [service-registry] [Eureka-EvictionTimer] c.n.e.registry.AbstractInstanceRegistry  : DS: Registry: expired lease for AUTH-SERVICE/172.20.10.4:auth-service:8081
+2026-06-25T05:21:00.838+03:00  INFO 52472 --- [service-registry] [Eureka-EvictionTimer] c.n.e.registry.AbstractInstanceRegistry  : Cancelled instance AUTH-SERVICE/172.20.10.4:auth-service:8081 (replication=false)
+2026-06-25T05:32:55.893+03:00  WARN 52472 --- [service-registry] [http-nio-9761-exec-39] c.n.e.registry.AbstractInstanceRegistry  : DS: Registry: lease doesn't exist, registering resource: AUTH-SERVICE - 172.20.10.4:auth-service:8081
+2026-06-25T05:32:55.895+03:00  WARN 52472 --- [service-registry] [http-nio-9761-exec-39] c.n.eureka.resources.InstanceResource    : Not Found (Renew): AUTH-SERVICE - 172.20.10.4:auth-service:8081
+2026-06-25T05:32:55.897+03:00  INFO 52472 --- [service-registry] [http-nio-9761-exec-42] c.n.e.registry.AbstractInstanceRegistry  : Registered instance AUTH-SERVICE/172.20.10.4:auth-service:8081 with status UP (replication=false)
+2026-06-25T06:07:12.318+03:00  INFO 52472 --- [service-registry] [Eureka-EvictionTimer] c.n.e.registry.AbstractInstanceRegistry  : Running the evict task with compensationTime 9ms
+2026-06-25T07:08:47.648+03:00  INFO 52472 --- [service-registry] [Eureka-EvictionTimer] c.n.e.registry.AbstractInstanceRegistry  : Running the evict task with compensationTime 9ms
+2026-06-25T07:08:47.648+03:00  INFO 52472 --- [service-registry] [Eureka-EvictionTimer] c.n.e.registry.AbstractInstanceRegistry  : Evicting 1 items (expired=6, evictionLimit=1)
+2026-06-25T07:08:47.648+03:00  WARN 52472 --- [service-registry] [Eureka-EvictionTimer] c.n.e.registry.AbstractInstanceRegistry  : DS: Registry: expired lease for BOOKING-SERVICE/172.20.10.4:booking-service:8084
+2026-06-25T07:08:47.648+03:00  INFO 52472 --- [service-registry] [Eureka-EvictionTimer] c.n.e.registry.AbstractInstanceRegistry  : Cancelled instance BOOKING-SERVICE/172.20.10.4:booking-service:8084 (replication=false)
+2026-06-25T07:08:48.538+03:00  WARN 52472 --- [service-registry] [http-nio-9761-exec-38] c.n.e.registry.AbstractInstanceRegistry  : DS: Registry: lease doesn't exist, registering resource: BOOKING-SERVICE - 172.20.10.4:booking-service:8084
+2026-06-25T07:08:48.538+03:00  WARN 52472 --- [service-registry] [http-nio-9761-exec-38] c.n.eureka.resources.InstanceResource    : Not Found (Renew): BOOKING-SERVICE - 172.20.10.4:booking-service:8084
+2026-06-25T07:08:48.543+03:00  INFO 52472 --- [service-registry] [http-nio-9761-exec-15] c.n.e.registry.AbstractInstanceRegistry  : Registered instance BOOKING-SERVICE/172.20.10.4:booking-service:8084 with status UP (replication=false)
+2026-06-25T07:51:12.221+03:00  INFO 52472 --- [service-registry] [Eureka-EvictionTimer] c.n.e.registry.AbstractInstanceRegistry  : Running the evict task with compensationTime 9ms
+2026-06-25T08:52:27.571+03:00  INFO 52472 --- [service-registry] [Eureka-EvictionTimer] c.n.e.registry.AbstractInstanceRegistry  : Running the evict task with compensationTime 10ms
+2026-06-25T08:52:27.574+03:00  INFO 52472 --- [service-registry] [Eureka-EvictionTimer] c.n.e.registry.AbstractInstanceRegistry  : Evicting 1 items (expired=6, evictionLimit=1)
+2026-06-25T08:52:27.574+03:00  WARN 52472 --- [service-registry] [Eureka-EvictionTimer] c.n.e.registry.AbstractInstanceRegistry  : DS: Registry: expired lease for USER-SERVICE/172.20.10.4:user-service:9082
+2026-06-25T08:52:27.574+03:00  INFO 52472 --- [service-registry] [Eureka-EvictionTimer] c.n.e.registry.AbstractInstanceRegistry  : Cancelled instance USER-SERVICE/172.20.10.4:user-service:9082 (replication=false)
+2026-06-25T09:36:26.159+03:00  WARN 52472 --- [service-registry] [http-nio-9761-exec-34] c.n.e.registry.AbstractInstanceRegistry  : DS: Registry: lease doesn't exist, registering resource: USER-SERVICE - 172.20.10.4:user-service:9082
+2026-06-25T09:36:26.159+03:00  WARN 52472 --- [service-registry] [http-nio-9761-exec-34] c.n.eureka.resources.InstanceResource    : Not Found (Renew): USER-SERVICE - 172.20.10.4:user-service:9082
+2026-06-25T09:36:26.161+03:00  INFO 52472 --- [service-registry] [http-nio-9761-exec-39] c.n.e.registry.AbstractInstanceRegistry  : Registered instance USER-SERVICE/172.20.10.4:user-service:9082 with status UP (replication=false)
+2026-06-25T09:36:58.855+03:00  INFO 52472 --- [service-registry] [Eureka-EvictionTimer] c.n.e.registry.AbstractInstanceRegistry  : Running the evict task with compensationTime 10ms
+2026-06-25T10:37:47.368+03:00  WARN 52472 --- [service-registry] [Eureka-PeerNodesUpdater] c.n.eureka.cluster.PeerEurekaNodes       : The replica size seems to be empty. Check the route 53 DNS Registry
+2026-06-25T10:37:51.133+03:00  INFO 52472 --- [service-registry] [Eureka-EvictionTimer] c.n.e.registry.AbstractInstanceRegistry  : Running the evict task with compensationTime 9ms
+2026-06-25T11:38:43.419+03:00  INFO 52472 --- [service-registry] [Eureka-EvictionTimer] c.n.e.registry.AbstractInstanceRegistry  : Running the evict task with compensationTime 0ms
+2026-06-25T12:33:53.691+03:00  INFO 52472 --- [service-registry] [Eureka-EvictionTimer] c.n.e.registry.AbstractInstanceRegistry  : Running the evict task with compensationTime 10ms
+2026-06-25T12:57:03.704+03:00  INFO 52472 --- [service-registry] [Eureka-EvictionTimer] c.n.e.registry.AbstractInstanceRegistry  : Running the evict task with compensationTime 8ms
+2026-06-25T12:57:03.705+03:00  INFO 52472 --- [service-registry] [Eureka-EvictionTimer] c.n.e.registry.AbstractInstanceRegistry  : Evicting 1 items (expired=3, evictionLimit=1)
+2026-06-25T12:57:03.705+03:00  WARN 52472 --- [service-registry] [Eureka-EvictionTimer] c.n.e.registry.AbstractInstanceRegistry  : DS: Registry: expired lease for API-GATEWAY/172.20.10.4:api-gateway:9087
+2026-06-25T12:57:03.705+03:00  INFO 52472 --- [service-registry] [Eureka-EvictionTimer] c.n.e.registry.AbstractInstanceRegistry  : Cancelled instance API-GATEWAY/172.20.10.4:api-gateway:9087 (replication=false)
+2026-06-25T13:14:40.465+03:00  WARN 52472 --- [service-registry] [http-nio-9761-exec-42] c.n.e.registry.AbstractInstanceRegistry  : DS: Registry: lease doesn't exist, registering resource: API-GATEWAY - 172.20.10.4:api-gateway:9087
+2026-06-25T13:14:40.465+03:00  WARN 52472 --- [service-registry] [http-nio-9761-exec-42] c.n.eureka.resources.InstanceResource    : Not Found (Renew): API-GATEWAY - 172.20.10.4:api-gateway:9087
+2026-06-25T13:14:40.474+03:00  INFO 52472 --- [service-registry] [http-nio-9761-exec-38] c.n.e.registry.AbstractInstanceRegistry  : Registered instance API-GATEWAY/172.20.10.4:api-gateway:9087 with status UP (replication=false)
+2026-06-25T13:56:27.980+03:00  INFO 52472 --- [service-registry] [Eureka-EvictionTimer] c.n.e.registry.AbstractInstanceRegistry  : Running the evict task with compensationTime 1ms
+2026-06-25T14:41:27.584+03:00  INFO 52472 --- [service-registry] [ReplicaAwareInstanceRegistry - RenewalThresholdUpdater] c.n.e.r.PeerAwareInstanceRegistryImpl    : Current renewal threshold is : 11
+2026-06-25T14:41:31.271+03:00  INFO 52472 --- [service-registry] [Eureka-EvictionTimer] c.n.e.registry.AbstractInstanceRegistry  : Running the evict task with compensationTime 9ms
+2026-06-25T15:42:22.534+03:00  INFO 52472 --- [service-registry] [Eureka-EvictionTimer] c.n.e.registry.AbstractInstanceRegistry  : Running the evict task with compensationTime 10ms
+2026-06-25T16:43:12.826+03:00  INFO 52472 --- [service-registry] [Eureka-EvictionTimer] c.n.e.registry.AbstractInstanceRegistry  : Running the evict task with compensationTime 10ms
+2026-06-25T17:44:03.112+03:00  INFO 52472 --- [service-registry] [Eureka-EvictionTimer] c.n.e.registry.AbstractInstanceRegistry  : Running the evict task with compensationTime 9ms
+2026-06-25T18:44:53.376+03:00  INFO 52472 --- [service-registry] [Eureka-EvictionTimer] c.n.e.registry.AbstractInstanceRegistry  : Running the evict task with compensationTime 7ms
+2026-06-25T19:45:39.852+03:00  WARN 52472 --- [service-registry] [Eureka-PeerNodesUpdater] c.n.eureka.cluster.PeerEurekaNodes       : The replica size seems to be empty. Check the route 53 DNS Registry
+2026-06-25T19:45:43.683+03:00  INFO 52472 --- [service-registry] [Eureka-EvictionTimer] c.n.e.registry.AbstractInstanceRegistry  : Running the evict task with compensationTime 10ms
+2026-06-25T20:46:34.026+03:00  INFO 52472 --- [service-registry] [Eureka-EvictionTimer] c.n.e.registry.AbstractInstanceRegistry  : Running the evict task with compensationTime 6ms
+2026-06-25T21:47:23.294+03:00  INFO 52472 --- [service-registry] [Eureka-EvictionTimer] c.n.e.registry.AbstractInstanceRegistry  : Running the evict task with compensationTime 10ms
+2026-06-25T21:47:23.294+03:00  INFO 52472 --- [service-registry] [Eureka-EvictionTimer] c.n.e.registry.AbstractInstanceRegistry  : Evicting 1 items (expired=3, evictionLimit=1)
+2026-06-25T21:47:23.294+03:00  WARN 52472 --- [service-registry] [Eureka-EvictionTimer] c.n.e.registry.AbstractInstanceRegistry  : DS: Registry: expired lease for NOTIFICATION-SERVICE/172.20.10.4:notification-service:8085
+2026-06-25T21:47:23.294+03:00  INFO 52472 --- [service-registry] [Eureka-EvictionTimer] c.n.e.registry.AbstractInstanceRegistry  : Cancelled instance NOTIFICATION-SERVICE/172.20.10.4:notification-service:8085 (replication=false)
+2026-06-25T21:47:24.441+03:00  WARN 52472 --- [service-registry] [http-nio-9761-exec-41] c.n.e.registry.AbstractInstanceRegistry  : DS: Registry: lease doesn't exist, registering resource: NOTIFICATION-SERVICE - 172.20.10.4:notification-service:8085
+2026-06-25T21:47:24.441+03:00  WARN 52472 --- [service-registry] [http-nio-9761-exec-41] c.n.eureka.resources.InstanceResource    : Not Found (Renew): NOTIFICATION-SERVICE - 172.20.10.4:notification-service:8085
+2026-06-25T21:47:24.445+03:00  INFO 52472 --- [service-registry] [http-nio-9761-exec-27] c.n.e.registry.AbstractInstanceRegistry  : Registered instance NOTIFICATION-SERVICE/172.20.10.4:notification-service:8085 with status UP (replication=false)
+2026-06-25T22:48:12.562+03:00  INFO 52472 --- [service-registry] [Eureka-EvictionTimer] c.n.e.registry.AbstractInstanceRegistry  : Running the evict task with compensationTime 9ms
+2026-06-25T23:49:01.794+03:00  INFO 52472 --- [service-registry] [Eureka-EvictionTimer] c.n.e.registry.AbstractInstanceRegistry  : Running the evict task with compensationTime 10ms
+2026-06-25T23:49:01.794+03:00  INFO 52472 --- [service-registry] [Eureka-EvictionTimer] c.n.e.registry.AbstractInstanceRegistry  : Evicting 1 items (expired=3, evictionLimit=1)
+2026-06-25T23:49:01.794+03:00  WARN 52472 --- [service-registry] [Eureka-EvictionTimer] c.n.e.registry.AbstractInstanceRegistry  : DS: Registry: expired lease for BOOKING-SERVICE/172.20.10.4:booking-service:8084
+2026-06-25T23:49:01.795+03:00  INFO 52472 --- [service-registry] [Eureka-EvictionTimer] c.n.e.registry.AbstractInstanceRegistry  : Cancelled instance BOOKING-SERVICE/172.20.10.4:booking-service:8084 (replication=false)
+2026-06-25T23:49:03.003+03:00  WARN 52472 --- [service-registry] [http-nio-9761-exec-14] c.n.e.registry.AbstractInstanceRegistry  : DS: Registry: lease doesn't exist, registering resource: BOOKING-SERVICE - 172.20.10.4:booking-service:8084
+2026-06-25T23:49:03.003+03:00  WARN 52472 --- [service-registry] [http-nio-9761-exec-14] c.n.eureka.resources.InstanceResource    : Not Found (Renew): BOOKING-SERVICE - 172.20.10.4:booking-service:8084
+2026-06-25T23:49:03.008+03:00  INFO 52472 --- [service-registry] [http-nio-9761-exec-42] c.n.e.registry.AbstractInstanceRegistry  : Registered instance BOOKING-SERVICE/172.20.10.4:booking-service:8084 with status UP (replication=false)

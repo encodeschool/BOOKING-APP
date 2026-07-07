@@ -40,7 +40,7 @@ public class ServiceController {
     }
 
     @PutMapping("/{id}")
-    public ServiceResponse update(@PathVariable Long id,
+    public ServiceResponse update(@PathVariable("id") Long id,
                                  HttpServletRequest request,
                                  @RequestBody UpdateServiceRequest req) {
         return service.update(id, (Long) request.getAttribute("userId"), req);

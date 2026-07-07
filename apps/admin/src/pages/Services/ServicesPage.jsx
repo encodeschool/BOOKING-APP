@@ -18,6 +18,10 @@ import {
   getServices,
 } from "../../lib/api";
 
+import {
+  updateServicesApi
+} from '../../lib/api/service.api';
+ 
 export default function ServicesPage() {
   const { token } = useAuth();
   const { selectedBusinessId } = useBusiness();
@@ -36,6 +40,11 @@ export default function ServicesPage() {
 
   const [search, setSearch] = useState("");
   const [priceFilter, setPriceFilter] = useState("");
+
+  const [editMode, setEditMode] = useState(false);
+  const [editId, setEditId] = useState(null);
+
+  const [details, setDetails] = useState(null);
 
   useEffect(() => {
     if (token && selectedBusinessId) {
@@ -65,42 +74,64 @@ export default function ServicesPage() {
     }
   }
 
-  async function handleCreate() {
-    if (
-      !form.name ||
-      !form.price ||
-      !form.durationMinutes
-    ) {
+  async function handleSubmit() {
+    if (!form.name || !form.price || !form.durationMinutes) {
       return;
     }
 
     try {
-      const created = await createService(token, {
-        ...form,
-        businessId: Number(selectedBusinessId),
-        price: Number(form.price),
-        durationMinutes: Number(
-          form.durationMinutes
-        ),
-      });
+      setLoading(true);
 
-      setServices((prev) => [...prev, created]);
+      if (editMode && editId) {
+        await updateServicesApi(token, editId, {
+          ...form
+        });
+      } else {
+        const created = await createService(token, {
+          ...form,
+          businessId: Number(selectedBusinessId),
+          price: Number(form.price),
+          durationMinutes: Number(
+            form.durationMinutes
+          ),
+        });
 
-      setForm({
-        name: "",
-        price: "",
-        durationMinutes: "",
-        description: "",
-      });
+        setServices((prev) => [...prev, created]);
+
+        setForm({
+          name: "",
+          price: "",
+          durationMinutes: "",
+          description: "",
+        });
+      }
 
       setShowForm(false);
+      setEditId(null);
+      setEditMode(false);
+      await load();
     } catch (error) {
       console.error(
         "Failed to create service:",
         error
       );
+    } finally {
+      setLoading(false);
     }
   }
+
+  function handleEdit(s) {
+    setForm({
+      name: s.name || "",
+      price:  s.price || "",
+      durationMinutes: s.durationMinutes || "",
+      description: s.description || ""
+    });
+
+    setEditMode(true);
+    setEditId(s.id);
+    setShowForm(true);
+  } 
 
   const filteredServices = services.filter(
     (service) =>
@@ -312,7 +343,7 @@ export default function ServicesPage() {
               {/* FOOTER */}
               <div className="p-5 flex items-center justify-between">
                 <div className="flex gap-3">
-                  <button className="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-600 transition">
+                  <button onClick={() => handleEdit(service)} className="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-600 transition">
                     <FiEdit2 size={16} />
                     Edit
                   </button>
@@ -362,7 +393,7 @@ export default function ServicesPage() {
             <div className="flex items-center justify-between p-6 border-b border-gray-100">
               <div>
                 <h2 className="text-2xl font-bold text-gray-900">
-                  Create Service
+                  {!editMode ? "Create Service" : "Edit Service"}
                 </h2>
 
                 <p className="text-sm text-gray-500 mt-1">
@@ -479,10 +510,10 @@ export default function ServicesPage() {
               </button>
 
               <button
-                onClick={handleCreate}
+                onClick={handleSubmit}
                 className="px-6 py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-green-600 hover:opacity-90 text-white font-medium shadow-lg transition"
               >
-                Create Service
+                {editMode ? loading ? "Updating..." : "Update" : loading ? "Creating..." : "Create"}
               </button>
             </div>
           </div>

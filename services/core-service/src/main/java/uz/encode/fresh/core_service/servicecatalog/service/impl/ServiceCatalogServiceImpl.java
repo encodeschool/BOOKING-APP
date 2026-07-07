@@ -79,6 +79,7 @@ public class ServiceCatalogServiceImpl implements ServiceCatalogService {
         r.price = s.getPrice();
         r.durationMinutes = s.getDurationMinutes();
         r.active = s.getActive();
+        r.description = s.getDescription();
         return r;
     }
 
