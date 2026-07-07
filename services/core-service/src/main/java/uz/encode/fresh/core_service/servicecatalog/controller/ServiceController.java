@@ -47,7 +47,7 @@ public class ServiceController {
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id,
+    public void delete(@PathVariable("id") Long id,
                        HttpServletRequest request) {
         service.delete(id, (Long) request.getAttribute("userId"));
     }

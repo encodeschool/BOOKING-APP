@@ -2147,3 +2147,98 @@ This generated password is for development use only. Your security configuration
 2026-07-07T11:05:53.571+03:00  INFO 14339 --- [core-service] [http-nio-8083-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
 2026-07-07T11:05:56.769+03:00  INFO 3733 --- [auth-service] [AsyncResolver-bootstrap-executor-%d] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
 2026-07-07T11:06:17.812+03:00  INFO 4237 --- [user-service] [AsyncResolver-bootstrap-executor-%d] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-07-07T11:06:20.190+03:00  INFO 2699 --- [service-registry] [Eureka-EvictionTimer] c.n.e.registry.AbstractInstanceRegistry  : Running the evict task with compensationTime 5ms
+2026-07-07T11:06:55.248+03:00  INFO 5253 --- [booking-service] [AsyncResolver-bootstrap-executor-%d] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-07-07T11:07:13.536+03:00  INFO 5766 --- [notification-service] [AsyncResolver-bootstrap-executor-%d] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-07-07T11:07:20.194+03:00  INFO 2699 --- [service-registry] [Eureka-EvictionTimer] c.n.e.registry.AbstractInstanceRegistry  : Running the evict task with compensationTime 4ms
+2026-07-07T11:08:20.198+03:00  INFO 2699 --- [service-registry] [Eureka-EvictionTimer] c.n.e.registry.AbstractInstanceRegistry  : Running the evict task with compensationTime 4ms
+2026-07-07T11:08:57.308+03:00  INFO 14339 --- [core-service] [AsyncResolver-bootstrap-executor-%d] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-07-07T11:09:20.200+03:00  INFO 2699 --- [service-registry] [Eureka-EvictionTimer] c.n.e.registry.AbstractInstanceRegistry  : Running the evict task with compensationTime 1ms
+2026-07-07T11:10:20.205+03:00  INFO 2699 --- [service-registry] [Eureka-EvictionTimer] c.n.e.registry.AbstractInstanceRegistry  : Running the evict task with compensationTime 5ms
+2026-07-07T11:10:56.771+03:00  INFO 3733 --- [auth-service] [AsyncResolver-bootstrap-executor-%d] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-07-07T11:11:16.390+03:00  INFO 14339 --- [core-service] [SpringApplicationShutdownHook] o.s.c.n.e.s.EurekaServiceRegistry        : Unregistering application CORE-SERVICE with eureka with status DOWN
+2026-07-07T11:11:16.391+03:00  INFO 14339 --- [core-service] [SpringApplicationShutdownHook] com.netflix.discovery.DiscoveryClient    : Saw local status change event StatusChangeEvent [timestamp=1783411876391, current=DOWN, previous=UP]
+2026-07-07T11:11:16.391+03:00  INFO 14339 --- [core-service] [DiscoveryClient-InstanceInfoReplicator-%d] com.netflix.discovery.DiscoveryClient    : DiscoveryClient_CORE-SERVICE/Nurmukhammads-MacBook-Pro.local:core-service:8083: registering service...
+2026-07-07T11:11:16.395+03:00  INFO 2699 --- [service-registry] [http-nio-9761-exec-4] c.n.e.registry.AbstractInstanceRegistry  : Registered instance CORE-SERVICE/Nurmukhammads-MacBook-Pro.local:core-service:8083 with status DOWN (replication=false)
+2026-07-07T11:11:16.396+03:00  INFO 14339 --- [core-service] [DiscoveryClient-InstanceInfoReplicator-%d] com.netflix.discovery.DiscoveryClient    : DiscoveryClient_CORE-SERVICE/Nurmukhammads-MacBook-Pro.local:core-service:8083 - registration status: 204
+2026-07-07T11:11:16.398+03:00  INFO 14339 --- [core-service] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-07-07T11:11:16.400+03:00  INFO 14339 --- [core-service] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-07-07T11:11:16.401+03:00  INFO 14339 --- [core-service] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-07-07T11:11:16.401+03:00  INFO 14339 --- [core-service] [SpringApplicationShutdownHook] com.netflix.discovery.DiscoveryClient    : Shutting down DiscoveryClient ...
+2026-07-07T11:11:17.821+03:00  INFO 4237 --- [user-service] [AsyncResolver-bootstrap-executor-%d] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-07-07T11:11:19.405+03:00  INFO 14339 --- [core-service] [SpringApplicationShutdownHook] com.netflix.discovery.DiscoveryClient    : Unregistering ...
+2026-07-07T11:11:19.408+03:00  INFO 2699 --- [service-registry] [http-nio-9761-exec-6] c.n.e.registry.AbstractInstanceRegistry  : Cancelled instance CORE-SERVICE/Nurmukhammads-MacBook-Pro.local:core-service:8083 (replication=false)
+2026-07-07T11:11:19.408+03:00  INFO 14339 --- [core-service] [SpringApplicationShutdownHook] com.netflix.discovery.DiscoveryClient    : DiscoveryClient_CORE-SERVICE/Nurmukhammads-MacBook-Pro.local:core-service:8083 - deregister  status: 200
+2026-07-07T11:11:19.408+03:00  INFO 14339 --- [core-service] [SpringApplicationShutdownHook] com.netflix.discovery.DiscoveryClient    : Completed shut down of DiscoveryClient
+2026-07-07T11:11:20.209+03:00  INFO 2699 --- [service-registry] [Eureka-EvictionTimer] c.n.e.registry.AbstractInstanceRegistry  : Running the evict task with compensationTime 4ms
+2026-07-07T11:11:29.929+03:00  INFO 17531 --- [core-service] [main] u.e.f.c.CoreServiceApplication           : Starting CoreServiceApplication using Java 21.0.10 with PID 17531 (/Users/menz_uzb/Business/Fresh/Project/BOOKING-APP/services/core-service/target/classes started by menz_uzb in /Users/menz_uzb/Business/Fresh/Project/BOOKING-APP)
+2026-07-07T11:11:29.930+03:00  INFO 17531 --- [core-service] [main] u.e.f.c.CoreServiceApplication           : The following 1 profile is active: "dev"
+2026-07-07T11:11:29.944+03:00  INFO 17531 --- [core-service] [main] o.s.c.c.c.ConfigServerConfigDataLoader   : Fetching config from server at : http://config-server:9888
+2026-07-07T11:11:29.945+03:00  INFO 17531 --- [core-service] [main] o.s.c.c.c.ConfigServerConfigDataLoader   : Exception on Url - http://config-server:9888:org.springframework.web.client.ResourceAccessException: I/O error on GET request for "http://config-server:9888/core-service/default": config-server. Will be trying the next url if available
+2026-07-07T11:11:29.945+03:00  WARN 17531 --- [core-service] [main] o.s.c.c.c.ConfigServerConfigDataLoader   : Could not locate PropertySource ([ConfigServerConfigDataResource@6f89f665 uris = array<String>['http://config-server:9888'], optional = true, profiles = 'default']): I/O error on GET request for "http://config-server:9888/core-service/default": config-server
+2026-07-07T11:11:29.945+03:00  INFO 17531 --- [core-service] [main] o.s.c.c.c.ConfigServerConfigDataLoader   : Fetching config from server at : http://localhost:9888
+2026-07-07T11:11:29.945+03:00  INFO 17531 --- [core-service] [main] o.s.c.c.c.ConfigServerConfigDataLoader   : Located environment: name=core-service, profiles=[default], label=null, version=null, state=null
+2026-07-07T11:11:29.945+03:00  INFO 17531 --- [core-service] [main] o.s.c.c.c.ConfigServerConfigDataLoader   : Fetching config from server at : http://config-server:9888
+2026-07-07T11:11:29.945+03:00  INFO 17531 --- [core-service] [main] o.s.c.c.c.ConfigServerConfigDataLoader   : Exception on Url - http://config-server:9888:org.springframework.web.client.ResourceAccessException: I/O error on GET request for "http://config-server:9888/core-service/dev": config-server. Will be trying the next url if available
+2026-07-07T11:11:29.945+03:00  WARN 17531 --- [core-service] [main] o.s.c.c.c.ConfigServerConfigDataLoader   : Could not locate PropertySource ([ConfigServerConfigDataResource@73eb8672 uris = array<String>['http://config-server:9888'], optional = true, profiles = 'dev']): I/O error on GET request for "http://config-server:9888/core-service/dev": config-server
+2026-07-07T11:11:29.945+03:00  INFO 17531 --- [core-service] [main] o.s.c.c.c.ConfigServerConfigDataLoader   : Fetching config from server at : http://config-server:9888
+2026-07-07T11:11:29.945+03:00  INFO 17531 --- [core-service] [main] o.s.c.c.c.ConfigServerConfigDataLoader   : Exception on Url - http://config-server:9888:org.springframework.web.client.ResourceAccessException: I/O error on GET request for "http://config-server:9888/core-service/default": config-server. Will be trying the next url if available
+2026-07-07T11:11:29.945+03:00  WARN 17531 --- [core-service] [main] o.s.c.c.c.ConfigServerConfigDataLoader   : Could not locate PropertySource ([ConfigServerConfigDataResource@5942ee04 uris = array<String>['http://config-server:9888'], optional = true, profiles = 'default']): I/O error on GET request for "http://config-server:9888/core-service/default": config-server
+2026-07-07T11:11:29.945+03:00  INFO 17531 --- [core-service] [main] o.s.c.c.c.ConfigServerConfigDataLoader   : Fetching config from server at : http://localhost:9888
+2026-07-07T11:11:29.945+03:00  INFO 17531 --- [core-service] [main] o.s.c.c.c.ConfigServerConfigDataLoader   : Located environment: name=core-service, profiles=[dev], label=null, version=null, state=null
+2026-07-07T11:11:30.168+03:00  INFO 17531 --- [core-service] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-07-07T11:11:30.217+03:00  INFO 17531 --- [core-service] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 46 ms. Found 6 JPA repository interfaces.
+2026-07-07T11:11:30.289+03:00  INFO 17531 --- [core-service] [main] o.s.cloud.context.scope.GenericScope     : BeanFactory id=ea74bdc7-936a-3b70-b470-1990afb1f6fb
+2026-07-07T11:11:30.398+03:00  INFO 17531 --- [core-service] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8083 (http)
+2026-07-07T11:11:30.402+03:00  INFO 17531 --- [core-service] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-07-07T11:11:30.402+03:00  INFO 17531 --- [core-service] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.20]
+2026-07-07T11:11:30.422+03:00  INFO 17531 --- [core-service] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-07-07T11:11:30.422+03:00  INFO 17531 --- [core-service] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 476 ms
+2026-07-07T11:11:30.470+03:00  INFO 17531 --- [core-service] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-07-07T11:11:30.486+03:00  INFO 17531 --- [core-service] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.4.4.Final
+2026-07-07T11:11:30.495+03:00  INFO 17531 --- [core-service] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-07-07T11:11:30.557+03:00  INFO 17531 --- [core-service] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-07-07T11:11:30.564+03:00  INFO 17531 --- [core-service] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-07-07T11:11:30.623+03:00  INFO 17531 --- [core-service] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@220be130
+2026-07-07T11:11:30.623+03:00  INFO 17531 --- [core-service] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-07-07T11:11:30.933+03:00  INFO 17531 --- [core-service] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-07-07T11:11:30.977+03:00  INFO 17531 --- [core-service] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-07-07T11:11:31.086+03:00  WARN 17531 --- [core-service] [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-07-07T11:11:31.108+03:00  WARN 17531 --- [core-service] [main] .s.s.UserDetailsServiceAutoConfiguration : 
+
+Using generated security password: c6bbe2d4-aef8-48b7-8b76-25ce8608ebc2
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2026-07-07T11:11:31.182+03:00  INFO 17531 --- [core-service] [main] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@5f386009, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@5112858c, org.springframework.security.web.context.SecurityContextHolderFilter@4f9a8d71, org.springframework.security.web.header.HeaderWriterFilter@1e8fd198, org.springframework.web.filter.CorsFilter@1786e49f, org.springframework.security.web.authentication.logout.LogoutFilter@7e9b68c5, uz.encode.fresh.core_service.security.JwtFilter@740c4868, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@363a1d8d, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@369958b0, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@3bfbe2a6, org.springframework.security.web.session.SessionManagementFilter@6eaa5458, org.springframework.security.web.access.ExceptionTranslationFilter@38fc2c39, org.springframework.security.web.access.intercept.AuthorizationFilter@26f50a28]
+2026-07-07T11:11:31.262+03:00  INFO 17531 --- [core-service] [main] DiscoveryClientOptionalArgsConfiguration : Eureka HTTP Client uses RestTemplate.
+2026-07-07T11:11:31.273+03:00  WARN 17531 --- [core-service] [main] iguration$LoadBalancerCaffeineWarnLogger : Spring Cloud LoadBalancer is currently working with the default cache. While this cache implementation is useful for development and tests, it's recommended to use Caffeine cache in production.You can switch to using Caffeine cache, by adding it and org.springframework.cache.caffeine.CaffeineCacheManager to the classpath.
+2026-07-07T11:11:31.286+03:00  INFO 17531 --- [core-service] [main] o.s.c.n.eureka.InstanceInfoFactory       : Setting initial instance status as: STARTING
+2026-07-07T11:11:31.293+03:00  INFO 17531 --- [core-service] [main] com.netflix.discovery.DiscoveryClient    : Initializing Eureka in region us-east-1
+2026-07-07T11:11:31.294+03:00  INFO 17531 --- [core-service] [main] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-07-07T11:11:31.297+03:00  INFO 17531 --- [core-service] [main] com.netflix.discovery.DiscoveryClient    : Disable delta property : false
+2026-07-07T11:11:31.297+03:00  INFO 17531 --- [core-service] [main] com.netflix.discovery.DiscoveryClient    : Single vip registry refresh property : null
+2026-07-07T11:11:31.297+03:00  INFO 17531 --- [core-service] [main] com.netflix.discovery.DiscoveryClient    : Force full registry fetch : false
+2026-07-07T11:11:31.297+03:00  INFO 17531 --- [core-service] [main] com.netflix.discovery.DiscoveryClient    : Application is null : false
+2026-07-07T11:11:31.297+03:00  INFO 17531 --- [core-service] [main] com.netflix.discovery.DiscoveryClient    : Registered Applications size is zero : true
+2026-07-07T11:11:31.297+03:00  INFO 17531 --- [core-service] [main] com.netflix.discovery.DiscoveryClient    : Application version is -1: true
+2026-07-07T11:11:31.297+03:00  INFO 17531 --- [core-service] [main] com.netflix.discovery.DiscoveryClient    : Getting all instance registry info from the eureka server
+2026-07-07T11:11:31.384+03:00  INFO 17531 --- [core-service] [main] com.netflix.discovery.DiscoveryClient    : The response status is 200
+2026-07-07T11:11:31.384+03:00  INFO 17531 --- [core-service] [main] com.netflix.discovery.DiscoveryClient    : Starting heartbeat executor: renew interval is: 30
+2026-07-07T11:11:31.385+03:00  INFO 17531 --- [core-service] [main] c.n.discovery.InstanceInfoReplicator     : InstanceInfoReplicator onDemand update allowed rate per min is 4
+2026-07-07T11:11:31.385+03:00  INFO 17531 --- [core-service] [main] com.netflix.discovery.DiscoveryClient    : Discovery Client initialized at timestamp 1783411891385 with initial instances count: 5
+2026-07-07T11:11:31.386+03:00  INFO 17531 --- [core-service] [main] o.s.c.n.e.s.EurekaServiceRegistry        : Registering application CORE-SERVICE with eureka with status UP
+2026-07-07T11:11:31.387+03:00  INFO 17531 --- [core-service] [main] com.netflix.discovery.DiscoveryClient    : Saw local status change event StatusChangeEvent [timestamp=1783411891387, current=UP, previous=STARTING]
+2026-07-07T11:11:31.387+03:00  INFO 17531 --- [core-service] [DiscoveryClient-InstanceInfoReplicator-%d] com.netflix.discovery.DiscoveryClient    : DiscoveryClient_CORE-SERVICE/Nurmukhammads-MacBook-Pro.local:core-service:8083: registering service...
+2026-07-07T11:11:31.393+03:00  INFO 17531 --- [core-service] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8083 (http) with context path ''
+2026-07-07T11:11:31.394+03:00  INFO 17531 --- [core-service] [main] .s.c.n.e.s.EurekaAutoServiceRegistration : Updating port to 8083
+2026-07-07T11:11:31.398+03:00  INFO 17531 --- [core-service] [main] u.e.f.c.CoreServiceApplication           : Started CoreServiceApplication in 6.788 seconds (process running for 6.925)
+2026-07-07T11:11:31.399+03:00  INFO 2699 --- [service-registry] [http-nio-9761-exec-7] c.n.e.registry.AbstractInstanceRegistry  : Registered instance CORE-SERVICE/Nurmukhammads-MacBook-Pro.local:core-service:8083 with status UP (replication=false)
+2026-07-07T11:11:31.400+03:00  INFO 17531 --- [core-service] [DiscoveryClient-InstanceInfoReplicator-%d] com.netflix.discovery.DiscoveryClient    : DiscoveryClient_CORE-SERVICE/Nurmukhammads-MacBook-Pro.local:core-service:8083 - registration status: 204
+2026-07-07T11:11:55.253+03:00  INFO 5253 --- [booking-service] [AsyncResolver-bootstrap-executor-%d] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-07-07T11:12:09.645+03:00  INFO 17531 --- [core-service] [http-nio-8083-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-07-07T11:12:09.646+03:00  INFO 17531 --- [core-service] [http-nio-8083-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-07-07T11:12:09.647+03:00  INFO 17531 --- [core-service] [http-nio-8083-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2026-07-07T11:12:13.541+03:00  INFO 5766 --- [notification-service] [AsyncResolver-bootstrap-executor-%d] c.n.d.s.r.aws.ConfigClusterResolver      : Resolving eureka endpoints via configuration
+2026-07-07T11:12:20.209+03:00  INFO 2699 --- [service-registry] [Eureka-EvictionTimer] c.n.e.registry.AbstractInstanceRegistry  : Running the evict task with compensationTime 0ms
+2026-07-07T11:13:20.211+03:00  INFO 2699 --- [service-registry] [Eureka-EvictionTimer] c.n.e.registry.AbstractInstanceRegistry  : Running the evict task with compensationTime 2ms

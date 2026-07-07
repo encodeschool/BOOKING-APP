@@ -16,3 +16,10 @@ export const updateServicesApi = (token, id, body) =>
     token,
     body
   });
+
+
+export const deleteServiceApi = (token, id) =>
+  request(`/api/services/${id}`, {
+    method: "DELETE",
+    token
+  });

@@ -19,7 +19,8 @@ import {
 } from "../../lib/api";
 
 import {
-  updateServicesApi
+  updateServicesApi,
+  deleteServiceApi
 } from '../../lib/api/service.api';
  
 export default function ServicesPage() {
@@ -141,6 +142,12 @@ export default function ServicesPage() {
       (priceFilter === "" ||
         service.price <= Number(priceFilter))
   );
+
+  async function handleDelete(id) {
+    if (!confirm("Delete service?")) return;
+    await deleteServiceApi(token, id);
+    load();
+  }
 
   return (
     <div className="space-y-6">
@@ -348,7 +355,7 @@ export default function ServicesPage() {
                     Edit
                   </button>
 
-                  <button className="flex items-center gap-2 px-4 py-2 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 transition">
+                  <button onClick={() => handleDelete(service.id)} className="flex items-center gap-2 px-4 py-2 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 transition">
                     <FiTrash2 size={16} />
                     Delete
                   </button>
