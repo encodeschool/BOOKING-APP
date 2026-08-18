@@ -10,15 +10,26 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # =========================================================
+      # CHECKOUT
+      # =========================================================
       - name: Checkout repository
         uses: actions/checkout@v4
 
+
+      # =========================================================
+      # JAVA
+      # =========================================================
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
 
+
+      # =========================================================
+      # MAVEN CACHE
+      # =========================================================
       - name: Cache Maven Repository
         uses: actions/cache@v4
         with:
@@ -27,33 +38,60 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
+
+      # =========================================================
+      # BUILD BACKEND
+      # =========================================================
       - name: Build Backend Services
         working-directory: services
-        run: mvn clean package -DskipTests
+        run: |
+          mvn clean package -DskipTests
 
+
+      # =========================================================
+      # NODE.JS
+      # =========================================================
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
+
+      # =========================================================
+      # BUILD ADMIN
+      # =========================================================
       - name: Build Admin Frontend
         working-directory: apps/admin
         run: |
           npm ci --legacy-peer-deps
           npm run build
 
+
+      # =========================================================
+      # BUILD WEB
+      # =========================================================
       - name: Build Web Frontend
         working-directory: apps/web
         run: |
           npm ci --legacy-peer-deps
           npm run build
 
+
+      # =========================================================
+      # SSH
+      # =========================================================
       - name: Configure SSH
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
 
+          ssh-keyscan -H "${{ secrets.VPS_IP }}" >> ~/.ssh/known_hosts
+
+
+      # =========================================================
+      # DEPLOY FILES
+      # =========================================================
       - name: Deploy Project Files
         run: |
           rsync -az --delete \
@@ -61,42 +99,290 @@ jobs:
             --exclude='node_modules' \
             --exclude='infra/docker/logs' \
             --exclude='logs' \
-            -e "ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa" \
+            -e "ssh -i ~/.ssh/id_rsa" \
             ./ \
             ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_IP }}:/home/${{ secrets.VPS_USERNAME }}/enroll
 
+
+      # =========================================================
+      # CONFIGURE JVM MEMORY
+      # =========================================================
+      - name: Configure JVM Memory Limits
+        run: |
+          ssh -i ~/.ssh/id_rsa \
+              ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_IP }} << 'EOF'
+
+          set -e
+
+          echo "========================================"
+          echo "Configuring JVM memory limits"
+          echo "========================================"
+
+          # -----------------------------------------------------
+          # Create systemd drop-in directories
+          # -----------------------------------------------------
+
+          sudo mkdir -p /etc/systemd/system/config-server.service.d
+          sudo mkdir -p /etc/systemd/system/service-registry.service.d
+          sudo mkdir -p /etc/systemd/system/api-gateway.service.d
+          sudo mkdir -p /etc/systemd/system/user-service.service.d
+          sudo mkdir -p /etc/systemd/system/auth-service.service.d
+          sudo mkdir -p /etc/systemd/system/core-service.service.d
+          sudo mkdir -p /etc/systemd/system/booking-service.service.d
+          sudo mkdir -p /etc/systemd/system/notification-service.service.d
+
+
+          # -----------------------------------------------------
+          # CONFIG SERVER
+          # 128 MB heap
+          # -----------------------------------------------------
+
+          sudo tee /etc/systemd/system/config-server.service.d/memory.conf > /dev/null << 'CONFIG_EOF'
+          [Service]
+          Environment="JDK_JAVA_OPTIONS=-Xms16m -Xmx128m -XX:MaxMetaspaceSize=96m -Xss512k -XX:+UseSerialGC"
+          CONFIG_EOF
+
+
+          # -----------------------------------------------------
+          # SERVICE REGISTRY
+          # 128 MB heap
+          # -----------------------------------------------------
+
+          sudo tee /etc/systemd/system/service-registry.service.d/memory.conf > /dev/null << 'REGISTRY_EOF'
+          [Service]
+          Environment="JDK_JAVA_OPTIONS=-Xms16m -Xmx128m -XX:MaxMetaspaceSize=96m -Xss512k -XX:+UseSerialGC"
+          REGISTRY_EOF
+
+
+          # -----------------------------------------------------
+          # API GATEWAY
+          # 160 MB heap
+          # -----------------------------------------------------
+
+          sudo tee /etc/systemd/system/api-gateway.service.d/memory.conf > /dev/null << 'GATEWAY_EOF'
+          [Service]
+          Environment="JDK_JAVA_OPTIONS=-Xms16m -Xmx160m -XX:MaxMetaspaceSize=96m -Xss512k -XX:+UseSerialGC"
+          GATEWAY_EOF
+
+
+          # -----------------------------------------------------
+          # USER SERVICE
+          # 128 MB heap
+          # -----------------------------------------------------
+
+          sudo tee /etc/systemd/system/user-service.service.d/memory.conf > /dev/null << 'USER_EOF'
+          [Service]
+          Environment="JDK_JAVA_OPTIONS=-Xms16m -Xmx128m -XX:MaxMetaspaceSize=96m -Xss512k -XX:+UseSerialGC"
+          USER_EOF
+
+
+          # -----------------------------------------------------
+          # AUTH SERVICE
+          # 128 MB heap
+          # -----------------------------------------------------
+
+          sudo tee /etc/systemd/system/auth-service.service.d/memory.conf > /dev/null << 'AUTH_EOF'
+          [Service]
+          Environment="JDK_JAVA_OPTIONS=-Xms16m -Xmx128m -XX:MaxMetaspaceSize=96m -Xss512k -XX:+UseSerialGC"
+          AUTH_EOF
+
+
+          # -----------------------------------------------------
+          # CORE SERVICE
+          # 160 MB heap
+          # -----------------------------------------------------
+
+          sudo tee /etc/systemd/system/core-service.service.d/memory.conf > /dev/null << 'CORE_EOF'
+          [Service]
+          Environment="JDK_JAVA_OPTIONS=-Xms16m -Xmx160m -XX:MaxMetaspaceSize=96m -Xss512k -XX:+UseSerialGC"
+          CORE_EOF
+
+
+          # -----------------------------------------------------
+          # BOOKING SERVICE
+          # 160 MB heap
+          # -----------------------------------------------------
+
+          sudo tee /etc/systemd/system/booking-service.service.d/memory.conf > /dev/null << 'BOOKING_EOF'
+          [Service]
+          Environment="JDK_JAVA_OPTIONS=-Xms16m -Xmx160m -XX:MaxMetaspaceSize=96m -Xss512k -XX:+UseSerialGC"
+          BOOKING_EOF
+
+
+          # -----------------------------------------------------
+          # NOTIFICATION SERVICE
+          # 128 MB heap
+          # -----------------------------------------------------
+
+          sudo tee /etc/systemd/system/notification-service.service.d/memory.conf > /dev/null << 'NOTIFICATION_EOF'
+          [Service]
+          Environment="JDK_JAVA_OPTIONS=-Xms16m -Xmx128m -XX:MaxMetaspaceSize=96m -Xss512k -XX:+UseSerialGC"
+          NOTIFICATION_EOF
+
+
+          # -----------------------------------------------------
+          # Reload systemd
+          # -----------------------------------------------------
+
+          sudo systemctl daemon-reload
+
+
+          echo "JVM memory configuration completed."
+
+          EOF
+
+
+      # =========================================================
+      # RESTART SERVICES
+      # =========================================================
       - name: Restart Services
         run: |
-          ssh -o StrictHostKeyChecking=no \
-              -i ~/.ssh/id_rsa \
-              ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_IP }} << EOF
+          ssh -i ~/.ssh/id_rsa \
+              ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_IP }} << 'EOF'
 
+          set -e
+
+          echo "========================================"
+          echo "Restarting microservices"
+          echo "========================================"
+
+
+          # -----------------------------------------------------
+          # CONFIG SERVER
+          # -----------------------------------------------------
+
+          echo "Starting config-server..."
           sudo systemctl restart config-server
+
           sleep 15
 
+          sudo systemctl is-active --quiet config-server
+          echo "config-server: RUNNING"
+
+
+          # -----------------------------------------------------
+          # SERVICE REGISTRY
+          # -----------------------------------------------------
+
+          echo "Starting service-registry..."
           sudo systemctl restart service-registry
+
           sleep 15
 
+          sudo systemctl is-active --quiet service-registry
+          echo "service-registry: RUNNING"
+
+
+          # -----------------------------------------------------
+          # API GATEWAY
+          # -----------------------------------------------------
+
+          echo "Starting api-gateway..."
           sudo systemctl restart api-gateway
+
           sleep 10
 
+          sudo systemctl is-active --quiet api-gateway
+          echo "api-gateway: RUNNING"
+
+
+          # -----------------------------------------------------
+          # USER SERVICE
+          # -----------------------------------------------------
+
+          echo "Starting user-service..."
           sudo systemctl restart user-service
+
           sleep 5
 
+          sudo systemctl is-active --quiet user-service
+          echo "user-service: RUNNING"
+
+
+          # -----------------------------------------------------
+          # AUTH SERVICE
+          # -----------------------------------------------------
+
+          echo "Starting auth-service..."
           sudo systemctl restart auth-service
+
           sleep 5
 
+          sudo systemctl is-active --quiet auth-service
+          echo "auth-service: RUNNING"
+
+
+          # -----------------------------------------------------
+          # CORE SERVICE
+          # -----------------------------------------------------
+
+          echo "Starting core-service..."
           sudo systemctl restart core-service
+
           sleep 5
 
+          sudo systemctl is-active --quiet core-service
+          echo "core-service: RUNNING"
+
+
+          # -----------------------------------------------------
+          # BOOKING SERVICE
+          # -----------------------------------------------------
+
+          echo "Starting booking-service..."
           sudo systemctl restart booking-service
+
           sleep 5
 
+          sudo systemctl is-active --quiet booking-service
+          echo "booking-service: RUNNING"
+
+
+          # -----------------------------------------------------
+          # NOTIFICATION SERVICE
+          # -----------------------------------------------------
+
+          echo "Starting notification-service..."
           sudo systemctl restart notification-service
+
           sleep 5
+
+          sudo systemctl is-active --quiet notification-service
+          echo "notification-service: RUNNING"
+
+
+          # =====================================================
+          # MEMORY INFORMATION
+          # =====================================================
+
+          echo ""
+          echo "========================================"
+          echo "JAVA PROCESSES"
+          echo "========================================"
+
+          ps -eo pid,ppid,%mem,rss,cmd --sort=-rss | grep '[j]ava' || true
+
+
+          echo ""
+          echo "========================================"
+          echo "SYSTEM MEMORY"
+          echo "========================================"
+
+          free -h
+
+
+          echo ""
+          echo "========================================"
+          echo "SERVICE STATUS"
+          echo "========================================"
 
           sudo systemctl status config-server --no-pager
           sudo systemctl status service-registry --no-pager
           sudo systemctl status api-gateway --no-pager
+          sudo systemctl status user-service --no-pager
+          sudo systemctl status auth-service --no-pager
+          sudo systemctl status core-service --no-pager
+          sudo systemctl status booking-service --no-pager
+          sudo systemctl status notification-service --no-pager
 
           EOF

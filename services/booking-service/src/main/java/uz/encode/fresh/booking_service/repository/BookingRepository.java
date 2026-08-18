@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -21,6 +23,8 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findByStaffIdOrderByBookingDateDescStartTimeDesc(Long staffId);
 
     List<Booking> findByStaffIdInOrderByBookingDateDescStartTimeDesc(Collection<Long> staffIds);
+
+    Optional<Booking> findByBookingToken(String bookingToken);
 
     long countByStaffIdAndBookingDateAndStatusIn(Long staffId, LocalDate bookingDate, Collection<BookingStatus> statuses);
 

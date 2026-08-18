@@ -3,7 +3,9 @@ package uz.encode.fresh.booking_service.entity;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.UUID;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -47,6 +49,9 @@ public class Booking {
     private String customerName;
     private String customerPhone;
     private String customerEmail;
+
+    @Column(unique = true)
+    private String bookingToken;
 
     @PrePersist
     public void prePersist() {

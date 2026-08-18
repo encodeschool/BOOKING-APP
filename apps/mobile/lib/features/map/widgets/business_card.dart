@@ -114,7 +114,7 @@ class _BusinessImageSliderState extends State<_BusinessImageSlider> {
 
   String fixUrl(String url) {
     if (url.startsWith("http")) return url;
-    return "http://localhost:9087$url";
+    return "https://api-enroll.encode.uz$url";
   }
 
   @override

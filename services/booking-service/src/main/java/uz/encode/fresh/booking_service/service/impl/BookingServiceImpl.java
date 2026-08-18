@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +18,7 @@ import uz.encode.fresh.booking_service.dto.BookingResponse;
 import uz.encode.fresh.booking_service.dto.CreateBookingRequest;
 import uz.encode.fresh.booking_service.dto.CreatePublicBookingRequest;
 import uz.encode.fresh.booking_service.dto.DashboardMetricsResponse;
+import uz.encode.fresh.booking_service.dto.RescheduleBookingRequest;
 import uz.encode.fresh.booking_service.dto.UpdateBookingStatusRequest;
 import uz.encode.fresh.booking_service.entity.Booking;
 import uz.encode.fresh.booking_service.integration.CoreServiceClient;
@@ -45,8 +47,8 @@ public class BookingServiceImpl implements BookingService {
     @Override
     @Transactional
     public BookingResponse create(Long clientId, CreateBookingRequest request) {
-        if (clientId == null) {
-            throw new IllegalArgumentException("Unauthorized booking request");
+        if (clientId != null && clientId < 0) {
+            clientId = null;
         }
 
         BusinessDetailsResponse business = getBusiness(request.businessId);
@@ -61,6 +63,7 @@ public class BookingServiceImpl implements BookingService {
 
         Booking booking = new Booking();
         booking.setClientId(clientId);
+        booking.setBookingToken(UUID.randomUUID().toString());
         booking.setBusinessId(business.id());
         booking.setServiceId(service.id());
         booking.setStaffId(staff.id());
@@ -101,7 +104,7 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public BookingResponse getBooking(Long requesterId, Long bookingId) {
         Booking booking = getBookingEntity(bookingId);
-        if (booking.getClientId().equals(requesterId)) {
+        if (booking.getClientId() != null && booking.getClientId().equals(requesterId)) {
             return toResponse(booking);
         }
 
@@ -153,7 +156,153 @@ public class BookingServiceImpl implements BookingService {
 
         booking.setStatus(BookingStatus.CANCELLED);
         booking.setStatusReason(reason);
-        return toResponse(bookingRepository.save(booking));
+        BookingResponse response = toResponse(bookingRepository.save(booking));
+        sendBookingStatusNotification(booking, BookingStatus.CANCELLED, reason);
+        return response;
+    }
+
+    @Override
+    @Transactional
+    public BookingResponse rescheduleBooking(Long requesterId, Long bookingId, RescheduleBookingRequest request) {
+        Booking booking = getBookingEntity(bookingId);
+        if (booking.getClientId() == null || !booking.getClientId().equals(requesterId)) {
+            throw new IllegalArgumentException("Booking not accessible");
+        }
+
+        if (booking.getStatus() == BookingStatus.CANCELLED
+                || booking.getStatus() == BookingStatus.COMPLETED
+                || booking.getStatus() == BookingStatus.REJECTED) {
+            throw new IllegalArgumentException("Booking cannot be rescheduled");
+        }
+
+        ServiceDetailsResponse service = getService(booking.getServiceId());
+        StaffDetailsResponse staff = getStaff(booking.getStaffId());
+        LocalTime startTime = LocalTime.parse(request.getBookingTime());
+        LocalTime endTime = startTime.plusMinutes(service.durationMinutes());
+
+        if (request.getBookingDate().isBefore(LocalDate.now())) {
+            throw new IllegalArgumentException("Booking date cannot be in the past");
+        }
+
+        if (request.getBookingDate().isEqual(LocalDate.now()) && startTime.isBefore(LocalTime.now())) {
+            throw new IllegalArgumentException("Booking time cannot be in the past");
+        }
+
+        booking.setBookingDate(request.getBookingDate());
+        booking.setStartTime(startTime);
+        booking.setEndTime(endTime);
+        booking.setStatusReason(request.getReason());
+
+        BookingResponse response = toResponse(bookingRepository.save(booking));
+        sendBookingStatusNotification(booking, booking.getStatus(), request.getReason());
+        return response;
+    }
+
+    @Override
+    @Transactional
+    public BookingResponse rescheduleByStaff(
+            Long userId,
+            Long bookingId,
+            RescheduleBookingRequest request) {
+
+        Booking booking = getBookingEntity(bookingId);
+
+        assertBusinessAccess(
+                userId,
+                booking.getBusinessId());
+
+        ServiceDetailsResponse service =
+                getService(booking.getServiceId());
+
+        StaffDetailsResponse staff =
+                getStaff(booking.getStaffId());
+
+        CreateBookingRequest validation =
+                new CreateBookingRequest();
+
+        validation.businessId = booking.getBusinessId();
+        validation.serviceId = booking.getServiceId();
+        validation.staffId = booking.getStaffId();
+        validation.bookingDate = request.getBookingDate();
+        validation.bookingTime = request.getBookingTime();
+
+        validateAvailability(validation, service, staff);
+
+        LocalTime start =
+                LocalTime.parse(request.getBookingTime());
+
+        booking.setBookingDate(request.getBookingDate());
+        booking.setStartTime(start);
+        booking.setEndTime(
+                start.plusMinutes(service.durationMinutes()));
+
+        booking.setStatusReason(request.getReason());
+
+        Booking saved = bookingRepository.save(booking);
+
+        sendBookingStatusNotification(
+                saved,
+                saved.getStatus(),
+                request.getReason());
+
+        return toResponse(saved);
+    }
+
+    @Override
+    @Transactional
+    public BookingResponse reschedulePublicBooking(
+            String token,
+            RescheduleBookingRequest request) {
+
+        Booking booking =
+                bookingRepository.findByBookingToken(token)
+                .orElseThrow(() ->
+                        new IllegalArgumentException("Booking not found"));
+
+        if (booking.getStatus() == BookingStatus.CANCELLED
+                || booking.getStatus() == BookingStatus.COMPLETED
+                || booking.getStatus() == BookingStatus.REJECTED) {
+
+            throw new IllegalArgumentException(
+                    "Booking cannot be rescheduled");
+        }
+
+        ServiceDetailsResponse service =
+                getService(booking.getServiceId());
+
+        StaffDetailsResponse staff =
+                getStaff(booking.getStaffId());
+
+        LocalTime start =
+                LocalTime.parse(request.getBookingTime());
+
+        LocalTime end =
+                start.plusMinutes(service.durationMinutes());
+
+        CreateBookingRequest validation =
+                new CreateBookingRequest();
+
+        validation.businessId = booking.getBusinessId();
+        validation.serviceId = booking.getServiceId();
+        validation.staffId = booking.getStaffId();
+        validation.bookingDate = request.getBookingDate();
+        validation.bookingTime = request.getBookingTime();
+
+        validateAvailability(validation, service, staff);
+
+        booking.setBookingDate(request.getBookingDate());
+        booking.setStartTime(start);
+        booking.setEndTime(end);
+        booking.setStatusReason(request.getReason());
+
+        Booking saved = bookingRepository.save(booking);
+
+        sendBookingStatusNotification(
+                saved,
+                saved.getStatus(),
+                request.getReason());
+
+        return toResponse(saved);
     }
 
     @Override
@@ -169,13 +318,22 @@ public class BookingServiceImpl implements BookingService {
         internalRequest.serviceId = request.serviceId;
         internalRequest.staffId = request.staffId != null ? request.staffId : getAvailableStaff(request.businessId);
         internalRequest.bookingDate = request.bookingDate;
-        internalRequest.bookingTime = request.startTime;
+        internalRequest.bookingTime = request.startTime != null && !request.startTime.isBlank()
+                ? request.startTime
+                : request.bookingTime;
         internalRequest.customerName = request.customerName;
         internalRequest.customerEmail = request.customerEmail;
         internalRequest.customerPhone = request.customerPhone;
         internalRequest.notes = request.notes;
 
-        return create(-1L, internalRequest); // Use default public client ID
+        return create(null, internalRequest); // Use default public client ID
+    }
+
+    @Override
+    public BookingResponse getPublicBooking(String token) {
+        Booking booking = bookingRepository.findByBookingToken(token)
+                .orElseThrow(() -> new IllegalArgumentException("Booking not found"));
+        return toResponse(booking);
     }
 
     private Long getAvailableStaff(Long businessId) {
@@ -405,6 +563,7 @@ public class BookingServiceImpl implements BookingService {
             notificationData.put("bookingDate", booking.getBookingDate().toString());
             notificationData.put("bookingTime", booking.getStartTime().toString());
             notificationData.put("duration", service.durationMinutes() + " minutes");
+            notificationData.put("bookingToken", booking.getBookingToken());
 
             notificationClient.sendBookingConfirmation(notificationData);
         } catch (Exception e) {
@@ -626,6 +785,7 @@ public class BookingServiceImpl implements BookingService {
         return BookingResponse.builder()
                 .id(booking.getId())
                 .clientId(booking.getClientId())
+                .bookingToken(booking.getBookingToken())
                 .businessId(booking.getBusinessId())
                 .serviceId(booking.getServiceId())
                 .staffId(booking.getStaffId())

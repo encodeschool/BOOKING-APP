@@ -15,6 +15,7 @@ import uz.encode.fresh.booking_service.model.BookingStatus;
 public class BookingResponse {
     Long id;
     Long clientId;
+    String bookingToken;
     Long businessId;
     Long serviceId;
     Long staffId;

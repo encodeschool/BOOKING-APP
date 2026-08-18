@@ -8,6 +8,7 @@ import uz.encode.fresh.booking_service.dto.BookingResponse;
 import uz.encode.fresh.booking_service.dto.CreateBookingRequest;
 import uz.encode.fresh.booking_service.dto.CreatePublicBookingRequest;
 import uz.encode.fresh.booking_service.dto.DashboardMetricsResponse;
+import uz.encode.fresh.booking_service.dto.RescheduleBookingRequest;
 import uz.encode.fresh.booking_service.dto.UpdateBookingStatusRequest;
 
 public interface BookingService {
@@ -24,7 +25,11 @@ public interface BookingService {
 
     BookingResponse cancelByClient(Long clientId, Long bookingId, String reason);
 
+    BookingResponse rescheduleBooking(Long requesterId, Long bookingId, RescheduleBookingRequest request);
+
     BookingResponse createPublicBooking(CreatePublicBookingRequest request);
+
+    BookingResponse getPublicBooking(String token);
 
     List<String> getAvailableSlots(Long businessId, Long serviceId, String date);
 
@@ -43,4 +48,8 @@ public interface BookingService {
     DashboardMetricsResponse getDashboardMetrics(Long businessId);
 
     List<BookedSlotResponse> getBookedSlots(Long staffId, LocalDate date);
+
+    BookingResponse rescheduleByStaff(Long userId, Long bookingId, RescheduleBookingRequest request);
+
+    BookingResponse reschedulePublicBooking(String token, RescheduleBookingRequest request);
 }

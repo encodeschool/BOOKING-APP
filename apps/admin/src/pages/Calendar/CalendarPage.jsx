@@ -20,6 +20,7 @@ import {
 
 import { useAuth } from "../../app/providers/AuthProvider";
 import { useBusiness } from "../../app/providers/BusinessProvider";
+import { rescheduleBooking } from "../../lib/api";
 
 // ─── Status config ────────────────────────────────────────────────────────────
 const STATUS = {
@@ -31,10 +32,13 @@ const STATUS = {
 };
 
 // ─── Booking Detail Modal ─────────────────────────────────────────────────────
-function BookingModal({ booking, onClose, onApprove, onReject }) {
+function BookingModal({ booking, onClose, onApprove, onReject, onReschedule }) {
   const [rejectReason, setRejectReason] = useState("");
   const [showRejectInput, setShowRejectInput] = useState(false);
-  const [loading, setLoading] = useState(null); // "approve" | "reject"
+  const [loading, setLoading] = useState(null); // "approve" | "reject" | "reschedule"
+  const [rescheduleDate, setRescheduleDate] = useState(booking?.bookingDate || "");
+  const [rescheduleTime, setRescheduleTime] = useState(booking?.startTime || "");
+  const [rescheduleReason, setRescheduleReason] = useState("Rescheduled by staff");
 
   if (!booking) return null;
 
@@ -57,6 +61,16 @@ function BookingModal({ booking, onClose, onApprove, onReject }) {
     await onReject(booking.id, rejectReason || "Rejected by business owner");
     setLoading(null);
     setShowRejectInput(false);
+  };
+
+  const handleReschedule = async () => {
+    setLoading("reschedule");
+    await onReschedule(booking.id, {
+      bookingDate: rescheduleDate,
+      bookingTime: rescheduleTime,
+      reason: rescheduleReason || "Rescheduled by staff",
+    });
+    setLoading(null);
   };
 
   return (
@@ -268,6 +282,35 @@ function BookingModal({ booking, onClose, onApprove, onReject }) {
             </div>
           )}
 
+          <div className="space-y-3 mb-4">
+            <div className="grid gap-3 sm:grid-cols-2">
+              <label className="text-sm font-medium text-gray-700">
+                <span className="mb-1 block">New date</span>
+                <input type="date" value={rescheduleDate} onChange={(e) => setRescheduleDate(e.target.value)} className="w-full rounded-2xl border border-gray-200 px-3 py-2 text-sm" />
+              </label>
+              <label className="text-sm font-medium text-gray-700">
+                <span className="mb-1 block">New time</span>
+                <input type="time" value={rescheduleTime} onChange={(e) => setRescheduleTime(e.target.value)} className="w-full rounded-2xl border border-gray-200 px-3 py-2 text-sm" />
+              </label>
+            </div>
+            <label className="text-sm font-medium text-gray-700 block">
+              <span className="mb-1 block">Reason</span>
+              <input type="text" value={rescheduleReason} onChange={(e) => setRescheduleReason(e.target.value)} className="w-full rounded-2xl border border-gray-200 px-3 py-2 text-sm" />
+            </label>
+            <button
+              onClick={handleReschedule}
+              disabled={loading === "reschedule" || !rescheduleDate || !rescheduleTime}
+              className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white py-3 rounded-2xl font-semibold hover:scale-[1.02] transition-all shadow-lg shadow-blue-100 disabled:opacity-60 disabled:scale-100"
+            >
+              {loading === "reschedule" ? (
+                <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+              ) : (
+                <FaCalendarAlt />
+              )}
+              Reschedule booking
+            </button>
+          </div>
+
           {/* ── Actions ── */}
           <div className="flex gap-3">
             {booking.status === "PENDING" && (
@@ -412,6 +455,24 @@ export default function CalendarPage() {
     if (res.ok) {
       setCalendarBookings((p) => p.map((b) => b.id === bookingId ? { ...b, status: "REJECTED", statusReason: reason } : b));
       setSelectedBooking((p) => p?.id === bookingId ? { ...p, status: "REJECTED", statusReason: reason } : p);
+    }
+  };
+
+  const handleReschedule = async (bookingId, payload) => {
+    try {
+      const updatedBooking = await rescheduleBooking(token, bookingId, payload);
+      const nextBooking = updatedBooking || {
+        ...selectedBooking,
+        bookingDate: payload.bookingDate,
+        startTime: payload.bookingTime,
+        endTime: payload.bookingTime,
+      };
+
+      setCalendarBookings((p) => p.map((b) => (b.id === bookingId ? { ...b, ...nextBooking } : b)));
+      setSelectedBooking((p) => (p?.id === bookingId ? { ...p, ...nextBooking } : p));
+    } catch (err) {
+      console.error("Reschedule failed", err);
+      alert(err.message || "Unable to reschedule booking right now.");
     }
   };
 
@@ -649,6 +710,7 @@ export default function CalendarPage() {
           onClose={() => setSelectedBooking(null)}
           onApprove={handleApprove}
           onReject={handleReject}
+          onReschedule={handleReschedule}
         />
       )}
 

@@ -5,6 +5,7 @@ class BusinessModel {
   final double latitude;
   final double longitude;
   final String? address;
+  final String category;
   final List<String>? images;
 
   BusinessModel({
@@ -14,6 +15,7 @@ class BusinessModel {
     required this.longitude,
     this.imageUrl,
     this.address,
+    this.category = 'General',
     this.images,
   });
 
@@ -27,6 +29,7 @@ class BusinessModel {
 
       imageUrl: json['imageUrl'],
       address: json['address'],
+      category: json['category']?.toString() ?? 'General',
 
       images: (json['images'] as List<dynamic>?)
           ?.map((e) => e.toString())

@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import uz.encode.fresh.booking_service.dto.BookingResponse;
 import uz.encode.fresh.booking_service.dto.CreateBookingRequest;
 import uz.encode.fresh.booking_service.dto.DashboardMetricsResponse;
+import uz.encode.fresh.booking_service.dto.RescheduleBookingRequest;
 import uz.encode.fresh.booking_service.dto.UpdateBookingStatusRequest;
 import uz.encode.fresh.booking_service.service.BookingService;
 
@@ -44,14 +45,14 @@ public class BookingController {
 
     @GetMapping("/{bookingId}")
     @PreAuthorize("isAuthenticated()")
-    public BookingResponse getById(HttpServletRequest request, @PathVariable Long bookingId) {
+    public BookingResponse getById(HttpServletRequest request, @PathVariable("bookingId") Long bookingId) {
         return bookingService.getBooking((Long) request.getAttribute("userId"), bookingId);
     }
 
     @GetMapping("/business/{businessId}")
     @PreAuthorize("hasAnyAuthority('STAFF', 'ADMIN')")
     public List<BookingResponse> businessBookings(HttpServletRequest request,
-                                                  @PathVariable Long businessId) {
+                                                  @PathVariable("businessId") Long businessId) {
         return bookingService.getBusinessBookings((Long) request.getAttribute("userId"), businessId);
     }
 
@@ -66,9 +67,30 @@ public class BookingController {
     @DeleteMapping("/{bookingId}")
     @PreAuthorize("hasAuthority('CLIENT')")
     public BookingResponse cancel(HttpServletRequest request,
-                                  @PathVariable Long bookingId,
+                                  @PathVariable("bookingId") Long bookingId,
                                   @RequestParam(required = false) String reason) {
         return bookingService.cancelByClient((Long) request.getAttribute("userId"), bookingId, reason);
+    }
+
+    @PatchMapping("/{bookingId}/reschedule")
+    @PreAuthorize("isAuthenticated()")
+    public BookingResponse reschedule(HttpServletRequest request,
+                                      @PathVariable("bookingId") Long bookingId,
+                                      @Valid @RequestBody RescheduleBookingRequest body) {
+        Long userId = (Long) request.getAttribute("userId");
+        String role = (String) request.getAttribute("role");
+
+        if ("STAFF".equalsIgnoreCase(role) || "ADMIN".equalsIgnoreCase(role)) {
+            return bookingService.rescheduleByStaff(userId, bookingId, body);
+        }
+
+        return bookingService.rescheduleBooking(userId, bookingId, body);
+    }
+
+    @PatchMapping("/public/{token}/reschedule")
+    public BookingResponse reschedule(@PathVariable("token") String token,
+                                      @Valid @RequestBody RescheduleBookingRequest body) {
+        return bookingService.reschedulePublicBooking(token, body);
     }
 
     @GetMapping("/staff/me")
@@ -79,7 +101,7 @@ public class BookingController {
 
     @GetMapping("/staff/{bookingId}")
     @PreAuthorize("hasAuthority('STAFF')")
-    public BookingResponse getStaffBooking(HttpServletRequest request, @PathVariable Long bookingId) {
+    public BookingResponse getStaffBooking(HttpServletRequest request, @PathVariable("bookingId") Long bookingId) {
         return bookingService.getStaffBooking((Long) request.getAttribute("userId"), bookingId);
     }
 

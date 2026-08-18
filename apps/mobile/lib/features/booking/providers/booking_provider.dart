@@ -2,19 +2,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/booking_model.dart';
 
-enum BookingStep {
-  type,
-  service,
-  staff,
-  time,
-  customer,
-  confirmation,
-}
+enum BookingStep { type, service, staff, time, customer, confirmation }
 
-class BookingNotifier
-    extends StateNotifier<BookingModel> {
-  BookingNotifier(this.ref)
-      : super(BookingModel());
+class BookingNotifier extends StateNotifier<BookingModel> {
+  BookingNotifier(this.ref) : super(BookingModel());
 
   final Ref ref;
 
@@ -22,17 +13,14 @@ class BookingNotifier
   // STEP GETTER
   // =========================================================
 
-  BookingStep get currentStep =>
-      ref.read(bookingStepProvider);
+  BookingStep get currentStep => ref.read(bookingStepProvider);
 
   // =========================================================
   // BUSINESS
   // =========================================================
 
   void setBusiness(dynamic business) {
-    state = state.copyWith(
-      business: business,
-    );
+    state = state.copyWith(business: business);
   }
 
   // =========================================================
@@ -48,9 +36,7 @@ class BookingNotifier
   // =========================================================
 
   void setService(dynamic service) {
-    state = state.copyWith(
-      service: service,
-    );
+    state = state.copyWith(service: service);
   }
 
   // =========================================================
@@ -58,9 +44,7 @@ class BookingNotifier
   // =========================================================
 
   void setStaff(dynamic staff) {
-    state = state.copyWith(
-      staff: staff,
-    );
+    state = state.copyWith(staff: staff);
   }
 
   // =========================================================
@@ -79,16 +63,16 @@ class BookingNotifier
     state = state.copyWith(time: time);
   }
 
+  void setBookingToken(String? bookingToken) {
+    state = state.copyWith(bookingToken: bookingToken);
+  }
+
   // =========================================================
   // CUSTOMER
   // =========================================================
 
-  void setCustomer(
-      Map<String, dynamic> customer,
-      ) {
-    state = state.copyWith(
-      customer: customer,
-    );
+  void setCustomer(Map<String, dynamic> customer) {
+    state = state.copyWith(customer: customer);
   }
 
   // =========================================================
@@ -96,17 +80,11 @@ class BookingNotifier
   // =========================================================
 
   void nextStep() {
-    final current =
-    ref.read(bookingStepProvider);
+    final current = ref.read(bookingStepProvider);
 
-    if (current.index <
-        BookingStep.values.length - 1) {
-      ref
-          .read(
-        bookingStepProvider.notifier,
-      )
-          .state = BookingStep
-          .values[current.index + 1];
+    if (current.index < BookingStep.values.length - 1) {
+      ref.read(bookingStepProvider.notifier).state =
+          BookingStep.values[current.index + 1];
     }
   }
 
@@ -115,16 +93,11 @@ class BookingNotifier
   // =========================================================
 
   void previousStep() {
-    final current =
-    ref.read(bookingStepProvider);
+    final current = ref.read(bookingStepProvider);
 
     if (current.index > 0) {
-      ref
-          .read(
-        bookingStepProvider.notifier,
-      )
-          .state = BookingStep
-          .values[current.index - 1];
+      ref.read(bookingStepProvider.notifier).state =
+          BookingStep.values[current.index - 1];
     }
   }
 
@@ -133,11 +106,7 @@ class BookingNotifier
   // =========================================================
 
   void goToStep(BookingStep step) {
-    ref
-        .read(
-      bookingStepProvider.notifier,
-    )
-        .state = step;
+    ref.read(bookingStepProvider.notifier).state = step;
   }
 
   // =========================================================
@@ -147,11 +116,7 @@ class BookingNotifier
   void reset() {
     state = BookingModel();
 
-    ref
-        .read(
-      bookingStepProvider.notifier,
-    )
-        .state = BookingStep.type;
+    ref.read(bookingStepProvider.notifier).state = BookingStep.type;
   }
 }
 
@@ -159,15 +124,10 @@ class BookingNotifier
 // PROVIDERS
 // =============================================================
 
-final bookingProvider =
-StateNotifierProvider<
-    BookingNotifier,
-    BookingModel
->(
-      (ref) => BookingNotifier(ref),
+final bookingProvider = StateNotifierProvider<BookingNotifier, BookingModel>(
+  (ref) => BookingNotifier(ref),
 );
 
-final bookingStepProvider =
-StateProvider<BookingStep>(
-      (ref) => BookingStep.type,
+final bookingStepProvider = StateProvider<BookingStep>(
+  (ref) => BookingStep.type,
 );

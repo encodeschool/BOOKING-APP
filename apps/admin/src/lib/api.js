@@ -127,6 +127,14 @@ export async function updateBookingStatus(token, bookingId, body) {
   });
 }
 
+export async function rescheduleBooking(token, bookingId, body) {
+  return request(`/api/bookings/${bookingId}/reschedule`, {
+    method: "PATCH",
+    token,
+    body,
+  });
+}
+
 export async function getStaffWorkingHours(
   token,
   staffId

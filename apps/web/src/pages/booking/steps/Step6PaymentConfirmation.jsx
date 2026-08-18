@@ -14,6 +14,7 @@ const Step6PaymentConfirmation = () => {
   const [paymentMethod, setPaymentMethod] = useState("card");
   const [loading, setLoading] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
+  const [bookingToken, setBookingToken] = useState(null);
 
   const service = booking?.service;
   const staff = booking?.staff;
@@ -48,7 +49,11 @@ const Step6PaymentConfirmation = () => {
         notes: booking.notes || "",
       };
 
-      await apiClient.createBooking(payload);
+      const createdBooking = await apiClient.createBooking(payload);
+      if (createdBooking?.bookingToken) {
+        localStorage.setItem("booking-token", createdBooking.bookingToken);
+        setBookingToken(createdBooking.bookingToken);
+      }
 
       setConfirmed(true);
 
@@ -82,6 +87,13 @@ const Step6PaymentConfirmation = () => {
           <p className="text-gray-600 mb-8">
             Your appointment has been successfully booked.
           </p>
+          {bookingToken && (
+            <div className="mb-6 rounded-2xl border border-slate-200 bg-slate-50 p-4 text-left text-sm text-slate-700">
+              <p className="text-xs uppercase tracking-[0.2em] text-slate-400 mb-2">Booking token</p>
+              <p className="font-semibold text-slate-900 break-all">{bookingToken}</p>
+              <p className="mt-2 text-xs text-slate-500">Save this token to manage or reschedule your booking later.</p>
+            </div>
+          )}
 
           <Link
             to="/"

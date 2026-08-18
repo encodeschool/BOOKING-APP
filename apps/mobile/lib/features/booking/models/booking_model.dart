@@ -14,6 +14,7 @@ class BookingModel {
   DateTime? date;
 
   String? time;
+  String? bookingToken;
 
   Map<String, dynamic>? customer;
 
@@ -24,6 +25,7 @@ class BookingModel {
     this.staff,
     this.date,
     this.time,
+    this.bookingToken,
     this.customer,
   });
 
@@ -34,6 +36,7 @@ class BookingModel {
     StaffModel? staff,
     DateTime? date,
     String? time,
+    String? bookingToken,
     Map<String, dynamic>? customer,
   }) {
     return BookingModel(
@@ -43,6 +46,7 @@ class BookingModel {
       staff: staff ?? this.staff,
       date: date ?? this.date,
       time: time ?? this.time,
+      bookingToken: bookingToken ?? this.bookingToken,
       customer: customer ?? this.customer,
     );
   }

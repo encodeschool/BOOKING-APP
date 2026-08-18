@@ -82,6 +82,13 @@ const Navbar = () => {
                 >
                   {userInitial}
                 </Link>
+                <button
+                  type="button"
+                  onClick={logout}
+                  className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition"
+                >
+                  Sign out
+                </button>
               </div>
             ) : (
               <Link
@@ -96,8 +103,9 @@ const Navbar = () => {
           <button
             type="button"
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="lg:hidden w-11 h-11 rounded-full border border-slate-200 bg-white text-slate-700 flex items-center justify-center hover:bg-slate-100 transition"
-            aria-label="Open navigation menu"
+            className="lg:hidden w-11 h-11 rounded-full border border-slate-200 bg-white text-slate-700 flex items-center justify-center hover:bg-slate-100 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+            aria-label={mobileOpen ? "Close navigation menu" : "Open navigation menu"}
+            aria-expanded={mobileOpen}
           >
             {mobileOpen ? <X size={20} /> : <Menu size={20} />}
           </button>

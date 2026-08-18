@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../app/providers/AuthProvider";
 import { useBusiness } from "../../app/providers/BusinessProvider";
-import { getBusinessBookings, updateBookingStatus } from "../../lib/api";
+import { getBusinessBookings, rescheduleBooking, updateBookingStatus } from "../../lib/api";
 
 export default function BookingsPage() {
   const { token } = useAuth();
@@ -45,9 +45,31 @@ export default function BookingsPage() {
     }
   }
 
+  async function changeDateTime(id) {
+    const booking = bookings.find((item) => item.id === id);
+    if (!booking) return;
+
+    const nextDate = window.prompt("New booking date (YYYY-MM-DD)", booking.bookingDate || "");
+    const nextTime = window.prompt("New booking time (HH:MM)", booking.startTime || "");
+    if (!nextDate || !nextTime) return;
+
+    try {
+      const updated = await rescheduleBooking(token, id, {
+        bookingDate: nextDate,
+        bookingTime: nextTime,
+        reason: "Rescheduled by staff",
+      });
+
+      setBookings((prev) => prev.map((item) => (item.id === id ? updated : item)));
+    } catch (error) {
+      console.error("Failed to reschedule booking:", error);
+    }
+  }
+
   const filteredBookings = bookings.filter(booking =>
     (booking.customerName?.toLowerCase().includes(search.toLowerCase()) ||
-     booking.serviceName?.toLowerCase().includes(search.toLowerCase())) &&
+     booking.serviceName?.toLowerCase().includes(search.toLowerCase()) ||
+     booking.bookingToken?.toLowerCase().includes(search.toLowerCase())) &&
     (statusFilter === "" || booking.status === statusFilter)
   );
 
@@ -68,7 +90,7 @@ export default function BookingsPage() {
         <div className="flex-1">
           <input
             type="text"
-            placeholder="Search by customer or service..."
+            placeholder="Search by customer, service, or token..."
             className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -113,6 +135,9 @@ export default function BookingsPage() {
                   Date & Time
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Token
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Status
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -131,6 +156,9 @@ export default function BookingsPage() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {booking.serviceName || 'N/A'}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 break-all">
+                    {booking.bookingToken || 'N/A'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {new Date(booking.date).toLocaleDateString()} at {booking.time}
@@ -154,12 +182,20 @@ export default function BookingsPage() {
                       </button>
                     )}
                     {booking.status !== 'CANCELLED' && (
-                      <button
-                        onClick={() => changeStatus(booking.id, "CANCELLED")}
-                        className="text-red-600 hover:text-red-900"
-                      >
-                        Cancel
-                      </button>
+                      <>
+                        <button
+                          onClick={() => changeDateTime(booking.id)}
+                          className="text-blue-600 hover:text-blue-900 mr-3"
+                        >
+                          Reschedule
+                        </button>
+                        <button
+                          onClick={() => changeStatus(booking.id, "CANCELLED")}
+                          className="text-red-600 hover:text-red-900"
+                        >
+                          Cancel
+                        </button>
+                      </>
                     )}
                   </td>
                 </tr>

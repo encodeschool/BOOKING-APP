@@ -2,6 +2,25 @@
   "version": "2.0.0",
   "tasks": [
     {
+      "label": "Run Admin Dev",
+      "type": "shell",
+      "command": "npm run dev",
+      "options": { "cwd": "${workspaceFolder}/apps/admin" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Run Web Dev",
+      "type": "shell",
+      "command": "npm run dev",
+      "options": { "cwd": "${workspaceFolder}/apps/web" },
+      "problemMatcher": []
+    }
+  ]
+}
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
       "label": "Run Auth DEV",
       "type": "shell",
       "command": "mvn spring-boot:run -Dspring-boot.run.profiles=dev",

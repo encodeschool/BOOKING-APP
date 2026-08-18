@@ -91,13 +91,18 @@ const ServicesPage = () => {
           <div className="space-y-6">
             <div className="rounded-3xl bg-white p-6 shadow-sm">
               <div className="relative">
+                <label htmlFor="service-search" className="sr-only">
+                  Search services
+                </label>
                 <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
                 <input
+                  id="service-search"
                   type="text"
                   placeholder="Search services..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="input-field pl-12"
+                  aria-label="Search services"
                 />
               </div>
             </div>

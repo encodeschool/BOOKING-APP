@@ -4,7 +4,7 @@ import '../../../core/api/api_client.dart';
 import '../../../core/data/mock.dart';
 import '../models/business_model.dart';
 
-const bool useMockData = true; // TODO: WHENEVER BACKEND IS READY NEED TO CHANGE TO FALSE
+const bool useMockData = false; // TODO: WHENEVER BACKEND IS READY NEED TO CHANGE TO FALSE
 
 final businessesProvider =
 FutureProvider<List<BusinessModel>>((ref) async {

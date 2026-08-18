@@ -1,18 +1,44 @@
-﻿import { useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { useAuth } from "../app/providers/AuthProvider";
 
 const ProfilePage = () => {
-  const { profile } = useAuth();
+  const { profile, updateProfile } = useAuth();
   const [editMode, setEditMode] = useState(false);
   const [formData, setFormData] = useState({
     fullName: profile?.fullName || "",
     email: profile?.email || "",
     phone: profile?.phone || "",
   });
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState("");
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
+
+  const handleSave = async (e) => {
+    e.preventDefault();
+    setSaving(true);
+    setMessage("");
+
+    try {
+      await updateProfile({ fullName: formData.fullName, phone: formData.phone });
+      setMessage("Profile updated successfully.");
+      setEditMode(false);
+    } catch (err) {
+      setMessage(err.message || "Unable to update profile.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  useEffect(() => {
+    setFormData({
+      fullName: profile?.fullName || "",
+      email: profile?.email || "",
+      phone: profile?.phone || "",
+    });
+  }, [profile]);
 
   return (
     <div className="min-h-screen bg-slate-50 py-12">
@@ -55,7 +81,7 @@ const ProfilePage = () => {
             </div>
 
             {editMode && (
-              <form className="mt-10 space-y-6">
+              <form onSubmit={handleSave} className="mt-10 space-y-6">
                 <div className="grid gap-6 sm:grid-cols-2">
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-2">Full Name</label>
@@ -69,8 +95,8 @@ const ProfilePage = () => {
                     <label className="block text-sm font-medium text-slate-700 mb-2">Email</label>
                     <input
                       value={formData.email}
-                      onChange={(e) => handleInputChange("email", e.target.value)}
-                      className="input-field"
+                      disabled
+                      className="input-field bg-slate-100 cursor-not-allowed"
                     />
                   </div>
                 </div>
@@ -82,7 +108,19 @@ const ProfilePage = () => {
                     className="input-field"
                   />
                 </div>
-                <button className="btn-primary">Save changes</button>
+                {message && <p className="text-sm text-slate-700">{message}</p>}
+                <div className="flex flex-col gap-3 sm:flex-row">
+                  <button type="submit" disabled={saving} className="btn-primary w-full sm:w-auto">
+                    {saving ? "Saving..." : "Save changes"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setEditMode(false)}
+                    className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 transition w-full sm:w-auto"
+                  >
+                    Cancel
+                  </button>
+                </div>
               </form>
             )}
           </div>

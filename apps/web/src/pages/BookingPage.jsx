@@ -111,6 +111,10 @@ const BookingPage = () => {
           </div>
           <div className="grid gap-4 rounded-3xl border border-slate-200 bg-slate-50 p-5 text-sm text-slate-700 mb-6">
             <div>
+              <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Booking Token</p>
+              <p className="font-semibold text-slate-900 break-all">{booking.bookingToken || 'N/A'}</p>
+            </div>
+            <div>
               <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Business</p>
               <p className="font-semibold text-slate-900">{booking.businessName}</p>
             </div>
@@ -261,9 +265,13 @@ const BookingPage = () => {
       };
 
       const createdBooking = await apiClient.createBooking(bookingData);
+      if (createdBooking?.bookingToken) {
+        localStorage.setItem("booking-token", createdBooking.bookingToken);
+      }
       setConfirmedBooking({
         ...bookingData,
         id: createdBooking?.id,
+        bookingToken: createdBooking?.bookingToken,
         businessName: selectedBusiness?.name,
         serviceName: selectedService?.name,
         staffName: selectedStaff?.name || "Any available staff",

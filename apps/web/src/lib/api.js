@@ -71,6 +71,72 @@ class ApiClient {
     return this.request(`/api/bookings/available-dates?${params}`);
   }
 
+  async getMyBookings(token) {
+    return this.request("/api/bookings/me", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  }
+
+  async getBooking(bookingId, token) {
+    return this.request(`/api/bookings/${bookingId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  }
+
+  async getProfile(token) {
+    return this.request("/api/users/me", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  }
+
+  async updateProfile(token, data) {
+    return this.request("/api/users/me", {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: data,
+    });
+  }
+
+  async cancelBooking(bookingId, token, reason) {
+    const params = new URLSearchParams();
+    if (reason) params.set("reason", reason);
+    return this.request(`/api/bookings/${bookingId}${params.toString() ? `?${params.toString()}` : ""}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  }
+
+  async rescheduleBooking(bookingId, token, body) {
+    return this.request(`/api/bookings/${bookingId}/reschedule`, {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body,
+    });
+  }
+
+  async reschedulePublicBooking(bookingToken, body) {
+    return this.request(`/api/bookings/public/${bookingToken}/reschedule`, {
+      method: "PATCH",
+      body,
+    });
+  }
+
+  async getPublicBooking(bookingToken) {
+    return this.request(`/api/bookings/public/${bookingToken}`);
+  }
+
   async getStaffBookings(token) {
     return this.request("/api/bookings/staff/me", {
       headers: {

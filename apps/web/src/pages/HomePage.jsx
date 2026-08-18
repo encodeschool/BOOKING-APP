@@ -89,7 +89,7 @@ const HomePage = () => {
               </div>
             </div>
 
-            <div className="rounded-[2rem] border border-white/20 bg-white/10 p-8 shadow-2xl backdrop-blur-xl">
+            {/* <div className="rounded-[2rem] border border-white/20 bg-white/10 p-8 shadow-2xl backdrop-blur-xl">
               <div className="flex items-center justify-between gap-4 mb-6">
                 <div>
                   <p className="text-sm text-slate-200">Service search</p>
@@ -118,24 +118,24 @@ const HomePage = () => {
                   </div>
                 </div>
               </div>
-            </div>
+            </div> */}
           </div>
 
-          <div className="mt-12 rounded-[2rem] border border-white/10 bg-white/10 p-6 shadow-2xl backdrop-blur-xl">
+          <div className="mt-12 rounded-[2rem]">
             <div className="grid gap-4 sm:grid-cols-3">
-              <div className="rounded-3xl bg-white/20 p-5">
+              <div className="rounded-3xl ">
                 <p className="text-sm text-slate-200">Appointments today</p>
-                <p className="mt-3 text-3xl font-semibold">
+                <p className="mt-3 text-5xl font-semibold">
                   <RollingNumber value={count} />
                 </p>
               </div>
-              <div className="rounded-3xl bg-white/20 p-5">
+              <div className="rounded-3xl ">
                 <p className="text-sm text-slate-200">Partner businesses</p>
-                <p className="mt-3 text-3xl font-semibold">{businesses.length}</p>
+                <p className="mt-3 text-5xl font-semibold">{businesses.length}</p>
               </div>
-              <div className="rounded-3xl bg-white/20 p-5">
+              <div className="rounded-3xl ">
                 <p className="text-sm text-slate-200">Booking confidence</p>
-                <p className="mt-3 text-3xl font-semibold">99%</p>
+                <p className="mt-3 text-5xl font-semibold">99%</p>
               </div>
             </div>
           </div>

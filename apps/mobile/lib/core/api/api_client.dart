@@ -5,12 +5,14 @@ import 'dart:io';
 class ApiClient {
   static String get baseUrl {
     if (Platform.isAndroid) {
+      // return "https://api-enroll.encode.uz";
       return "http://10.0.2.2:9087";
     } else if (Platform.isIOS) {
-      return "http://localhost:9087";
+      return "https://api-enroll.encode.uz";
+      // return "http://localhost:9087";
     }
+    // return "https://api-enroll.encode.uz";
     return "http://localhost:9087";
-    // return "http://localhost:8087";
   }
 
   final Dio dio = Dio(
@@ -38,8 +40,56 @@ class ApiClient {
     return res.data;
   }
 
-  Future<void> createBooking(Map<String, dynamic> data) async {
-    await dio.post("/api/bookings/public", data: data);
+  Future<Map<String, dynamic>> createBooking(Map<String, dynamic> data) async {
+    final res = await dio.post("/api/bookings/public", data: data);
+    return res.data as Map<String, dynamic>;
+  }
+
+  Future<List<dynamic>> getMyBookings(String token) async {
+    final res = await dio.get(
+      "/api/bookings/me",
+      options: Options(headers: {"Authorization": "Bearer $token"}),
+    );
+    return res.data;
+  }
+
+  Future<void> cancelBooking(
+    int bookingId,
+    String token, {
+    String? reason,
+  }) async {
+    await dio.delete(
+      "/api/bookings/$bookingId",
+      queryParameters: reason == null ? null : {"reason": reason},
+      options: Options(headers: {"Authorization": "Bearer $token"}),
+    );
+  }
+
+  Future<void> rescheduleBooking(
+    int bookingId,
+    String token,
+    Map<String, dynamic> data,
+  ) async {
+    await dio.patch(
+      "/api/bookings/$bookingId/reschedule",
+      data: data,
+      options: Options(headers: {"Authorization": "Bearer $token"}),
+    );
+  }
+
+  Future<void> reschedulePublicBooking(
+    String bookingToken,
+    Map<String, dynamic> data,
+  ) async {
+    await dio.patch(
+      "/api/bookings/public/$bookingToken/reschedule",
+      data: data,
+    );
+  }
+
+  Future<Map<String, dynamic>> getPublicBooking(String bookingToken) async {
+    final res = await dio.get("/api/bookings/public/$bookingToken");
+    return res.data as Map<String, dynamic>;
   }
 
   // Notification methods

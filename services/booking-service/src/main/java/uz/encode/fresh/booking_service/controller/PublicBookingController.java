@@ -30,6 +30,11 @@ public class PublicBookingController {
         return bookingService.createPublicBooking(body);
     }
 
+    @GetMapping("/public/{token}")
+    public BookingResponse getBookingByToken(@PathVariable("token") String token) {
+        return bookingService.getPublicBooking(token);
+    }
+
     @GetMapping("/available-slots")
     public List<String> getAvailableSlots(
             @RequestParam("businessId") Long businessId,

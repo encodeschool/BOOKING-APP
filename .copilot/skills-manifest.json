@@ -1,0 +1,10 @@
+{
+  "skills": [
+    {
+      "id": "ui-ux",
+      "name": "UI/UX",
+      "path": ".github/skills/ui-ux/SKILL.md",
+      "description": "UI/UX guidance and artifacts for Booking App frontends"
+    }
+  ]
+}

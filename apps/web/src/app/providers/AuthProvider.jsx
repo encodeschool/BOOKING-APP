@@ -7,6 +7,10 @@ const API_BASE_URL =
   (import.meta.env.DEV ? "http://localhost:9087" : "https://api-enroll.encode.uz");
 const authApi = axios.create({
   baseURL: API_BASE_URL,
+  headers: {
+    "Content-Type": "application/json",
+    Accept: "application/json",
+  },
 });
 
 const AuthContext = createContext();
@@ -48,7 +52,18 @@ export default function AuthProvider({ children }) {
     }
   };
 
-  const register = async (email, password, fullName) => {
+  const getApiErrorMessage = (err) => {
+    if (!err) return "An unexpected error occurred";
+    return (
+      err.response?.data?.message ||
+      err.response?.data?.error ||
+      err.response?.data?.errors?.[0] ||
+      err.message ||
+      "An unexpected error occurred"
+    );
+  };
+
+  const register = async ({ email, password, fullName }) => {
     setLoading(true);
     setError(null);
     try {
@@ -72,14 +87,15 @@ export default function AuthProvider({ children }) {
       }
       return response.data;
     } catch (err) {
-      setError(err.response?.data?.message || "Registration failed");
-      throw err;
+      const message = getApiErrorMessage(err);
+      setError(message);
+      throw new Error(message);
     } finally {
       setLoading(false);
     }
   };
 
-  const login = async (email, password) => {
+  const login = async ({ email, password }) => {
     setLoading(true);
     setError(null);
     try {
@@ -91,8 +107,9 @@ export default function AuthProvider({ children }) {
       setToken(response.data.token);
       return response.data;
     } catch (err) {
-      setError(err.response?.data?.message || "Login failed");
-      throw err;
+      const message = getApiErrorMessage(err);
+      setError(message);
+      throw new Error(message);
     } finally {
       setLoading(false);
     }
@@ -124,8 +141,9 @@ export default function AuthProvider({ children }) {
       });
       return response.data;
     } catch (err) {
-      setError(err.response?.data?.message || "Password reset failed");
-      throw err;
+      const message = getApiErrorMessage(err);
+      setError(message);
+      throw new Error(message);
     } finally {
       setLoading(false);
     }
