@@ -9,36 +9,42 @@ class StaffBottomNav extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = Theme.of(context).primaryColor;
-    return BottomAppBar(
-      shape: CircularNotchedRectangle(),
-      notchMargin: 6.0,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            _NavItem(
-              icon: Icons.dashboard,
-              label: 'Dashboard',
-              active: currentIndex == 0,
-              color: color,
-              onTap: () => onTap(0),
+    return SafeArea(
+      top: false,
+      child: BottomAppBar(
+        shape: CircularNotchedRectangle(),
+        notchMargin: 6.0,
+        child: SizedBox(
+          // height: 64,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 6.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _NavItem(
+                  icon: Icons.dashboard,
+                  label: 'Dashboard',
+                  active: currentIndex == 0,
+                  color: color,
+                  onTap: () => onTap(0),
+                ),
+                _NavItem(
+                  icon: Icons.calendar_today,
+                  label: 'Calendar',
+                  active: currentIndex == 1,
+                  color: color,
+                  onTap: () => onTap(1),
+                ),
+                _NavItem(
+                  icon: Icons.person,
+                  label: 'Profile',
+                  active: currentIndex == 2,
+                  color: color,
+                  onTap: () => onTap(2),
+                ),
+              ],
             ),
-            _NavItem(
-              icon: Icons.calendar_today,
-              label: 'Calendar',
-              active: currentIndex == 1,
-              color: color,
-              onTap: () => onTap(1),
-            ),
-            _NavItem(
-              icon: Icons.person,
-              label: 'Profile',
-              active: currentIndex == 2,
-              color: color,
-              onTap: () => onTap(2),
-            ),
-          ],
+          ),
         ),
       ),
     );
@@ -67,12 +73,12 @@ class _NavItem extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(16),
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8.0),
+          padding: const EdgeInsets.symmetric(vertical: 0.0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(icon, color: active ? color : Colors.grey),
-              const SizedBox(height: 4),
+              // const SizedBox(height: 4),
               Text(
                 label,
                 style: TextStyle(

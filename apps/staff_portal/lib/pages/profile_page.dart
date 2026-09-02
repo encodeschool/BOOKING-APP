@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/api_service.dart';
 import '../models/user.dart';
+import '../widgets/business_name.dart';
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -37,7 +38,10 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Profile')),
+      appBar: AppBar(title: Text('Profile'), actions: [
+        Padding(
+            padding: EdgeInsets.only(right: 4), child: BusinessNameDisplay())
+      ]),
       body: _loading
           ? Center(child: CircularProgressIndicator())
           : Padding(
@@ -45,7 +49,8 @@ class _ProfilePageState extends State<ProfilePage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(_user?.name ?? '—', style: Theme.of(context).textTheme.headlineMedium),
+                  Text(_user?.name ?? '—',
+                      style: Theme.of(context).textTheme.headlineMedium),
                   SizedBox(height: 8),
                   Text('Email: ${_user?.email ?? ''}'),
                   SizedBox(height: 8),

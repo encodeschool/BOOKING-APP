@@ -1,179 +1,1183 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:table_calendar/table_calendar.dart';
-import '../services/api_service.dart';
+
 import '../models/booking.dart';
+import '../services/api_service.dart';
+import '../widgets/business_name.dart';
 
 class CalendarPage extends StatefulWidget {
+  const CalendarPage({Key? key}) : super(key: key);
   @override
-  _CalendarPageState createState() => _CalendarPageState();
+  State<CalendarPage> createState() => _CalendarPageState();
 }
 
 class _CalendarPageState extends State<CalendarPage> {
   DateTime _focused = DateTime.now();
-  DateTime? _selected;
-  Map<DateTime, List<Booking>> _events = {};
+  List<Booking> _dayEvents = [];
   bool _loading = true;
-  String _view = 'month'; // 'day', 'month', 'year'
-
+  final ScrollController _scrollController = ScrollController();
+  static const double _hourHeight = 90.0;
+  static const double _timeColumnWidth = 72.0;
   @override
   void initState() {
     super.initState();
+    _focused = DateTime(
+      _focused.year,
+      _focused.month,
+      _focused.day,
+    );
     _loadEvents();
   }
 
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
   Future<void> _loadEvents() async {
-    setState(() => _loading = true);
-    final api = Provider.of<ApiService>(context, listen: false);
-    // determine range based on current view
-    DateTime from;
-    DateTime to;
-    if (_view == 'day') {
-      from = DateTime(_focused.year, _focused.month, _focused.day);
-      to = from.add(Duration(days: 1));
-    } else if (_view == 'year') {
-      from = DateTime(_focused.year, 1, 1);
-      to = DateTime(_focused.year + 1, 1, 1).subtract(Duration(seconds: 1));
-    } else {
-      // month
-      from = DateTime(_focused.year, _focused.month, 1);
-      to = DateTime(_focused.year, _focused.month + 1, 1)
-          .subtract(Duration(seconds: 1));
-    }
-
-    final bookings = await api.getCalendarEvents(from, to);
-    final map = <DateTime, List<Booking>>{};
-    for (var b in bookings) {
-      final day = DateTime(b.start.year, b.start.month, b.start.day);
-      map.putIfAbsent(day, () => []).add(b);
-    }
+    if (!mounted) return;
     setState(() {
-      _events = map;
-      _loading = false;
+      _loading = true;
     });
-  }
-
-  List<Booking> _getEventsForDay(DateTime day) {
-    final key = DateTime(day.year, day.month, day.day);
-    return _events[key] ?? [];
-  }
-
-  void _showActions(Booking b) async {
-    final api = Provider.of<ApiService>(context, listen: false);
-    final action = await showModalBottomSheet<String>(
-        context: context,
-        builder: (_) => Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ListTile(
-                    title: Text('Approve'),
-                    onTap: () => Navigator.pop(context, 'approve')),
-                ListTile(
-                    title: Text('Cancel'),
-                    onTap: () => Navigator.pop(context, 'cancel')),
-                ListTile(
-                    title: Text('Reschedule'),
-                    onTap: () => Navigator.pop(context, 'reschedule')),
-              ],
-            ));
-    if (action == 'approve') {
-      await api.approveBooking(b.id);
-    } else if (action == 'cancel') {
-      await api.cancelBooking(b.id);
-    } else if (action == 'reschedule') {
-      final dt = await showDatePicker(
-          context: context,
-          initialDate: b.start,
-          firstDate: DateTime.now(),
-          lastDate: DateTime.now().add(Duration(days: 365)));
-      if (dt != null) {
-        await api.rescheduleBooking(b.id, dt);
-      }
+    try {
+      final api = Provider.of<ApiService>(
+        context,
+        listen: false,
+      );
+      final from = DateTime(
+        _focused.year,
+        _focused.month,
+        _focused.day,
+      );
+      final to = from.add(
+        const Duration(days: 1),
+      );
+      final bookings = await api.getCalendarEvents(
+        from,
+        to,
+      );
+      final dayEvents = bookings.where((b) {
+        return b.start.year == _focused.year &&
+            b.start.month == _focused.month &&
+            b.start.day == _focused.day;
+      }).toList();
+      dayEvents.sort(
+        (a, b) => a.start.compareTo(b.start),
+      );
+      if (!mounted) return;
+      setState(() {
+        _dayEvents = dayEvents;
+        _loading = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _dayEvents = [];
+        _loading = false;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Failed to load calendar: $e',
+          ),
+        ),
+      );
     }
+  }
+
+  void _changeDay(int amount) {
+    setState(() {
+      _focused = _focused.add(
+        Duration(days: amount),
+      );
+    });
+    _loadEvents();
+  }
+
+  Future<void> _selectDate() async {
+    final selected = await showDatePicker(
+      context: context,
+      initialDate: _focused,
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2035),
+      initialDatePickerMode: DatePickerMode.day,
+    );
+    if (selected == null) return;
+    setState(() {
+      _focused = DateTime(
+        selected.year,
+        selected.month,
+        selected.day,
+      );
+    });
     await _loadEvents();
+  }
+
+  Future<void> _selectMonthYear() async {
+    final result = await showDialog<DateTime>(
+      context: context,
+      builder: (context) {
+        return _MonthYearPicker(
+          initialDate: _focused,
+          firstDate: DateTime(2020),
+          lastDate: DateTime(2035),
+        );
+      },
+    );
+    if (result == null) return;
+    final lastDay = DateTime(
+      result.year,
+      result.month + 1,
+      0,
+    ).day;
+    final selectedDay = _focused.day > lastDay ? lastDay : _focused.day;
+    setState(() {
+      _focused = DateTime(
+        result.year,
+        result.month,
+        selectedDay,
+      );
+    });
+    await _loadEvents();
+  }
+
+  void _goToToday() {
+    final today = DateTime.now();
+    setState(() {
+      _focused = DateTime(
+        today.year,
+        today.month,
+        today.day,
+      );
+    });
+    _loadEvents();
+  }
+
+  String _monthName(int month) {
+    const months = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
+    ];
+    return months[month - 1];
+  }
+
+  String _weekdayName(int weekday) {
+    const weekdays = [
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+      'Sunday',
+    ];
+    return weekdays[weekday - 1];
+  }
+
+  String _formatTime(DateTime date) {
+    final hour = date.hour.toString().padLeft(2, '0');
+    final minute = date.minute.toString().padLeft(2, '0');
+    return '$hour:$minute';
+  }
+
+  String _formatHour(int hour) {
+    return '${hour.toString().padLeft(2, '0')}:00';
+  }
+
+  bool _isToday() {
+    final now = DateTime.now();
+    return now.year == _focused.year &&
+        now.month == _focused.month &&
+        now.day == _focused.day;
+  }
+
+  double _eventTop(DateTime start) {
+    final minutes = start.hour * 60 + start.minute;
+    return (minutes / 60) * _hourHeight;
+  }
+
+  double _eventHeight(
+    DateTime start,
+    DateTime end,
+  ) {
+    final duration = end.difference(start).inMinutes;
+    final minutes = duration <= 15 ? 30 : duration;
+    return (minutes / 60) * _hourHeight;
+  }
+
+  String _normalizedStatus(String status) {
+    final value =
+        status.trim().toLowerCase().replaceAll('-', '_').replaceAll(' ', '_');
+    switch (value) {
+      case 'accepted':
+      case 'approve':
+      case 'approved':
+      case 'confirmed':
+      case 'confirmation':
+        return 'accepted';
+      case 'cancel':
+      case 'cancelled':
+      case 'canceled':
+        return 'cancelled';
+      case 'pending':
+      case 'waiting':
+      case 'requested':
+        return 'pending';
+      case 'completed':
+      case 'complete':
+        return 'completed';
+      default:
+        return value;
+    }
+  }
+
+  Color _statusColor(String status) {
+    switch (_normalizedStatus(status)) {
+      case 'pending':
+        return Colors.orange;
+      case 'accepted':
+        return Colors.green;
+      case 'cancelled':
+        return Colors.red;
+      case 'completed':
+        return Colors.blue;
+      default:
+        return Theme.of(context).colorScheme.primary;
+    }
+  }
+
+  Color _statusBackgroundColor(String status) {
+    switch (_normalizedStatus(status)) {
+      case 'pending':
+        return Colors.orange.withOpacity(0.16);
+      case 'accepted':
+        return Colors.green.withOpacity(0.16);
+      case 'cancelled':
+        return Colors.red.withOpacity(0.16);
+      case 'completed':
+        return Colors.blue.withOpacity(0.16);
+      default:
+        return Theme.of(context).colorScheme.primary.withOpacity(0.12);
+    }
+  }
+
+  String _statusLabel(String status) {
+    switch (_normalizedStatus(status)) {
+      case 'pending':
+        return 'PENDING';
+      case 'accepted':
+        return 'ACCEPTED';
+      case 'cancelled':
+        return 'CANCELLED';
+      case 'completed':
+        return 'COMPLETED';
+      default:
+        return status.toUpperCase();
+    }
+  }
+
+  IconData _statusIcon(String status) {
+    switch (_normalizedStatus(status)) {
+      case 'pending':
+        return Icons.schedule;
+      case 'accepted':
+        return Icons.check_circle;
+      case 'cancelled':
+        return Icons.cancel;
+      case 'completed':
+        return Icons.task_alt;
+      default:
+        return Icons.event;
+    }
+  }
+
+  Future<void> _showActions(
+    Booking booking,
+  ) async {
+    final api = Provider.of<ApiService>(
+      context,
+      listen: false,
+    );
+    final action = await showModalBottomSheet<String>(
+      context: context,
+      showDragHandle: true,
+      builder: (context) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 16.0, vertical: 12.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Booking #${booking.id}',
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 6),
+                    Row(children: [
+                      const Icon(Icons.person, size: 18),
+                      const SizedBox(width: 8),
+                      Expanded(
+                          child: Text(booking.customerName.isNotEmpty
+                              ? booking.customerName
+                              : 'Guest'))
+                    ]),
+                    const SizedBox(height: 6),
+                    Row(children: [
+                      const Icon(Icons.event, size: 18),
+                      const SizedBox(width: 8),
+                      Text('${booking.start} - ${booking.end}')
+                    ]),
+                    const SizedBox(height: 6),
+                    Row(children: [
+                      const Icon(Icons.room_service, size: 18),
+                      const SizedBox(width: 8),
+                      Text(booking.serviceName)
+                    ]),
+                    const SizedBox(height: 8),
+                    Divider(),
+                  ],
+                ),
+              ),
+              ListTile(
+                leading: const Icon(
+                  Icons.check_circle_outline,
+                ),
+                title: const Text('Approve'),
+                onTap: () {
+                  Navigator.pop(
+                    context,
+                    'approve',
+                  );
+                },
+              ),
+              ListTile(
+                leading: const Icon(
+                  Icons.cancel_outlined,
+                ),
+                title: const Text('Cancel'),
+                onTap: () {
+                  Navigator.pop(
+                    context,
+                    'cancel',
+                  );
+                },
+              ),
+              ListTile(
+                leading: const Icon(
+                  Icons.schedule,
+                ),
+                title: const Text('Reschedule'),
+                onTap: () {
+                  Navigator.pop(
+                    context,
+                    'reschedule',
+                  );
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+    if (action == null) return;
+    try {
+      if (action == 'approve') {
+        await api.approveBooking(
+          booking.id,
+        );
+      } else if (action == 'cancel') {
+        await api.cancelBooking(
+          booking.id,
+        );
+      } else if (action == 'reschedule') {
+        final dt = await showDatePicker(
+          context: context,
+          initialDate: booking.start,
+          firstDate: DateTime.now(),
+          lastDate: DateTime.now().add(
+            const Duration(days: 365),
+          ),
+        );
+        if (dt != null) {
+          await api.rescheduleBooking(
+            booking.id,
+            dt,
+          );
+        }
+      }
+      await _loadEvents();
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Action failed: $e',
+          ),
+        ),
+      );
+    }
+  }
+
+  Widget _buildHeader() {
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 16,
+        vertical: 10,
+      ),
+      decoration: BoxDecoration(
+        color: theme.scaffoldBackgroundColor,
+        border: Border(
+          bottom: BorderSide(
+            color: theme.dividerColor,
+          ),
+        ),
+      ),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final compact = constraints.maxWidth < 850;
+          if (compact) {
+            return Column(
+              children: [
+                Row(
+                  children: [
+                    IconButton(
+                      tooltip: 'Previous day',
+                      onPressed: () => _changeDay(-1),
+                      icon: const Icon(
+                        Icons.chevron_left,
+                      ),
+                    ),
+                    IconButton(
+                      tooltip: 'Next day',
+                      onPressed: () => _changeDay(1),
+                      icon: const Icon(
+                        Icons.chevron_right,
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    Expanded(
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(8),
+                        onTap: _selectDate,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 6,
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '${_monthName(_focused.month)} '
+                                '${_focused.day}, '
+                                '${_focused.year}',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                _isToday()
+                                    ? 'Today · ${_weekdayName(_focused.weekday)}'
+                                    : _weekdayName(
+                                        _focused.weekday,
+                                      ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: theme.textTheme.bodySmall?.color,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    OutlinedButton(
+                      onPressed: _goToToday,
+                      child: const Text('Today'),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: _selectMonthYear,
+                    icon: const Icon(
+                      Icons.calendar_month,
+                      size: 18,
+                    ),
+                    label: Text(
+                      '${_monthName(_focused.month)} ' '${_focused.year}',
+                    ),
+                  ),
+                ),
+              ],
+            );
+          }
+          return Row(
+            children: [
+              IconButton(
+                tooltip: 'Previous day',
+                onPressed: () => _changeDay(-1),
+                icon: const Icon(
+                  Icons.chevron_left,
+                ),
+              ),
+              IconButton(
+                tooltip: 'Next day',
+                onPressed: () => _changeDay(1),
+                icon: const Icon(
+                  Icons.chevron_right,
+                ),
+              ),
+              const SizedBox(width: 6),
+              Expanded(
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(8),
+                  onTap: _selectDate,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 6,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '${_monthName(_focused.month)} '
+                          '${_focused.day}, '
+                          '${_focused.year}',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          _isToday()
+                              ? 'Today · ${_weekdayName(_focused.weekday)}'
+                              : _weekdayName(
+                                  _focused.weekday,
+                                ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: theme.textTheme.bodySmall?.color,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              OutlinedButton(
+                onPressed: _goToToday,
+                child: const Text('Today'),
+              ),
+              const SizedBox(width: 8),
+              OutlinedButton.icon(
+                onPressed: _selectMonthYear,
+                icon: const Icon(
+                  Icons.calendar_month,
+                  size: 18,
+                ),
+                label: Text(
+                  '${_monthName(_focused.month)} ' '${_focused.year}',
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildTimeColumn() {
+    return SizedBox(
+      width: _timeColumnWidth,
+      height: _hourHeight * 24,
+      child: Column(
+        children: List.generate(
+          24,
+          (hour) {
+            return SizedBox(
+              height: _hourHeight,
+              child: Align(
+                alignment: Alignment.topRight,
+                child: Padding(
+                  padding: const EdgeInsets.only(
+                    right: 10,
+                    top: 5,
+                  ),
+                  child: Text(
+                    _formatHour(hour),
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey.shade600,
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHourGrid() {
+    final theme = Theme.of(context);
+    return SizedBox(
+      height: _hourHeight * 24,
+      width: double.infinity,
+      child: Stack(
+        children: [
+          Column(
+            children: List.generate(
+              24,
+              (hour) {
+                return Container(
+                  height: _hourHeight,
+                  decoration: BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(
+                        color: theme.dividerColor.withOpacity(0.45),
+                        width: 1,
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          ..._dayEvents.map(
+            (booking) => _buildBookingCard(booking),
+          ),
+          _buildCurrentTimeIndicator(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBookingCard(
+    Booking booking,
+  ) {
+    final top = _eventTop(
+      booking.start,
+    );
+    DateTime end = booking.end;
+    if (end.isBefore(booking.start) ||
+        end.isAtSameMomentAs(
+          booking.start,
+        )) {
+      end = booking.start.add(
+        const Duration(minutes: 30),
+      );
+    }
+    final height = _eventHeight(
+      booking.start,
+      end,
+    );
+    final statusColor = _statusColor(booking.status);
+    final backgroundColor = _statusBackgroundColor(booking.status);
+    final statusLabel = _statusLabel(booking.status);
+    final statusIcon = _statusIcon(booking.status);
+    final safeHeight = height < 34 ? 34.0 : height;
+    final isCancelled = _normalizedStatus(booking.status) == 'cancelled';
+    return Positioned(
+      top: top + 3,
+      left: 5,
+      right: 8,
+      height: safeHeight - 6,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(8),
+          onTap: () => _showActions(booking),
+          child: Container(
+            decoration: BoxDecoration(
+              color: backgroundColor,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: statusColor.withOpacity(
+                  0.45,
+                ),
+                width: 1,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: statusColor.withOpacity(
+                    0.08,
+                  ),
+                  blurRadius: 3,
+                  offset: const Offset(0, 1),
+                ),
+              ],
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Container(
+                  width: 5,
+                  decoration: BoxDecoration(
+                    color: statusColor,
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(8),
+                      bottomLeft: Radius.circular(8),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 6,
+                    ),
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        final compact = constraints.maxHeight < 58;
+                        if (compact) {
+                          return Row(
+                            children: [
+                              Icon(
+                                statusIcon,
+                                size: 14,
+                                color: statusColor,
+                              ),
+                              const SizedBox(width: 5),
+                              Expanded(
+                                child: Text(
+                                  booking.customerName.isNotEmpty
+                                      ? booking.customerName
+                                      : 'Guest',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 13,
+                                    color: isCancelled ? statusColor : null,
+                                    decoration: isCancelled
+                                        ? TextDecoration.lineThrough
+                                        : null,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                _formatTime(
+                                  booking.start,
+                                ),
+                                maxLines: 1,
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: statusColor,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          );
+                        }
+                        return Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(
+                                  statusIcon,
+                                  size: 15,
+                                  color: statusColor,
+                                ),
+                                const SizedBox(width: 6),
+                                Expanded(
+                                  child: Text(
+                                    booking.customerName.isNotEmpty
+                                        ? booking.customerName
+                                        : 'Guest',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 14,
+                                      color: isCancelled ? statusColor : null,
+                                      decoration: isCancelled
+                                          ? TextDecoration.lineThrough
+                                          : null,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 6),
+                                Flexible(
+                                  child: Container(
+                                    constraints: const BoxConstraints(
+                                      maxWidth: 105,
+                                    ),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 7,
+                                      vertical: 3,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: statusColor.withOpacity(
+                                        0.14,
+                                      ),
+                                      borderRadius: BorderRadius.circular(
+                                        10,
+                                      ),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(
+                                          statusIcon,
+                                          size: 10,
+                                          color: statusColor,
+                                        ),
+                                        const SizedBox(
+                                          width: 3,
+                                        ),
+                                        Flexible(
+                                          child: Text(
+                                            statusLabel,
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: TextStyle(
+                                              fontSize: 9,
+                                              fontWeight: FontWeight.w700,
+                                              color: statusColor,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 4),
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.access_time,
+                                  size: 13,
+                                  color: Colors.grey.shade700,
+                                ),
+                                const SizedBox(width: 4),
+                                Expanded(
+                                  child: Text(
+                                    '${_formatTime(booking.start)} – '
+                                    '${_formatTime(end)}',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey.shade700,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCurrentTimeIndicator() {
+    if (!_isToday()) {
+      return const SizedBox.shrink();
+    }
+    final now = DateTime.now();
+    final minutes = now.hour * 60 + now.minute + now.second / 60;
+    final top = (minutes / 60) * _hourHeight;
+    return Positioned(
+      top: top,
+      left: 0,
+      right: 0,
+      child: IgnorePointer(
+        child: Row(
+          children: [
+            Container(
+              width: 7,
+              height: 7,
+              decoration: const BoxDecoration(
+                color: Colors.red,
+                shape: BoxShape.circle,
+              ),
+            ),
+            Expanded(
+              child: Container(
+                height: 1.5,
+                color: Colors.red,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCalendarBody() {
+    return Scrollbar(
+      controller: _scrollController,
+      thumbVisibility: true,
+      child: SingleChildScrollView(
+        controller: _scrollController,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildTimeColumn(),
+            Expanded(
+              child: _buildHourGrid(),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Calendar'),
+        title: const Text('Calendar'),
         actions: [
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8),
-            child: Row(
-              children: [
-                TextButton(
-                    onPressed: () {
-                      setState(() => _view = 'day');
-                      _loadEvents();
-                    },
-                    child: Text('Day',
-                        style: TextStyle(
-                            color: _view == 'day'
-                                ? Colors.white
-                                : Colors.white70))),
-                TextButton(
-                    onPressed: () {
-                      setState(() => _view = 'month');
-                      _loadEvents();
-                    },
-                    child: Text('Month',
-                        style: TextStyle(
-                            color: _view == 'month'
-                                ? Colors.white
-                                : Colors.white70))),
-                TextButton(
-                    onPressed: () {
-                      setState(() => _view = 'year');
-                      _loadEvents();
-                    },
-                    child: Text('Year',
-                        style: TextStyle(
-                            color: _view == 'year'
-                                ? Colors.white
-                                : Colors.white70))),
-              ],
+            padding: const EdgeInsets.only(
+              right: 12,
             ),
-          )
+            child: BusinessNameDisplay(),
+          ),
         ],
       ),
-      body: _loading
-          ? Center(child: CircularProgressIndicator())
-          : Column(
-              children: [
-                TableCalendar(
-                  focusedDay: _focused,
-                  firstDay: DateTime(2020),
-                  lastDay: DateTime(2035),
-                  selectedDayPredicate: (d) => isSameDay(_selected, d),
-                  onDaySelected: (s, f) {
-                    setState(() {
-                      _selected = s;
-                      _focused = f;
-                    });
-                    _loadEvents();
-                  },
-                  eventLoader: _getEventsForDay,
-                  calendarFormat: _view == 'day'
-                      ? CalendarFormat.week
-                      : CalendarFormat.month,
-                ),
-                Expanded(
-                  child: ListView(
-                    children: _getEventsForDay(_selected ?? _focused)
-                        .map((b) => ListTile(
-                              title: Text(b.customerName),
-                              subtitle: Text('${b.start}',
-                                  overflow: TextOverflow.ellipsis),
-                              trailing: Text(b.status),
-                              onTap: () => _showActions(b),
-                            ))
-                        .toList(),
-                  ),
-                )
-              ],
+      body: Column(
+        children: [
+          _buildHeader(),
+          Expanded(
+            child: _loading
+                ? const Center(
+                    child: CircularProgressIndicator(),
+                  )
+                : _buildCalendarBody(),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _MonthYearPicker extends StatefulWidget {
+  final DateTime initialDate;
+  final DateTime firstDate;
+  final DateTime lastDate;
+  const _MonthYearPicker({
+    Key? key,
+    required this.initialDate,
+    required this.firstDate,
+    required this.lastDate,
+  }) : super(key: key);
+  @override
+  State<_MonthYearPicker> createState() => _MonthYearPickerState();
+}
+
+class _MonthYearPickerState extends State<_MonthYearPicker> {
+  late int _month;
+  late int _year;
+  @override
+  void initState() {
+    super.initState();
+    _month = widget.initialDate.month;
+    _year = widget.initialDate.year;
+  }
+
+  String _monthName(int month) {
+    const months = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
+    ];
+    return months[month - 1];
+  }
+
+  bool _isAllowed(
+    int year,
+    int month,
+  ) {
+    final date = DateTime(
+      year,
+      month,
+    );
+    final first = DateTime(
+      widget.firstDate.year,
+      widget.firstDate.month,
+    );
+    final last = DateTime(
+      widget.lastDate.year,
+      widget.lastDate.month,
+    );
+    return !date.isBefore(first) && !date.isAfter(last);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return AlertDialog(
+      titlePadding: const EdgeInsets.fromLTRB(
+        20,
+        18,
+        12,
+        8,
+      ),
+      contentPadding: const EdgeInsets.fromLTRB(
+        20,
+        8,
+        20,
+        12,
+      ),
+      title: Row(
+        children: [
+          const Expanded(
+            child: Text(
+              'Select month',
             ),
+          ),
+          DropdownButton<int>(
+            value: _year,
+            isDense: true,
+            items: [
+              for (int year = widget.firstDate.year;
+                  year <= widget.lastDate.year;
+                  year++)
+                DropdownMenuItem(
+                  value: year,
+                  child: Text('$year'),
+                ),
+            ],
+            onChanged: (value) {
+              if (value == null) return;
+              setState(() {
+                _year = value;
+              });
+            },
+          ),
+        ],
+      ),
+      content: SizedBox(
+        width: 380,
+        child: GridView.builder(
+          shrinkWrap: true,
+          itemCount: 12,
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 3,
+            childAspectRatio: 2.2,
+            crossAxisSpacing: 8,
+            mainAxisSpacing: 8,
+          ),
+          itemBuilder: (context, index) {
+            final month = index + 1;
+            final selected = month == _month;
+            final enabled = _isAllowed(
+              _year,
+              month,
+            );
+            return InkWell(
+              borderRadius: BorderRadius.circular(8),
+              onTap: enabled
+                  ? () {
+                      setState(() {
+                        _month = month;
+                      });
+                    }
+                  : null,
+              child: Container(
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: selected
+                      ? theme.colorScheme.primary.withOpacity(0.12)
+                      : null,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: selected
+                        ? theme.colorScheme.primary
+                        : theme.dividerColor,
+                  ),
+                ),
+                child: Text(
+                  _monthName(month),
+                  style: TextStyle(
+                    fontWeight: selected ? FontWeight.w600 : FontWeight.normal,
+                    color: enabled ? null : Colors.grey,
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text(
+            'Cancel',
+          ),
+        ),
+        FilledButton(
+          onPressed: () {
+            Navigator.pop(
+              context,
+              DateTime(
+                _year,
+                _month,
+                1,
+              ),
+            );
+          },
+          child: const Text(
+            'Apply',
+          ),
+        ),
+      ],
     );
   }
 }
