@@ -303,97 +303,204 @@ class _CalendarPageState extends State<CalendarPage> {
   }
 
   Future<void> _showActions(
-    Booking booking,
-  ) async {
+      Booking booking,
+      ) async {
     final api = Provider.of<ApiService>(
       context,
       listen: false,
     );
+
+    String formatDateTime(DateTime dateTime) {
+      final day = dateTime.day.toString().padLeft(2, '0');
+      final month = dateTime.month.toString().padLeft(2, '0');
+      final year = dateTime.year.toString();
+
+      final hour = dateTime.hour.toString().padLeft(2, '0');
+      final minute = dateTime.minute.toString().padLeft(2, '0');
+
+      return '$day.$month.$year  $hour:$minute';
+    }
+
     final action = await showModalBottomSheet<String>(
       context: context,
       showDragHandle: true,
-      builder: (context) {
+      isScrollControlled: true,
+      // backgroundColor: Colors.transparent,
+      builder: (sheetContext) {
+        final theme = Theme.of(sheetContext);
+        final colorScheme = theme.colorScheme;
+
         return SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 16.0, vertical: 12.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Booking #${booking.id}',
-                        style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 6),
-                    Row(children: [
-                      const Icon(Icons.person, size: 18),
-                      const SizedBox(width: 8),
-                      Expanded(
-                          child: Text(booking.customerName.isNotEmpty
+          child: Container(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(sheetContext).size.height * 0.85,
+            ),
+            decoration: BoxDecoration(
+              color: theme.scaffoldBackgroundColor,
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(24),
+              ),
+            ),
+            child: SingleChildScrollView(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(sheetContext).viewInsets.bottom,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(
+                      20,
+                      4,
+                      20,
+                      12,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              width: 42,
+                              height: 42,
+                              decoration: BoxDecoration(
+                                color: colorScheme.primary.withOpacity(0.10),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Icon(
+                                Icons.calendar_month_rounded,
+                                color: colorScheme.primary,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment:
+                                CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Booking details',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: theme.textTheme.titleLarge?.copyWith(
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    'Booking #${booking.id}',
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: theme.textTheme.bodySmall?.copyWith(
+                                      color: theme
+                                          .textTheme
+                                          .bodySmall
+                                          ?.color
+                                          ?.withOpacity(0.65),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 18),
+
+                        _bookingDetailRow(
+                          context: sheetContext,
+                          icon: Icons.person_rounded,
+                          label: 'Customer',
+                          value: booking.customerName.isNotEmpty
                               ? booking.customerName
-                              : 'Guest'))
-                    ]),
-                    const SizedBox(height: 6),
-                    Row(children: [
-                      const Icon(Icons.event, size: 18),
-                      const SizedBox(width: 8),
-                      Text('${booking.start} - ${booking.end}')
-                    ]),
-                    const SizedBox(height: 6),
-                    Row(children: [
-                      const Icon(Icons.room_service, size: 18),
-                      const SizedBox(width: 8),
-                      Text(booking.serviceName)
-                    ]),
-                    const SizedBox(height: 8),
-                    Divider(),
-                  ],
-                ),
+                              : 'Guest',
+                        ),
+
+                        const SizedBox(height: 12),
+
+                        _bookingDetailRow(
+                          context: sheetContext,
+                          icon: Icons.access_time_rounded,
+                          label: 'Date & time',
+                          value:
+                          '${formatDateTime(booking.start)}\n'
+                              '${formatDateTime(booking.end)}',
+                        ),
+
+                        const SizedBox(height: 12),
+
+                        _bookingDetailRow(
+                          context: sheetContext,
+                          icon: Icons.room_service_rounded,
+                          label: 'Service',
+                          value: booking.serviceName.isNotEmpty
+                              ? booking.serviceName
+                              : 'Service',
+                        ),
+
+                        const SizedBox(height: 16),
+
+                        Divider(
+                          height: 1,
+                          color: theme.dividerColor,
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  _bookingActionTile(
+                    context: sheetContext,
+                    icon: Icons.check_circle_rounded,
+                    title: 'Approve',
+                    subtitle: 'Accept this booking',
+                    color: Colors.green,
+                    onTap: () {
+                      Navigator.pop(
+                        sheetContext,
+                        'approve',
+                      );
+                    },
+                  ),
+
+                  _bookingActionTile(
+                    context: sheetContext,
+                    icon: Icons.cancel_rounded,
+                    title: 'Cancel',
+                    subtitle: 'Cancel this booking',
+                    color: Colors.red,
+                    onTap: () {
+                      Navigator.pop(
+                        sheetContext,
+                        'cancel',
+                      );
+                    },
+                  ),
+
+                  _bookingActionTile(
+                    context: sheetContext,
+                    icon: Icons.schedule_rounded,
+                    title: 'Reschedule',
+                    subtitle: 'Change booking date and time',
+                    color: Colors.orange,
+                    onTap: () {
+                      Navigator.pop(
+                        sheetContext,
+                        'reschedule',
+                      );
+                    },
+                  ),
+
+                  const SizedBox(height: 8),
+                ],
               ),
-              ListTile(
-                leading: const Icon(
-                  Icons.check_circle_outline,
-                ),
-                title: const Text('Approve'),
-                onTap: () {
-                  Navigator.pop(
-                    context,
-                    'approve',
-                  );
-                },
-              ),
-              ListTile(
-                leading: const Icon(
-                  Icons.cancel_outlined,
-                ),
-                title: const Text('Cancel'),
-                onTap: () {
-                  Navigator.pop(
-                    context,
-                    'cancel',
-                  );
-                },
-              ),
-              ListTile(
-                leading: const Icon(
-                  Icons.schedule,
-                ),
-                title: const Text('Reschedule'),
-                onTap: () {
-                  Navigator.pop(
-                    context,
-                    'reschedule',
-                  );
-                },
-              ),
-            ],
+            ),
           ),
         );
       },
     );
-    if (action == null) return;
+
+    if (action == null || !mounted) return;
+
     try {
       if (action == 'approve') {
         await api.approveBooking(
@@ -406,31 +513,179 @@ class _CalendarPageState extends State<CalendarPage> {
       } else if (action == 'reschedule') {
         final dt = await showDatePicker(
           context: context,
-          initialDate: booking.start,
+          initialDate: booking.start.isBefore(DateTime.now())
+              ? DateTime.now()
+              : booking.start,
           firstDate: DateTime.now(),
           lastDate: DateTime.now().add(
             const Duration(days: 365),
           ),
         );
-        if (dt != null) {
+
+        if (dt != null && mounted) {
           await api.rescheduleBooking(
             booking.id,
             dt,
           );
         }
       }
-      await _loadEvents();
+
+      if (mounted) {
+        await _loadEvents();
+      }
     } catch (e) {
       if (!mounted) return;
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
+          behavior: SnackBarBehavior.floating,
           content: Text(
             'Action failed: $e',
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
           ),
         ),
       );
     }
   }
+
+  Widget _bookingDetailRow({
+    required BuildContext context,
+    required IconData icon,
+    required String label,
+    required String value,
+  }) {
+    final theme = Theme.of(context);
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 36,
+          height: 36,
+          decoration: BoxDecoration(
+            color: theme.colorScheme.primary.withOpacity(0.08),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Icon(
+            icon,
+            size: 19,
+            color: theme.colorScheme.primary,
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.textTheme.bodySmall?.color?.withOpacity(0.60),
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(height: 3),
+              Text(
+                value,
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  height: 1.35,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _bookingActionTile({
+    required BuildContext context,
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    final theme = Theme.of(context);
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 12,
+        vertical: 3,
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 8,
+              vertical: 9,
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: color.withOpacity(0.10),
+                    borderRadius: BorderRadius.circular(13),
+                  ),
+                  child: Icon(
+                    icon,
+                    color: color,
+                    size: 23,
+                  ),
+                ),
+                const SizedBox(width: 13),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.bodyLarge?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        subtitle,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme
+                              .textTheme
+                              .bodySmall
+                              ?.color
+                              ?.withOpacity(0.60),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Icon(
+                  Icons.chevron_right_rounded,
+                  color: theme.iconTheme.color?.withOpacity(0.45),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
 
   Widget _buildHeader() {
     final theme = Theme.of(context);
