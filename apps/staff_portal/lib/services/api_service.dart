@@ -159,13 +159,17 @@ class ApiService {
     return res.statusCode == 200 || res.statusCode == 204;
   }
 
-  Future<bool> rescheduleBooking(String id, DateTime at) async {
+  Future<bool> rescheduleBooking(String id, DateTime bookingDate, String bookingTime, {String? reason}) async {
     final t = await _token();
     final url = Uri.parse('$baseUrl/api/bookings/$id/reschedule');
     final headers = <String, String>{'Content-Type': 'application/json'};
     if (t != null) headers['Authorization'] = 'Bearer $t';
-    final res = await http.patch(url,
-        headers: headers, body: jsonEncode({'datetime': at.toIso8601String()}));
+    final body = {
+      'bookingDate': bookingDate.toIso8601String().split('T')[0],
+      'bookingTime': bookingTime,
+      if (reason != null) 'reason': reason,
+    };
+    final res = await http.patch(url, headers: headers, body: jsonEncode(body));
     return res.statusCode == 200 || res.statusCode == 204;
   }
 

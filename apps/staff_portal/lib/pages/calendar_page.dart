@@ -523,10 +523,20 @@ class _CalendarPageState extends State<CalendarPage> {
         );
 
         if (dt != null && mounted) {
-          await api.rescheduleBooking(
-            booking.id,
-            dt,
+          final initialTime = TimeOfDay.fromDateTime(booking.start);
+          final pickedTime = await showTimePicker(
+            context: context,
+            initialTime: initialTime,
           );
+
+          if (pickedTime != null && mounted) {
+            final bookingTime = '${pickedTime.hour.toString().padLeft(2, '0')}:${pickedTime.minute.toString().padLeft(2, '0')}';
+            await api.rescheduleBooking(
+              booking.id,
+              dt,
+              bookingTime,
+            );
+          }
         }
       }
 
